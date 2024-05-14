@@ -13,7 +13,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun LargeButton(
+fun MainButton(
     modifier: Modifier = Modifier,
     onClickAction: () -> Unit = { },
     text: String,
