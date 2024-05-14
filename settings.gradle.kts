@@ -10,6 +10,7 @@ pluginManagement {
                 includeGroupAndSubgroups("com.google")
             }
         }
+        maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
         mavenCentral()
         gradlePluginPortal()
     }
@@ -17,6 +18,9 @@ pluginManagement {
 
 dependencyResolutionManagement {
     repositories {
+        maven("https://jitpack.io")
+        maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+        maven("https://s01.oss.sonatype.org/content/repositories/snapshots/")
         google {
             mavenContent {
                 includeGroupAndSubgroups("androidx")

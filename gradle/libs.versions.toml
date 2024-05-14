@@ -1,19 +1,35 @@
 [versions]
-agp = "8.2.0"
+agp = "8.2.2"
 android-compileSdk = "34"
 android-minSdk = "24"
 android-targetSdk = "34"
 androidx-activityCompose = "1.9.0"
 androidx-appcompat = "1.6.1"
 androidx-constraintlayout = "2.1.4"
-androidx-core-ktx = "1.13.0"
+androidx-core-ktx = "1.13.1"
 androidx-espresso-core = "3.5.1"
-androidx-material = "1.11.0"
+androidx-material = "1.12.0"
 androidx-test-junit = "1.1.5"
-compose = "1.6.6"
+compose = "1.6.7"
 compose-plugin = "1.6.2"
 junit = "4.13.2"
 kotlin = "1.9.23"
+coroutinesVersion = "1.8.0"
+dateTimeVersion = "0.4.1"
+koin = "3.5.3"
+ktor = "2.3.7"
+resourcesGenerator = "0.24.0-beta-2"
+sqlDelight = "2.0.2"
+lifecycleViewmodelCompose = "2.7.0"
+material3 = "1.2.1"
+elmslie = "3.0.0-alpha10"
+koin-bom = "x.x.x"
+libres = "1.2.2"
+moko = "0.8.0"
+decompose = "3.0.0"
+voyager = "1.0.0"
+kotlinxCoroutinesSwing = "1.7.3"
+kstore = "Release 0.8.0"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -28,9 +44,66 @@ androidx-constraintlayout = { group = "androidx.constraintlayout", name = "const
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activityCompose" }
 compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "compose" }
 compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "compose" }
+androidx-lifecycle-viewmodel-compose = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-compose", version.ref = "lifecycleViewmodelCompose" }
+androidx-compose-material3 = { module = "androidx.compose.material3:material3", version.ref = "material3" }
+kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutinesVersion" }
+kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "dateTimeVersion" }
+
+kotlinx-coroutines-swing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version.ref = "kotlinxCoroutinesSwing" }
+
+# koin
+koin-androidx-compose = { module = "io.insert-koin:koin-androidx-compose", version.ref = "koin" }
+koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
+koin-ktor = { module = "io.insert-koin:koin-ktor", version.ref = "koin" }
+koin-logger = { module = "io.insert-koin:koin-logger-slf4j", version.ref = "koin" }
+
+# ktor
+ktor-client-android = { module = "io.ktor:ktor-client-android", version.ref = "ktor" }
+ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
+ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
+ktor-client-darwin = { module = "io.ktor:ktor-client-darwin", version.ref = "ktor" }
+ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
+
+# sqldelight
+android-driver = { module = "app.cash.sqldelight:android-driver", version.ref = "sqlDelight" }
+native-driver = { module = "app.cash.sqldelight:native-driver", version.ref = "sqlDelight" }
+resources = { module = "dev.icerock.moko:resources", version.ref = "resourcesGenerator" }
+resources-generator = { module = "dev.icerock.moko:resources-generator", version.ref = "resourcesGenerator" }
+runtime = { module = "app.cash.sqldelight:runtime", version.ref = "sqlDelight" }
+
+# elmslie
+elmslie-core = { module = "com.github.vivid-money.elmslie:elmslie-core", version.ref = "elmslie" }
+elmslie-android = { module = "com.github.vivid-money.elmslie:elmslie-android", version.ref = "elmslie" }
+elmslie-compose = { module = "com.github.vivid-money.elmslie:elmslie-compose", version.ref = "elmslie" }
+
+# moko permissions
+moko-main = { module = "dev.icerock.moko:permissions", version.ref = "moko" }
+moko-compose = { module = "dev.icerock.moko:permissions-compose", version.ref = "moko" }
+
+# decompose
+decompose = { module = "com.arkivanov.decompose:decompose", version.ref = "decompose" }
+
+# voyager
+voyager-navigator = { module = "cafe.adriel.voyager:voyager-navigator", version.ref = "voyager" }
+voyager-bottomSheetNavigator = { module = "cafe.adriel.voyager:voyager-bottom-sheet-navigator", version.ref = "voyager" }
+voyager-screenmodel = { module = "cafe.adriel.voyager:voyager-screenmodel", version.ref = "voyager" }
+voyager-tabNavigator = { module = "cafe.adriel.voyager:voyager-tab-navigator", version.ref = "voyager" }
+voyager-transitions = { module = "cafe.adriel.voyager:voyager-transitions", version.ref = "voyager" }
+
+# kstore
+kstore = { module = "io.github.xxfast:kstore", version.ref = "kstore" }
+# for android, iOS, desktop and nodeJs
+kstore-file = { module = "io.github.xxfast:kstore-file", version.ref = "kstore" }
+
+# libres
+libres-compose = { module = "io.github.skeptick.libres:libres-compose", version.ref = "libres" }
+
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
 androidLibrary = { id = "com.android.library", version.ref = "agp" }
 jetbrainsCompose = { id = "org.jetbrains.compose", version.ref = "compose-plugin" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+kotlinxSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+sqldelight = { id = "app.cash.sqldelight", version.ref = "sqlDelight" }
+libres = { id = "io.github.skeptick.libres", version.ref = "libres" }

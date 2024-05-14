@@ -1,9 +1,20 @@
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidLibrary)
+    alias(libs.plugins.kotlinxSerialization)
+    alias(libs.plugins.sqldelight)
+    id("dev.icerock.mobile.multiplatform-resources")
 }
 
 kotlin {
+    sqldelight {
+        databases {
+            create("TaskDatabase") {
+                packageName.set("ru.kpfu.itis.features.task")
+            }
+        }
+    }
+
     androidTarget {
         compilations.all {
             kotlinOptions {
@@ -22,12 +33,29 @@ kotlin {
         iosTarget.binaries.framework {
             baseName = "Shared"
             isStatic = true
+            export("dev.icerock.moko:resources:0.24.0-beta-2")
+            export("dev.icerock.moko:graphics:0.9.0")
         }
     }
 
     sourceSets {
+        androidMain.dependencies {
+            implementation(libs.ktor.client.android)
+            implementation(libs.android.driver)
+        }
+        iosMain.dependencies {
+            implementation(libs.ktor.client.darwin)
+            implementation(libs.native.driver)
+        }
         commonMain.dependencies {
-            // put your Multiplatform dependencies here
+            api(libs.resources)
+            implementation(libs.kotlinx.coroutines.core)
+            implementation(libs.ktor.client.core)
+            implementation(libs.ktor.client.content.negotiation)
+            implementation(libs.ktor.serialization.kotlinx.json)
+            implementation(libs.runtime)
+            implementation(libs.kotlinx.datetime)
+            implementation(libs.koin.core)
         }
     }
 }
@@ -42,4 +70,8 @@ android {
     defaultConfig {
         minSdk = libs.versions.android.minSdk.get().toInt()
     }
+}
+
+multiplatformResources {
+    resourcesPackage = "ru.kpfu.itis.shared"
 }

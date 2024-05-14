@@ -1,0 +1,24 @@
+import kotlin.Boolean;
+
+CREATE TABLE Task (
+    id INTEGER NOT NULL PRIMARY KEY,
+    name TEXT NOT NULL,
+    description TEXT,
+    userId INTEGER NOT NULL,
+    isCompleted INTEGER AS Boolean DEFAULT 0 NOT NULL,
+    lastModifiedTime TEXT,
+    deadlineTime TEXT,
+    completedTime TEXT,
+    completedOnTime INTEGER AS Boolean DEFAULT 0 NOT NULL
+);
+
+insertTask:
+INSERT INTO Task(id, name, description, userId, isCompleted, lastModifiedTime, deadlineTime, completedTime, completedOnTime)
+VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+removeAllTasks:
+DELETE FROM Task;
+
+selectAllTasks:
+SELECT Task.*
+FROM Task;
