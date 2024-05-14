@@ -21,7 +21,7 @@ fun MainTextField(
     onValueChange: (String) -> Unit,
     label: String,
     text: String,
-    modifier: Modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+    modifier: Modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp),
     isPassword: Boolean = false,
     errorText: String? = null,
     icon: Icon? = null,
@@ -45,12 +45,10 @@ fun MainTextField(
         label = { Text(label) },
         supportingText = {
             Row {
-                errorText?.let {
-                    Text(
-                        text = errorText,
-                        Modifier.weight(1f)
-                    )
-                }
+                Text(
+                    text = errorText ?: "",
+                    Modifier.weight(1f)
+                )
                 characterMaxCount?.let {
                     Text(
                         text = "${text.length} / $characterMaxCount",

@@ -19,7 +19,7 @@ fun MainButton(
     text: String,
     textStyle: TextStyle = MaterialTheme.typography.titleMedium,
     innerPadding: PaddingValues = PaddingValues(vertical = 8.dp),
-    outerPadding: PaddingValues = PaddingValues(horizontal = 16.dp),
+    outerPadding: PaddingValues = PaddingValues(horizontal = 20.dp),
     isMainButton: Boolean = true
 ) {
     if (isMainButton) {
