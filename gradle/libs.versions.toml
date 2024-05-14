@@ -30,6 +30,8 @@ decompose = "3.0.0"
 voyager = "1.0.0"
 kotlinxCoroutinesSwing = "1.7.3"
 kstore = "Release 0.8.0"
+material3Android = "1.2.1"
+uiTextGoogleFonts = "1.6.7"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -97,6 +99,8 @@ kstore-file = { module = "io.github.xxfast:kstore-file", version.ref = "kstore" 
 
 # libres
 libres-compose = { module = "io.github.skeptick.libres:libres-compose", version.ref = "libres" }
+androidx-material3-android = { group = "androidx.compose.material3", name = "material3-android", version.ref = "material3Android" }
+androidx-ui-text-google-fonts = { group = "androidx.compose.ui", name = "ui-text-google-fonts", version.ref = "uiTextGoogleFonts" }
 
 
 [plugins]
