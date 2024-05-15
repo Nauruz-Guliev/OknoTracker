@@ -23,6 +23,9 @@ kotlin {
         androidMain.dependencies {
             implementation(libs.compose.ui.tooling.preview)
             implementation(libs.androidx.activity.compose)
+
+            implementation(libs.koin.core)
+            implementation(libs.koin.androidx.compose)
         }
         commonMain.dependencies {
             implementation(libs.compose.ui.tooling.preview)
@@ -42,8 +45,19 @@ kotlin {
             implementation(libs.voyager.bottomSheetNavigator)
             implementation(libs.voyager.tabNavigator)
 
+            // flowmvi
+            implementation(libs.flowmvi.compose)
+            implementation(libs.flowmvi.core)
+            implementation(libs.flowmvi.savedstate)
+
             // coil
             implementation(libs.landscapist.coil3)
+
+            // koin
+            implementation(libs.koin.core)
+            implementation(libs.koin.ktor)
+            implementation(libs.koin.logger)
+            implementation(libs.koin.compose)
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)

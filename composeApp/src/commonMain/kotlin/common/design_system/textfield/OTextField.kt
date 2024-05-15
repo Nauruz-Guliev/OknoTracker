@@ -17,7 +17,7 @@ import androidx.compose.ui.unit.dp
 import javax.swing.Icon
 
 @Composable
-fun MainTextField(
+fun OTextField(
     onValueChange: (String) -> Unit,
     label: String,
     text: String,

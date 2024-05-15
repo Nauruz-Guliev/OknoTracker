@@ -19,7 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun TaskCard(
+fun OTaskCard(
     onCheckedAction: (Boolean) -> Unit = { },
     labels: List<String> = listOf(),
     title: String

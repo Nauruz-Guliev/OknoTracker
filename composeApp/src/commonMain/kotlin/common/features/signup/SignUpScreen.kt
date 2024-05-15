@@ -1,4 +1,4 @@
-package common.features.signup.presentation
+package common.features.signup
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,9 +19,9 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.coil3.CoilImage
-import common.design_system.button.MainButton
-import common.design_system.textfield.MainTextField
-import common.features.signin.presentation.SignInScreen
+import common.design_system.button.OButton
+import common.design_system.textfield.OTextField
+import common.features.signin.SignInScreen
 
 
 class SignUpScreen : Screen {
@@ -54,7 +54,7 @@ class SignUpScreen : Screen {
                     modifier = Modifier.height(16.dp)
                 )
 
-                MainTextField(
+                OTextField(
                     onValueChange = { email = it },
                     label = "Login",
                     text = email,
@@ -65,7 +65,7 @@ class SignUpScreen : Screen {
                     modifier = Modifier.height(16.dp)
                 )
 
-                MainTextField(
+                OTextField(
                     onValueChange = { password = it },
                     label = "Password",
                     text = password,
@@ -76,14 +76,14 @@ class SignUpScreen : Screen {
                     modifier = Modifier.height(16.dp)
                 )
 
-                MainButton(
+                OButton(
                     text = "Register",
                 )
 
                 Spacer(
                     modifier = Modifier.height(8.dp)
                 )
-                MainButton(
+                OButton(
                     text = "Login",
                     isMainButton = false,
                     onClickAction = {

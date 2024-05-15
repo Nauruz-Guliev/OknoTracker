@@ -10,11 +10,11 @@ import io.ktor.client.request.setBody
 import io.ktor.client.request.url
 import ru.kpfu.itis.features.user.data.model.UserAuthRequest
 import ru.kpfu.itis.features.user.data.model.UserChangeRequest
-import ru.kpfu.itis.features.user.data.model.UserDto
+import ru.kpfu.itis.features.user.data.model.UserCreateRequest
 import ru.kpfu.itis.features.user.data.model.UserResponse
 import ru.kpfu.itis.shared.MR
 
-internal class UserService(
+class UserService(
     private val httpClient: HttpClient
 ) {
 
@@ -25,7 +25,7 @@ internal class UserService(
         }.body()
     }
 
-    internal suspend fun createUser(user: UserDto): UserResponse {
+    internal suspend fun createUser(user: UserCreateRequest): UserResponse {
         return httpClient.post {
             url("${MR.strings.url}/user/")
             setBody(user)

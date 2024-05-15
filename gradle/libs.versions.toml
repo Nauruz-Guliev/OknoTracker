@@ -1,5 +1,5 @@
 [versions]
-agp = "8.2.2"
+agp = "8.4.0"
 android-compileSdk = "34"
 android-minSdk = "24"
 android-targetSdk = "34"
@@ -19,14 +19,13 @@ kotlin = "1.9.23"
 coroutinesVersion = "1.8.0"
 dateTimeVersion = "0.5.0"
 koin = "3.5.3"
-ktor = "2.3.7"
-ktorClientOkhttp = "1.0.0"
+ktor = "2.3.10"
+ktorClientOkhttp = "2.3.10"
 landscapistCoil3 = "2.3.3"
 resourcesGenerator = "0.24.0-beta-2"
 sqlDelight = "2.0.2"
-lifecycleViewmodelCompose = "2.7.0"
+lifecycleViewmodelCompose = "2.8.0"
 material3 = "1.2.1"
-elmslie = "3.0.0-alpha10"
 libres = "1.2.2"
 moko = "0.8.0"
 decompose = "3.0.0"
@@ -35,6 +34,8 @@ kotlinxCoroutinesSwing = "1.8.0"
 kstore = "Release 0.8.0"
 material3Android = "1.2.1"
 uiTextGoogleFonts = "1.6.7"
+flowmvi = "2.4.1"
+
 
 [libraries]
 coil-network-ktor = { module = "io.coil-kt.coil3:coil-network-ktor", version.ref = "coil" }
@@ -63,6 +64,7 @@ koin-androidx-compose = { module = "io.insert-koin:koin-androidx-compose", versi
 koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
 koin-ktor = { module = "io.insert-koin:koin-ktor", version.ref = "koin" }
 koin-logger = { module = "io.insert-koin:koin-logger-slf4j", version.ref = "koin" }
+koin-compose = { module = "io.insert-koin:koin-compose", version = "3.6.0-wasm-alpha2" }
 
 # ktor
 ktor-client-android = { module = "io.ktor:ktor-client-android", version.ref = "ktor" }
@@ -80,17 +82,14 @@ resources = { module = "dev.icerock.moko:resources", version.ref = "resourcesGen
 resources-generator = { module = "dev.icerock.moko:resources-generator", version.ref = "resourcesGenerator" }
 runtime = { module = "app.cash.sqldelight:runtime", version.ref = "sqlDelight" }
 
-# elmslie
-elmslie-core = { module = "com.github.vivid-money.elmslie:elmslie-core", version.ref = "elmslie" }
-elmslie-android = { module = "com.github.vivid-money.elmslie:elmslie-android", version.ref = "elmslie" }
-elmslie-compose = { module = "com.github.vivid-money.elmslie:elmslie-compose", version.ref = "elmslie" }
+# flowmvi
+flowmvi-compose = { module = "pro.respawn.flowmvi:compose", version.ref = "flowmvi" }
+flowmvi-core = { module = "pro.respawn.flowmvi:core", version.ref = "flowmvi" }
+flowmvi-savedstate = { module = "pro.respawn.flowmvi:savedstate", version.ref = "flowmvi" }
 
 # moko permissions
 moko-main = { module = "dev.icerock.moko:permissions", version.ref = "moko" }
 moko-compose = { module = "dev.icerock.moko:permissions-compose", version.ref = "moko" }
-
-# decompose
-decompose = { module = "com.arkivanov.decompose:decompose", version.ref = "decompose" }
 
 # voyager
 voyager-navigator = { module = "cafe.adriel.voyager:voyager-navigator", version.ref = "voyager" }
@@ -109,7 +108,6 @@ kstore-file = { module = "io.github.xxfast:kstore-file", version.ref = "kstore" 
 libres-compose = { module = "io.github.skeptick.libres:libres-compose", version.ref = "libres" }
 androidx-material3-android = { group = "androidx.compose.material3", name = "material3-android", version.ref = "material3Android" }
 androidx-ui-text-google-fonts = { group = "androidx.compose.ui", name = "ui-text-google-fonts", version.ref = "uiTextGoogleFonts" }
-
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

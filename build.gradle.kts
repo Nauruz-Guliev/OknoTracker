@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
     // this is necessary to avoid the plugins to be loaded multiple times
     // in each subproject's classloader
@@ -11,5 +13,17 @@ plugins {
 buildscript {
     dependencies {
         classpath(libs.resources.generator)
+    }
+}
+
+allprojects {
+    tasks.withType<KotlinCompile>().configureEach {
+        compilerOptions {
+            freeCompilerArgs.addAll(
+                "-P",
+                "plugin:androidx.compose.compiler.plugins.kotlin:stabilityConfigurationPath=" +
+                        "${rootProject.rootDir.absolutePath}/stability_definitions.txt"
+            )
+        }
     }
 }

@@ -20,17 +20,6 @@ class TaskService(
     private val httpClient: HttpClient
 ) {
 
-    /*
-    HttpClient {
-    install(ContentNegotiation) {
-        json(Json {
-            ignoreUnknownKeys = true
-            useAlternativeNames = false
-        })
-    }
-}
-     */
-
     suspend fun getTask(taskId: String): TaskResponseSingle {
         return httpClient.get(
             "${MR.strings.url}/task/$taskId"

@@ -13,7 +13,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun MainButton(
+fun OButton(
     modifier: Modifier = Modifier,
     onClickAction: () -> Unit = { },
     text: String,
