@@ -1,5 +1,6 @@
 package ru.kpfu.itis.features.task.data.service
 
+import dev.icerock.moko.resources.StringResource
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.delete
@@ -9,52 +10,55 @@ import io.ktor.client.request.put
 import io.ktor.client.request.setBody
 import io.ktor.client.request.url
 import io.ktor.http.parameters
+import ru.kpfu.itis.extensions.getString
 import ru.kpfu.itis.features.task.data.model.TaskChangeRequest
 import ru.kpfu.itis.features.task.data.model.TaskCreateRequest
 import ru.kpfu.itis.features.task.data.model.TaskResponseList
 import ru.kpfu.itis.features.task.data.model.TaskResponseSingle
 import ru.kpfu.itis.features.task.data.model.TaskStatisticResponse
 import ru.kpfu.itis.shared.MR
+import ru.kpfu.itis.utils.Strings
 
 class TaskService(
-    private val httpClient: HttpClient
+    private val httpClient: HttpClient,
+    private val strings: Strings
 ) {
 
     suspend fun getTask(taskId: String): TaskResponseSingle {
         return httpClient.get(
-            "${MR.strings.url}/task/$taskId"
+            "${(MR.strings.url.get())}/task/$taskId"
         ).body()
     }
 
     suspend fun createTask(task: TaskCreateRequest): TaskResponseSingle {
         return httpClient.post {
-            url("${MR.strings.url}/task/")
+            url("${(MR.strings.url.get())}/task/")
             setBody(task)
         }.body()
     }
 
     suspend fun changeTask(task: TaskChangeRequest): TaskResponseSingle {
         return httpClient.put {
-            url("${MR.strings.url}/task/")
+            url("${(MR.strings.url.get())}/task/")
             setBody(task)
         }.body()
     }
 
     suspend fun deleteTask(taskId: Long): TaskResponseSingle {
         return httpClient.delete {
-            url("${MR.strings.url}/task/$taskId")
+            url("${(MR.strings.url.get())}/task/$taskId")
         }.body()
     }
 
     suspend fun markTaskCompleted(taskId: Long): TaskResponseSingle {
         return httpClient.put {
-            url("${MR.strings.url}/task/mark_as_completed/$taskId")
+            url("${(MR.strings.url.get())}/task/mark_as_completed/$taskId")
         }.body()
     }
 
     suspend fun markTaskUncompleted(taskId: Long): TaskResponseSingle {
         return httpClient.put {
-            url("${MR.strings.url}/task/mark_as_uncompleted/$taskId")
+            url("${(MR.strings.url.get())}/task/mark_as_uncompleted/$taskId")
         }.body()
     }
 
@@ -64,7 +68,7 @@ class TaskService(
         page: Long = 0,
     ): List<TaskResponseList> {
         return httpClient.get {
-            url("${MR.strings.url}/task/uncompleted_list/order_by_deadline/$userId")
+            url("${(MR.strings.url.get())}/task/uncompleted_list/order_by_deadline/$userId")
             parameters {
                 append("page", "$page")
                 append("pageSize", "$pageSize")
@@ -78,7 +82,7 @@ class TaskService(
         endDay: String,
     ): TaskStatisticResponse {
         return httpClient.get {
-            url("${MR.strings.url}/task/statistics")
+            url("${(MR.strings.url.get())}/task/statistics")
             parameters {
                 append("user-id", "$userId")
                 append("startDay", startDay)
@@ -93,11 +97,15 @@ class TaskService(
         page: Long = 0,
     ): TaskResponseList {
         return httpClient.get {
-            url("${MR.strings.url}/task/completed_list/order_by_completed_desc/$userId")
+            url("${MR.strings.url.get()}/task/completed_list/order_by_completed_desc/$userId")
             parameters {
                 append("page", "$page")
                 append("pageSize", "$pageSize")
             }
         }.body()
+    }
+
+    fun StringResource.get(): String {
+        return strings.getString(this)
     }
 }

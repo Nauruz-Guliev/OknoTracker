@@ -78,9 +78,12 @@ ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx
 android-driver = { module = "app.cash.sqldelight:android-driver", version.ref = "sqlDelight" }
 landscapist-coil3 = { module = "com.github.skydoves:landscapist-coil3", version.ref = "landscapistCoil3" }
 native-driver = { module = "app.cash.sqldelight:native-driver", version.ref = "sqlDelight" }
+runtime = { module = "app.cash.sqldelight:runtime", version.ref = "sqlDelight" }
+
+# moko
 resources = { module = "dev.icerock.moko:resources", version.ref = "resourcesGenerator" }
 resources-generator = { module = "dev.icerock.moko:resources-generator", version.ref = "resourcesGenerator" }
-runtime = { module = "app.cash.sqldelight:runtime", version.ref = "sqlDelight" }
+resources-compose = { module = "dev.icerock.moko:resources-compose", version.ref = "resourcesGenerator" }
 
 # flowmvi
 flowmvi-compose = { module = "pro.respawn.flowmvi:compose", version.ref = "flowmvi" }

@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsCompose)
+    id("dev.icerock.mobile.multiplatform-resources")
 }
 
 kotlin {
@@ -58,6 +59,10 @@ kotlin {
             implementation(libs.koin.ktor)
             implementation(libs.koin.logger)
             implementation(libs.koin.compose)
+
+            // resources
+            api(libs.resources)
+            api(libs.resources.compose)
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
@@ -113,4 +118,8 @@ compose.desktop {
             packageVersion = "1.0.0"
         }
     }
+}
+
+multiplatformResources {
+    resourcesPackage = "ru.kpfu.itis"
 }

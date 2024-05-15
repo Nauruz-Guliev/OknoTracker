@@ -1,10 +1,10 @@
 package ru.kpfu.itis
 
-
 import android.app.Application
-import common.features.di.signInModule
+import features.di.signInModule
 import initKoin
 import org.koin.android.ext.koin.androidContext
+import ru.kpfu.itis.di.androidModule
 import ru.kpfu.itis.di.networkModule
 
 class Application : Application() {
@@ -13,7 +13,8 @@ class Application : Application() {
         super.onCreate()
         initKoin(
             signInModule(),
-            networkModule()
+            networkModule(),
+            androidModule(),
         ) {
             androidContext(this@Application)
         }
