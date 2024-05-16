@@ -12,8 +12,8 @@ class TaskRepository(
     private val taskMapper: TaskMapper,
 ) {
 
-    suspend fun getTask(taskId: String) {
-        handleTask(taskService.getTask(taskId))
+    suspend fun getTask(taskId: Long): TaskModel {
+        return handleTask(taskService.getTask(taskId))
     }
 
     suspend fun createTask(taskModel: TaskModel) {

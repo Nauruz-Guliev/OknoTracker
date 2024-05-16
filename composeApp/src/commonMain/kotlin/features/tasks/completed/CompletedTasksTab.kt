@@ -1,4 +1,4 @@
-package features.tasks
+package features.tasks.completed
 
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -11,7 +11,7 @@ import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
 import design_system.card.OTaskCard
 
-object ClosedTasksTab : Tab {
+object CompletedTasksTab : Tab {
 
     override val options: TabOptions
         @Composable

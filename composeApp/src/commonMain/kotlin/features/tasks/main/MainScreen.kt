@@ -1,4 +1,4 @@
-package features.tasks
+package features.tasks.main
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Home
@@ -24,12 +23,16 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -45,26 +48,33 @@ import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabNavigator
 import features.settings.SettingsTab
 import features.statistics.StatisticsTab
+import features.tasks.completed.CompletedTasksTab
+import features.tasks.create.TaskBottomSheet
+import org.koin.compose.koinInject
 
 class MainScreen : Screen {
 
-    @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
+    @OptIn(ExperimentalMaterial3Api::class)
     @Composable
-    override fun Content() {
+    override fun Content() = with(koinInject<MainTasksContainer>().store) {
 
         val navigator = LocalNavigator.current
         var showBottomSheet by rememberSaveable { mutableStateOf(false) }
         val sheetState = rememberModalBottomSheetState()
+        var selectedTaskId by rememberSaveable { mutableStateOf<Long?>(null) }
+        val snackbarHostState = remember { SnackbarHostState() }
+        val scope = rememberCoroutineScope()
+        var currentTabName by rememberSaveable { mutableStateOf<String?>(null) }
 
-        var taskTitle by rememberSaveable { mutableStateOf("") }
-        var taskDescription by rememberSaveable { mutableStateOf("") }
-
-        TabNavigator(AllTasksTab) {
+        TabNavigator(MainTasksTab) {
 
             Scaffold(
+                snackbarHost = {
+                    SnackbarHost(snackbarHostState)
+                },
                 topBar = {
                     TopAppBar(
-                        title = { Text("Tasks") }
+                        title = { Text(currentTabName ?: "Tasks") }
                     )
                 },
                 content = { innerPadding ->
@@ -78,64 +88,75 @@ class MainScreen : Screen {
                             },
                             sheetState = sheetState
                         ) {
-                            TaskBottomSheetContent(
-                                title = taskTitle,
-                                titleLabel = "Enter task name",
-                                onTitleChange = { taskTitle = it },
-                                description = taskDescription,
-                                descriptionLabel = "Enter task description",
-                                onDescriptionChange = { taskDescription = it },
+                            TaskBottomSheet(
+                                taskId = selectedTaskId
                             )
                         }
                     }
                 },
                 bottomBar = {
-                    BottomNavigation(
-                        modifier = Modifier.height(96.dp)
-                            .fillMaxWidth(),
-                        backgroundColor = MaterialTheme.colorScheme.surfaceDim,
-                    ) {
-
-                        Row(
-                            modifier = Modifier.width(220.dp)
-                                .padding(vertical = 24.dp, horizontal = 16.dp)
-                        ) {
-                            TabNavigationItem(AllTasksTab)
-                            TabNavigationItem(ClosedTasksTab)
-                            TabNavigationItem(StatisticsTab)
-                            TabNavigationItem(SettingsTab)
+                    BottomActionBar(
+                        onTabSelectedAction = {
+                            currentTabName = it
+                        },
+                        onButtonClickedAction = {
+                            intent(MainTasksIntent.LoadActiveTasks)
                         }
-
-                        Column(
-                            modifier = Modifier
-                                .padding(16.dp)
-                                .weight(1f),
-                            horizontalAlignment = Alignment.End,
-                        ) {
-                            FloatingActionButton(
-                                onClick = {
-                                    showBottomSheet = !showBottomSheet
-                                },
-                                containerColor = MaterialTheme.colorScheme.tertiaryContainer,
-                                modifier = Modifier.size(56.dp),
-                                elevation = FloatingActionButtonDefaults.elevation(0.dp),
-                                contentColor = MaterialTheme.colorScheme.onBackground
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Add,
-                                    contentDescription = "Add",
-                                    modifier = Modifier.size(28.dp),
-                                )
-                            }
-                        }
-                    }
+                    )
                 }
             )
         }
     }
 
     @Composable
-    private fun RowScope.TabNavigationItem(tab: Tab) {
+    private fun BottomActionBar(
+        onButtonClickedAction: () -> Unit,
+        onTabSelectedAction: (String?) -> Unit
+    ) {
+        BottomNavigation(
+            modifier = Modifier.height(96.dp)
+                .fillMaxWidth(),
+            backgroundColor = MaterialTheme.colorScheme.surfaceDim,
+        ) {
+
+            Row(
+                modifier = Modifier.width(220.dp)
+                    .padding(vertical = 24.dp, horizontal = 16.dp)
+            ) {
+                TabNavigationItem(MainTasksTab, onTabSelectedAction)
+                TabNavigationItem(CompletedTasksTab, onTabSelectedAction)
+                TabNavigationItem(StatisticsTab, onTabSelectedAction)
+                TabNavigationItem(SettingsTab, onTabSelectedAction)
+            }
+
+            Column(
+                modifier = Modifier
+                    .padding(16.dp)
+                    .weight(1f),
+                horizontalAlignment = Alignment.End,
+            ) {
+                FloatingActionButton(
+                    onClick = onButtonClickedAction,
+                    containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+                    modifier = Modifier.size(56.dp),
+                    elevation = FloatingActionButtonDefaults.elevation(0.dp),
+                    contentColor = MaterialTheme.colorScheme.onBackground
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = "Add",
+                        modifier = Modifier.size(28.dp),
+                    )
+                }
+            }
+        }
+    }
+
+    @Composable
+    private fun RowScope.TabNavigationItem(
+        tab: Tab,
+        onTabSelected: (String?) -> Unit
+    ) {
         val tabNavigator = LocalTabNavigator.current
         val isSelected = tabNavigator.current == tab
 
@@ -152,9 +173,13 @@ class MainScreen : Screen {
                 .padding(4.dp)
                 .size(36.dp)
         ) {
+            val selectedTabName = tab.options.title
             BottomNavigationItem(
                 selected = isSelected,
-                onClick = { tabNavigator.current = tab },
+                onClick = {
+                    tabNavigator.current = tab
+                    onTabSelected(selectedTabName)
+                },
                 icon = {
                     Icon(
                         modifier = Modifier,

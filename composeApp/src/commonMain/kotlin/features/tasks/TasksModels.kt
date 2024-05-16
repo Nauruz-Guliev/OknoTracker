@@ -1,17 +1,18 @@
 package features.tasks
 
 import androidx.compose.runtime.Immutable
-import pro.respawn.flowmvi.api.MVIState
+import pro.respawn.flowmvi.api.MVIIntent
+import ru.kpfu.itis.features.task.domain.model.TaskModel
+
 
 @Immutable
-sealed interface TasksState : MVIState {
+sealed interface TasksIntent : MVIIntent {
 
-    sealed interface AllTasksState : TasksState {
+    sealed interface CreateOrEdit : TasksIntent {
 
-        data class Success(val taskList: List<>)
+        data class SaveTask(val taskModel: TaskModel) : CreateOrEdit
+        data object EnterEditMode : CreateOrEdit
+        data object EnterReadMode : CreateOrEdit
     }
-
-    sealed interface ClosedTasksState : TasksState
-
-    sealed interface NewTaskState : TasksState
 }
+

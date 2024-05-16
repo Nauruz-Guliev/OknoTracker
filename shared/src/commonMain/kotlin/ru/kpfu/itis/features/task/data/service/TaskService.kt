@@ -24,7 +24,7 @@ class TaskService(
     private val strings: Strings
 ) {
 
-    suspend fun getTask(taskId: String): TaskResponseSingle {
+    suspend fun getTask(taskId: Long): TaskResponseSingle {
         return httpClient.get(
             "${(MR.strings.url.get())}/task/$taskId"
         ).body()

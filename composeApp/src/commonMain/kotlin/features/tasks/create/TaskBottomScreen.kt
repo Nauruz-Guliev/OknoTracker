@@ -1,4 +1,4 @@
-package features.tasks
+package features.tasks.create
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -14,35 +14,37 @@ import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import design_system.textfield.OTextField
 
 @Composable
-fun TaskBottomSheetContent(
-    title: String,
-    titleLabel: String,
-    onTitleChange: (String) -> Unit,
-    description: String,
-    descriptionLabel: String,
-    onDescriptionChange: (String) -> Unit,
+fun TaskBottomSheet(
+    taskId: Long? = null,
     onButtonClickedAction: () -> Unit = {}
 ) {
+    var taskTitle by rememberSaveable { mutableStateOf("") }
+    var taskDescription by rememberSaveable { mutableStateOf("") }
+
     Column(
         modifier = Modifier.fillMaxSize(),
     ) {
         Column {
 
             OTextField(
-                text = title,
-                onValueChange = onTitleChange,
-                label = titleLabel
+                text = taskTitle,
+                onValueChange = { },
+                label = taskTitle
             )
 
             OTextField(
-                text = description,
-                onValueChange = onDescriptionChange,
-                label = descriptionLabel,
+                text = taskDescription,
+                onValueChange = { },
+                label = taskDescription,
                 maxLines = 8
             )
         }

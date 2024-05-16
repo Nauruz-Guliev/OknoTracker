@@ -36,7 +36,7 @@ data class SignInScreen(
 ) : Screen {
 
     @Composable
-    override fun Content() {
+    override fun Content() =
         with(koinInject<SignInContainer>().store) {
 
             LaunchedEffect(Unit) { start(this).join() }
@@ -60,7 +60,7 @@ data class SignInScreen(
                             OErrorScreen(
                                 errorModel = action.errorModel,
                                 onClickAction = {
-                                    navigator.popUntilRoot()
+                                    navigator.pop()
                                 },
                                 isTryAgain = false
                             )
@@ -71,7 +71,7 @@ data class SignInScreen(
 
             SignInContent(state)
         }
-    }
+
 
     @Composable
     private fun IntentReceiver<SignInIntent>.SignInContent(state: SignInState) {
