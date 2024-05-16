@@ -1,7 +1,7 @@
 package ru.kpfu.itis
 
 import android.app.Application
-import features.di.signInModule
+import features.signin.signInModule
 import initKoin
 import org.koin.android.ext.koin.androidContext
 import ru.kpfu.itis.di.androidModule

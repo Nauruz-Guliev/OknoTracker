@@ -25,7 +25,8 @@ fun OTextField(
     isPassword: Boolean = false,
     errorText: String? = null,
     icon: Icon? = null,
-    characterMaxCount: Int? = null
+    characterMaxCount: Int? = null,
+    maxLines: Int = 1,
 ) {
     TextField(
         modifier = modifier,
@@ -57,7 +58,7 @@ fun OTextField(
                 }
             }
         },
-        maxLines = 1,
+        maxLines = maxLines,
         isError = errorText != null,
         trailingIcon = {
             errorText?.let {

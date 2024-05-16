@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class TaskChangeRequest(
     @SerialName("id")
-    val id: String,
+    val id: Long,
     @SerialName("name")
     val name: String,
     @SerialName("description")
@@ -14,5 +14,5 @@ data class TaskChangeRequest(
     @SerialName("userId")
     val userId: Long,
     @SerialName("deadlineTime")
-    val deadlineTime: String,
+    val deadlineTime: String? = null,
 )

@@ -9,16 +9,38 @@ CREATE TABLE Task (
     lastModifiedTime TEXT,
     deadlineTime TEXT,
     completedTime TEXT,
-    completedOnTime INTEGER AS Boolean DEFAULT 0 NOT NULL
+    completedOnTime INTEGER AS Boolean DEFAULT 0
 );
 
 insertTask:
 INSERT INTO Task(id, name, description, userId, isCompleted, lastModifiedTime, deadlineTime, completedTime, completedOnTime)
 VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?);
 
-removeAllTasks:
+deleteAllTasks:
 DELETE FROM Task;
 
-selectAllTasks:
+deleteActiveTasks:
+DELETE FROM Task
+WHERE isCompleted = 0;
+
+deleteCompletedTasks:
+DELETE FROM Task
+WHERE isCompleted = 1;
+
+getAllTasks:
 SELECT Task.*
 FROM Task;
+
+deleteTaskById:
+DELETE FROM Task
+WHERE id = ?;
+
+getCompletedTasks:
+SELECT Task.*
+FROM Task
+WHERE isCompleted = 0;
+
+getActiveTasks:
+SELECT Task.*
+FROM Task
+WHERE isCompleted = 1;

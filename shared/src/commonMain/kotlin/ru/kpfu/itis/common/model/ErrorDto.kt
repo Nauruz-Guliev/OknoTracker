@@ -1,4 +1,4 @@
-package ru.kpfu.itis.common.data.model
+package ru.kpfu.itis.common.model
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

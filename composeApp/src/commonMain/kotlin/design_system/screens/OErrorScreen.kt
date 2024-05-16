@@ -23,9 +23,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
-import cafe.adriel.voyager.navigator.LocalNavigator
 import design_system.button.OButton
-import ru.kpfu.itis.common.domain.model.ErrorModel
+import ru.kpfu.itis.common.model.ErrorModel
 
 data class OErrorScreen(
     private val errorModel: ErrorModel,
@@ -42,8 +41,6 @@ data class OErrorScreen(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
-
-            val navigator = LocalNavigator.current
 
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,

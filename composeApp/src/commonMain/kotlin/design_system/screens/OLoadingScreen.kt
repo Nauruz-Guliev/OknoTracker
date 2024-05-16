@@ -29,7 +29,6 @@ fun OLoadingScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-
     ) {
         if (isLoading) {
             Surface(

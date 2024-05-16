@@ -16,9 +16,9 @@ data class TaskCreateRequest(
     @SerialName("name")
     val name: String,
     @SerialName("description")
-    val description: String,
+    val description: String? = null,
     @SerialName("userId")
     val userId: Long,
     @SerialName("deadlineTime")
-    val deadlineTime: String,
+    val deadlineTime: String? = null,
 )

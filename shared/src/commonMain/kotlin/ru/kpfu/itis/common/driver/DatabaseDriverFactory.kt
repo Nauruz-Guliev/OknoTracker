@@ -1,4 +1,4 @@
-package ru.kpfu.itis.common.data.driver
+package ru.kpfu.itis.common.driver
 
 import app.cash.sqldelight.db.SqlDriver
 

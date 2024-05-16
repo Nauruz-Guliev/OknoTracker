@@ -4,7 +4,7 @@ import androidx.compose.runtime.Immutable
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
-import ru.kpfu.itis.common.domain.model.ErrorModel
+import ru.kpfu.itis.common.model.ErrorModel
 
 @Immutable
 sealed interface SignInState : MVIState {

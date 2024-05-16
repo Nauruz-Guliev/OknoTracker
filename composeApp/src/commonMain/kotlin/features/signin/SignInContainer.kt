@@ -7,7 +7,7 @@ import pro.respawn.flowmvi.api.Store
 import pro.respawn.flowmvi.dsl.store
 import pro.respawn.flowmvi.plugins.recover
 import pro.respawn.flowmvi.plugins.reduce
-import ru.kpfu.itis.common.data.mapper.ErrorMapper
+import ru.kpfu.itis.common.mapper.ErrorMapper
 import ru.kpfu.itis.features.user.data.repository.UserRepository
 
 class SignInContainer(

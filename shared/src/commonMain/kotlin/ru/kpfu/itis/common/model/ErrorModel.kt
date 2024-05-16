@@ -1,4 +1,4 @@
-package ru.kpfu.itis.common.domain.model
+package ru.kpfu.itis.common.model
 
 data class ErrorModel(
     val title: String,

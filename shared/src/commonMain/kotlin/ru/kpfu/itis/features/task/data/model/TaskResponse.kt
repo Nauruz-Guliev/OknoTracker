@@ -2,7 +2,7 @@ package ru.kpfu.itis.features.task.data.model
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import ru.kpfu.itis.common.data.model.ErrorDto
+import ru.kpfu.itis.common.model.ErrorDto
 
 @Serializable
 data class TaskResponseSingle(
@@ -51,5 +51,5 @@ data class TaskDto(
     @SerialName("completedTime")
     val completedTime: String? = null,
     @SerialName("completedOnTime")
-    val completedOnTime: Boolean,
+    val completedOnTime: Boolean? = null,
 )

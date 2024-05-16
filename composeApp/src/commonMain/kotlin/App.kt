@@ -1,7 +1,7 @@
 import androidx.compose.runtime.Composable
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.transitions.SlideTransition
-import features.signin.SignInScreen
+import features.tasks.MainScreen
 import org.koin.core.context.startKoin
 import org.koin.core.module.Module
 import org.koin.dsl.KoinAppDeclaration
@@ -14,7 +14,7 @@ fun App(
     strings: Strings
 ) {
     AppTheme {
-        Navigator(SignInScreen(strings)) { navigator: Navigator ->
+        Navigator(MainScreen()) { navigator: Navigator ->
             SlideTransition(navigator)
         }
     }

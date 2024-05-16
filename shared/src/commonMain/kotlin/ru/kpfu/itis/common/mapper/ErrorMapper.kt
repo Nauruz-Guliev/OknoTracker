@@ -1,8 +1,8 @@
-package ru.kpfu.itis.common.data.mapper
+package ru.kpfu.itis.common.mapper
 
 import dev.icerock.moko.resources.StringResource
-import ru.kpfu.itis.common.data.model.ErrorDto
-import ru.kpfu.itis.common.domain.model.ErrorModel
+import ru.kpfu.itis.common.model.ErrorDto
+import ru.kpfu.itis.common.model.ErrorModel
 import ru.kpfu.itis.shared.MR
 import ru.kpfu.itis.utils.Strings
 

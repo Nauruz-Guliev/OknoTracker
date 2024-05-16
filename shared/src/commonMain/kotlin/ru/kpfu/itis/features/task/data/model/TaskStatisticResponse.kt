@@ -2,7 +2,7 @@ package ru.kpfu.itis.features.task.data.model
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import ru.kpfu.itis.common.data.model.ErrorDto
+import ru.kpfu.itis.common.model.ErrorDto
 
 @Serializable
 data class TaskStatisticResponse(

@@ -66,7 +66,7 @@ class TaskService(
         userId: Long,
         pageSize: Long = 20,
         page: Long = 0,
-    ): List<TaskResponseList> {
+    ): TaskResponseList {
         return httpClient.get {
             url("${(MR.strings.url.get())}/task/uncompleted_list/order_by_deadline/$userId")
             parameters {
