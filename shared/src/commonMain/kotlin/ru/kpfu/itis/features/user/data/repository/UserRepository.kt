@@ -4,6 +4,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import ru.kpfu.itis.features.user.data.model.UserAuthRequest
 import ru.kpfu.itis.features.user.data.model.UserCreateRequest
+import ru.kpfu.itis.features.user.data.model.UserResponse
 import ru.kpfu.itis.features.user.data.service.UserService
 
 class UserRepository(
@@ -27,5 +28,9 @@ class UserRepository(
                 password = password
             )
         )
+    }
+
+    private fun handleResult(response: UserResponse) {
+
     }
 }

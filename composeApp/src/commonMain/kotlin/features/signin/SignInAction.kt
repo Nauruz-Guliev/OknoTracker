@@ -8,7 +8,7 @@ import ru.kpfu.itis.common.model.ErrorModel
 @Immutable
 sealed interface SignInAction : MVIAction {
 
-    data object OpenRegisterScreen : SignInAction
+    data object OpenSignUpScreen : SignInAction
     data class OpenMainScreen(val userId: Long) : SignInAction
     data class OpenErrorScreen(val errorModel: ErrorModel) : SignInAction
 }

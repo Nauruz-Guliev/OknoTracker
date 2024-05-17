@@ -1,6 +1,7 @@
 package ru.kpfu.itis
 
 import android.app.Application
+import features.settings.settingsModule
 import features.signin.signInModule
 import features.tasks.tasksModule
 import initKoin
@@ -23,6 +24,7 @@ class Application : Application() {
             databaseModule(),
             dbModule(),
             kstoreModule(cacheDir.path),
+            settingsModule(),
         ) {
             androidContext(this@Application)
         }

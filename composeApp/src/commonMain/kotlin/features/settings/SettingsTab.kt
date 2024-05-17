@@ -29,28 +29,12 @@ import pro.respawn.flowmvi.compose.dsl.subscribe
 
 object SettingsTab : Tab {
 
-    override val options: TabOptions
-        @Composable
-        get() {
-            val title = "Settings"
-            val icon = rememberVectorPainter(Icons.Outlined.Settings)
-
-            return remember {
-                TabOptions(
-                    index = 0u,
-                    title = title,
-                    icon = icon
-                )
-            }
-        }
-
     @Composable
     override fun Content(): Unit = with(koinInject<SettingsContainer>().store) {
 
         val navigator = LocalNavigator.current
         val isNotificationEnabled by rememberSaveable { mutableStateOf(false) }
         val isDarkModeEnabled by rememberSaveable { mutableStateOf(false) }
-
 
         val state by subscribe { action ->
             when (action) {
@@ -64,20 +48,19 @@ object SettingsTab : Tab {
             }
         }
 
+        SettingsContent(
+            notificationSwitchAction = {
+                // todo some sort of storage with booleans should be implemented
+            },
+            isNotificationEnabled = isNotificationEnabled,
+            darkModeSwitchAction = {
+                // todo some sort of storage with booleans should be implemented
+            },
+            isDarkModeEnabled = isDarkModeEnabled
+        )
+
         when (state) {
-            is OTrackerState.Success, is OTrackerState.Initial -> {
-                SettingsScreen(
-                    notificationSwitchAction = {
-
-                    },
-                    isNotificationEnabled = isNotificationEnabled,
-                    darkModeSwitchAction = {
-
-                    },
-                    isDarkModeEnabled = isDarkModeEnabled
-                )
-            }
-
+            is OTrackerState.Success, is OTrackerState.Initial -> {}
             is OTrackerState.Error -> {
                 navigator?.push(
                     OErrorScreen(
@@ -88,15 +71,14 @@ object SettingsTab : Tab {
                     )
                 )
             }
-
             is OTrackerState.Loading -> {
-                OLoadingScreen(true)
+                OLoadingScreen()
             }
         }
     }
 
     @Composable
-    private fun SettingsScreen(
+    private fun SettingsContent(
         isNotificationEnabled: Boolean,
         notificationSwitchAction: (Boolean) -> Unit,
         isDarkModeEnabled: Boolean,
@@ -138,4 +120,19 @@ object SettingsTab : Tab {
             }
         }
     }
+
+    override val options: TabOptions
+        @Composable
+        get() {
+            val title = "Settings"
+            val icon = rememberVectorPainter(Icons.Outlined.Settings)
+
+            return remember {
+                TabOptions(
+                    index = 0u,
+                    title = title,
+                    icon = icon
+                )
+            }
+        }
 }

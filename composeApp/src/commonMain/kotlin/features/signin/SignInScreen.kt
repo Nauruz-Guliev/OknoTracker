@@ -44,7 +44,7 @@ class SignInScreen : Screen {
 
             val state by subscribe { action ->
                 when (action) {
-                    is SignInAction.OpenRegisterScreen -> {
+                    is SignInAction.OpenSignUpScreen -> {
                         navigator?.replace(SignUpScreen())
                     }
 

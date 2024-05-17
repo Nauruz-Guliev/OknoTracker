@@ -53,8 +53,7 @@ class SignInContainer(
                     }
 
                     SignInIntent.SignUpClicked -> {
-                        updateState { OTrackerState.Loading }
-                        action(SignInAction.OpenRegisterScreen)
+                        action(SignInAction.OpenSignUpScreen)
                         updateState { OTrackerState.Initial }
                     }
                 }
