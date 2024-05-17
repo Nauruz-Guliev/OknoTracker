@@ -11,7 +11,7 @@ import ru.kpfu.itis.features.task.data.service.TaskService
 
 fun tasksModule() = module {
     single {
-        CompletedTasksContainer(get(), get(), get())
+        CompletedTasksContainer(get(), get(), get(), get())
     }
 
     single {

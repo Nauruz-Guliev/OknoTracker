@@ -38,7 +38,10 @@ object CompletedTasksTab : Tab {
                 }
             }
             items(list) {
-                OTaskCard(title = it)
+                OTaskCard(
+                    title = it,
+                    labels = list
+                )
             }
         }
     }

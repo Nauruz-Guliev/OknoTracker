@@ -35,8 +35,8 @@ import cafe.adriel.voyager.navigator.tab.TabOptions
 import design_system.card.OTaskCard
 import design_system.screens.OErrorScreen
 import design_system.screens.OInitialScreen
+import features.OTrackerState
 import features.signin.SignInScreen
-import features.tasks.TasksState
 import features.tasks.create.TaskBottomSheet
 import org.koin.compose.koinInject
 import pro.respawn.flowmvi.compose.dsl.subscribe
@@ -108,25 +108,25 @@ object MainTasksTab : Tab {
                 }
 
                 when (state) {
-                    is TasksState.Initial -> {
+                    is OTrackerState.Initial -> {
                         isRefreshing = false
                         OInitialScreen()
                     }
 
-                    is TasksState.Success -> {
+                    is OTrackerState.Success -> {
                         isRefreshing = false
-                        SuccessScreen(state as TasksState.Success<List<TaskModel>>)
+                        SuccessScreen(state as OTrackerState.Success<List<TaskModel>>)
                     }
 
-                    is TasksState.Loading -> {
+                    is OTrackerState.Loading -> {
                         isRefreshing = true
                     }
 
-                    is TasksState.Error -> {
+                    is OTrackerState.Error -> {
                         isRefreshing = false
                         navigator?.push(
                             OErrorScreen(
-                                errorModel = (state as TasksState.Error).errorModel,
+                                errorModel = (state as OTrackerState.Error).error,
                                 onClickAction = {
                                     TODO()
                                 }
@@ -152,9 +152,9 @@ object MainTasksTab : Tab {
     }
 
     @Composable
-    private fun SuccessScreen(state: TasksState.Success<List<TaskModel>>) {
+    private fun SuccessScreen(state: OTrackerState.Success<List<TaskModel>>) {
         LazyColumn {
-            items(state.taskList) { item ->
+            items(state.data) { item ->
                 OTaskCard(
                     onCheckedAction = { isChecked ->
                         TODO()

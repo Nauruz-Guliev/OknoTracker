@@ -13,13 +13,19 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.unit.dp
+import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
+import design_system.screens.OErrorScreen
+import design_system.screens.OLoadingScreen
+import features.OTrackerState
+import org.koin.compose.koinInject
+import pro.respawn.flowmvi.compose.dsl.subscribe
 
 object SettingsTab : Tab {
 
@@ -39,16 +45,69 @@ object SettingsTab : Tab {
         }
 
     @Composable
-    override fun Content() {
-        var notificationsEnabled by remember { mutableStateOf(true) }
-        var darkModeEnabled by remember { mutableStateOf(false) }
+    override fun Content(): Unit = with(koinInject<SettingsContainer>().store) {
+
+        val navigator = LocalNavigator.current
+        val isNotificationEnabled by rememberSaveable { mutableStateOf(false) }
+        val isDarkModeEnabled by rememberSaveable { mutableStateOf(false) }
+
+
+        val state by subscribe { action ->
+            when (action) {
+                is SettingsAction.Logout -> {
+                    intent(SettingsIntent.Logout)
+                }
+
+                is SettingsAction.ToggleDarkTheme -> {
+                    intent(SettingsIntent.ToggleDarkMode(isDarkModeEnabled))
+                }
+            }
+        }
+
+        when (state) {
+            is OTrackerState.Success, is OTrackerState.Initial -> {
+                SettingsScreen(
+                    notificationSwitchAction = {
+
+                    },
+                    isNotificationEnabled = isNotificationEnabled,
+                    darkModeSwitchAction = {
+
+                    },
+                    isDarkModeEnabled = isDarkModeEnabled
+                )
+            }
+
+            is OTrackerState.Error -> {
+                navigator?.push(
+                    OErrorScreen(
+                        errorModel = (state as OTrackerState.Error).error,
+                        onClickAction = {
+                            navigator.pop()
+                        }
+                    )
+                )
+            }
+
+            is OTrackerState.Loading -> {
+                OLoadingScreen(true)
+            }
+        }
+    }
+
+    @Composable
+    private fun SettingsScreen(
+        isNotificationEnabled: Boolean,
+        notificationSwitchAction: (Boolean) -> Unit,
+        isDarkModeEnabled: Boolean,
+        darkModeSwitchAction: (Boolean) -> Unit,
+    ) {
 
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(16.dp)
         ) {
-            Text(text = "Settings", modifier = Modifier.padding(bottom = 16.dp))
 
             Row(
                 modifier = Modifier
@@ -58,8 +117,9 @@ object SettingsTab : Tab {
             ) {
                 Text(text = "Notifications", modifier = Modifier.weight(1f))
                 Switch(
-                    checked = notificationsEnabled,
-                    onCheckedChange = { notificationsEnabled = it })
+                    checked = isNotificationEnabled,
+                    onCheckedChange = notificationSwitchAction
+                )
             }
 
             Row(
@@ -69,7 +129,12 @@ object SettingsTab : Tab {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(text = "Dark Mode", modifier = Modifier.weight(1f))
-                Switch(checked = darkModeEnabled, onCheckedChange = { darkModeEnabled = it })
+                Switch(
+                    checked = isDarkModeEnabled,
+                    onCheckedChange = {
+                        darkModeSwitchAction(it)
+                    }
+                )
             }
         }
     }

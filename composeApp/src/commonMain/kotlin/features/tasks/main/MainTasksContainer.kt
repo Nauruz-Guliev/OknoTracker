@@ -1,6 +1,6 @@
 package features.tasks.main
 
-import features.tasks.TasksState
+import features.OTrackerState
 import flow_mvi.DefaultConfigurationFactory
 import flow_mvi.configure
 import pro.respawn.flowmvi.api.Container
@@ -18,15 +18,15 @@ class MainTasksContainer(
     private val repository: TaskRepository,
     private val configurationFactory: DefaultConfigurationFactory,
     private val userStore: UserStore,
-) : Container<TasksState<List<TaskModel>>, MainTasksIntent, MainTasksAction> {
+) : Container<OTrackerState<List<TaskModel>>, MainTasksIntent, MainTasksAction> {
 
-    override val store: Store<TasksState<List<TaskModel>>, MainTasksIntent, MainTasksAction> =
-        store(TasksState.Initial) {
+    override val store: Store<OTrackerState<List<TaskModel>>, MainTasksIntent, MainTasksAction> =
+        store(OTrackerState.Initial) {
 
             configure(configurationFactory, "Tasks")
 
             recover { exception ->
-                updateState { TasksState.Error(errorMapper.map(exception = exception)) }
+                updateState { OTrackerState.Error(errorMapper.map(exception = exception)) }
                 null
             }
 
@@ -34,13 +34,13 @@ class MainTasksContainer(
                 val userId = userStore.getUserId()
                 if (userId == null) {
                     action(MainTasksAction.SignOut)
-                    intent(MainTasksIntent.ClearCache)
+                    intent(MainTasksIntent.ClearUserCache)
                 } else {
                     when (intent) {
                         is MainTasksIntent.LoadActiveTasks -> {
-                            updateState { TasksState.Loading }
+                            updateState { OTrackerState.Loading }
                             val tasks = repository.getActiveTasks(userId)
-                            updateState { TasksState.Success(tasks) }
+                            updateState { OTrackerState.Success(tasks) }
                         }
 
                         is MainTasksIntent.EditTask -> {
@@ -48,16 +48,16 @@ class MainTasksContainer(
                         }
 
                         is MainTasksIntent.DeleteTask -> {
-                            updateState { TasksState.Loading }
+                            updateState { OTrackerState.Loading }
                             repository.deleteTask(intent.taskId)
                             val tasks = repository.getActiveTasks(userId)
-                            updateState { TasksState.Success(tasks) }
+                            updateState { OTrackerState.Success(tasks) }
                         }
 
                         is MainTasksIntent.LoadAllTasks -> {
-                            updateState { TasksState.Loading }
+                            updateState { OTrackerState.Loading }
                             val tasks = repository.getActiveTasks(userId)
-                            updateState { TasksState.Success(tasks) }
+                            updateState { OTrackerState.Success(tasks) }
                         }
 
                         MainTasksIntent.FloatingButtonClicked -> {
@@ -68,7 +68,7 @@ class MainTasksContainer(
                             action(MainTasksAction.OpenErrorScreen(intent.errorModel, userId))
                         }
 
-                        is MainTasksIntent.ClearCache -> {
+                        is MainTasksIntent.ClearUserCache -> {
                             repository.clearTasks()
                         }
                     }

@@ -16,7 +16,7 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun OLoadingScreen(
-    isLoading: Boolean,
+    isLoading: Boolean = true,
     backgroundColor: Color = Color.Gray,
     alpha: Float = 0.25f,
     progressColor: Color = MaterialTheme.colorScheme.primary,

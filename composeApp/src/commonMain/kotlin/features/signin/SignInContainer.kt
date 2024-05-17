@@ -1,5 +1,6 @@
 package features.signin
 
+import features.OTrackerState
 import flow_mvi.ConfigurationFactory
 import flow_mvi.configure
 import pro.respawn.flowmvi.api.Container
@@ -16,15 +17,15 @@ class SignInContainer(
     private val userRepository: UserRepository,
     private val configurationFactory: ConfigurationFactory,
     private val userStore: UserStore,
-) : Container<SignInState, SignInIntent, SignInAction> {
+) : Container<OTrackerState<Nothing>, SignInIntent, SignInAction> {
 
-    override val store: Store<SignInState, SignInIntent, SignInAction> =
-        store(SignInState.Initial) {
+    override val store: Store<OTrackerState<Nothing>, SignInIntent, SignInAction> =
+        store(OTrackerState.Initial) {
             configure(configurationFactory, "SignIn")
 
             recover { exception ->
                 updateState {
-                    SignInState.Error(errorMapper.map(exception = exception))
+                    OTrackerState.Error(errorMapper.map(exception = exception))
                 }
                 null
             }
@@ -32,29 +33,29 @@ class SignInContainer(
             reduce { intent ->
                 when (intent) {
                     is SignInIntent.SignInClicked -> {
-                        updateState { SignInState.Loading }
+                        updateState { OTrackerState.Loading }
                         val data = userRepository.signIn(intent.email, intent.password)
                         when {
                             data.data != null -> {
                                 userStore.setUserID(data.data!!.id)
                                 action(SignInAction.OpenMainScreen(data.data!!.id))
-                                updateState { SignInState.Initial }
+                                updateState { OTrackerState.Initial }
                             }
 
                             else -> {
-                                updateState { SignInState.Error(errorMapper.map(data.error)) }
+                                updateState { OTrackerState.Error(errorMapper.map(data.error)) }
                             }
                         }
                     }
                     is SignInIntent.ErrorOccured -> {
                         action(SignInAction.OpenErrorScreen(intent.errorModel))
-                        updateState { SignInState.Initial }
+                        updateState { OTrackerState.Initial }
                     }
 
                     SignInIntent.SignUpClicked -> {
-                        updateState { SignInState.Loading }
+                        updateState { OTrackerState.Loading }
                         action(SignInAction.OpenRegisterScreen)
-                        updateState { SignInState.Initial }
+                        updateState { OTrackerState.Initial }
                     }
                 }
             }

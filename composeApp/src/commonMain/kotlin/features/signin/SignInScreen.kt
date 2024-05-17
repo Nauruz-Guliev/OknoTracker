@@ -24,6 +24,7 @@ import design_system.button.OButton
 import design_system.screens.OErrorScreen
 import design_system.screens.OLoadingScreen
 import design_system.textfield.OTextField
+import features.OTrackerState
 import features.signup.SignUpScreen
 import features.tasks.main.MainScreen
 import org.koin.compose.koinInject
@@ -67,32 +68,28 @@ class SignInScreen : Screen {
                 }
             }
 
-            SignInContent(state)
+            HandleSignInState(state)
         }
 
 
     @Composable
-    private fun IntentReceiver<SignInIntent>.SignInContent(state: SignInState) {
-        var isLoading by rememberSaveable { mutableStateOf(false) }
-
+    private fun IntentReceiver<SignInIntent>.HandleSignInState(state: OTrackerState<Nothing>) {
+        InitialContent()
         when (state) {
-            SignInState.Loading -> {
-                isLoading = true
+            OTrackerState.Loading -> {
+                OLoadingScreen()
             }
 
-            is SignInState.Error -> {
-                isLoading = false
-                send(SignInIntent.ErrorOccured(state.model))
+            is OTrackerState.Error -> {
+                send(SignInIntent.ErrorOccured(state.error))
             }
 
-            is SignInState.Initial -> {
-                isLoading = false
+            OTrackerState.Initial, is OTrackerState.Success -> {
+                // no need to do anything
+                // if u put InitialContent() here the loading screen will overlap
+                // InitialContent which is not expected behaviour
             }
         }
-
-        InitialContent()
-
-        OLoadingScreen(isLoading)
     }
 
     @Composable
