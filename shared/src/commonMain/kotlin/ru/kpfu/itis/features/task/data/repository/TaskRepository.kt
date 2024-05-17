@@ -51,6 +51,10 @@ class TaskRepository(
         }
     }
 
+    suspend fun clearTasks() {
+        taskDatabase.deleteAllTasks()
+    }
+
     private fun handleTask(task: TaskResponseSingle): TaskModel {
         return if (task.data != null) {
             taskDatabase.saveTask(task.data)

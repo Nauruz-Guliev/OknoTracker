@@ -31,7 +31,7 @@ moko = "0.8.0"
 decompose = "3.0.0"
 voyager = "1.0.0"
 kotlinxCoroutinesSwing = "1.8.0"
-kstore = "Release 0.8.0"
+kstore = "0.8.0"
 material3Android = "1.2.1"
 uiTextGoogleFonts = "1.6.7"
 flowmvi = "2.4.1"
@@ -106,6 +106,7 @@ voyager-koin = { module = "cafe.adriel.voyager:voyager-koin", version.ref = "voy
 kstore = { module = "io.github.xxfast:kstore", version.ref = "kstore" }
 # for android, iOS, desktop and nodeJs
 kstore-file = { module = "io.github.xxfast:kstore-file", version.ref = "kstore" }
+kstore-storage = { module = "io.github.xxfast:kstore-storage", version.ref = "kstore" }
 
 # libres
 libres-compose = { module = "io.github.skeptick.libres:libres-compose", version.ref = "libres" }

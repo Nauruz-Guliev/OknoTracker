@@ -71,7 +71,6 @@ object SettingsTab : Tab {
                 Text(text = "Dark Mode", modifier = Modifier.weight(1f))
                 Switch(checked = darkModeEnabled, onCheckedChange = { darkModeEnabled = it })
             }
-            // Add more settings rows as needed
         }
     }
 }

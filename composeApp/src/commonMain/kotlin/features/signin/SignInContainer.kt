@@ -8,17 +8,18 @@ import pro.respawn.flowmvi.dsl.store
 import pro.respawn.flowmvi.plugins.recover
 import pro.respawn.flowmvi.plugins.reduce
 import ru.kpfu.itis.common.mapper.ErrorMapper
+import ru.kpfu.itis.features.task.data.store.UserStore
 import ru.kpfu.itis.features.user.data.repository.UserRepository
 
 class SignInContainer(
     private val errorMapper: ErrorMapper,
     private val userRepository: UserRepository,
     private val configurationFactory: ConfigurationFactory,
+    private val userStore: UserStore,
 ) : Container<SignInState, SignInIntent, SignInAction> {
 
     override val store: Store<SignInState, SignInIntent, SignInAction> =
         store(SignInState.Initial) {
-
             configure(configurationFactory, "SignIn")
 
             recover { exception ->
@@ -34,7 +35,8 @@ class SignInContainer(
                         updateState { SignInState.Loading }
                         val data = userRepository.signIn(intent.email, intent.password)
                         when {
-                            data.isSuccess && data.data != null -> {
+                            data.data != null -> {
+                                userStore.setUserID(data.data!!.id)
                                 action(SignInAction.OpenMainScreen(data.data!!.id))
                                 updateState { SignInState.Initial }
                             }

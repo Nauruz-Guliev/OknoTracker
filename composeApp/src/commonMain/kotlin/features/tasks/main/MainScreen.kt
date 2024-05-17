@@ -21,18 +21,12 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -41,7 +35,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
-import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.tab.CurrentTab
 import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import cafe.adriel.voyager.navigator.tab.Tab
@@ -49,7 +42,6 @@ import cafe.adriel.voyager.navigator.tab.TabNavigator
 import features.settings.SettingsTab
 import features.statistics.StatisticsTab
 import features.tasks.completed.CompletedTasksTab
-import features.tasks.create.TaskBottomSheet
 import org.koin.compose.koinInject
 
 class MainScreen : Screen {
@@ -57,41 +49,21 @@ class MainScreen : Screen {
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     override fun Content() = with(koinInject<MainTasksContainer>().store) {
-
-        val navigator = LocalNavigator.current
-        var showBottomSheet by rememberSaveable { mutableStateOf(false) }
-        val sheetState = rememberModalBottomSheetState()
-        var selectedTaskId by rememberSaveable { mutableStateOf<Long?>(null) }
-        val snackbarHostState = remember { SnackbarHostState() }
-        val scope = rememberCoroutineScope()
         var currentTabName by rememberSaveable { mutableStateOf<String?>(null) }
 
         TabNavigator(MainTasksTab) {
 
             Scaffold(
-                snackbarHost = {
-                    SnackbarHost(snackbarHostState)
-                },
                 topBar = {
                     TopAppBar(
                         title = { Text(currentTabName ?: "Tasks") }
                     )
                 },
                 content = { innerPadding ->
-                    Box(Modifier.padding(innerPadding)) {
+                    Box(
+                        modifier = Modifier.padding(innerPadding)
+                    ) {
                         CurrentTab()
-                    }
-                    if (showBottomSheet) {
-                        ModalBottomSheet(
-                            onDismissRequest = {
-                                showBottomSheet = false
-                            },
-                            sheetState = sheetState
-                        ) {
-                            TaskBottomSheet(
-                                taskId = selectedTaskId
-                            )
-                        }
                     }
                 },
                 bottomBar = {
@@ -100,7 +72,7 @@ class MainScreen : Screen {
                             currentTabName = it
                         },
                         onButtonClickedAction = {
-                            intent(MainTasksIntent.LoadActiveTasks)
+                            intent(MainTasksIntent.FloatingButtonClicked)
                         }
                     )
                 }

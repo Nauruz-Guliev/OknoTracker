@@ -22,11 +22,8 @@ import com.skydoves.landscapist.coil3.CoilImage
 import design_system.button.OButton
 import design_system.textfield.OTextField
 import features.signin.SignInScreen
-import ru.kpfu.itis.utils.Strings
 
-data class SignUpScreen(
-    val strings: Strings
-) : Screen {
+class SignUpScreen : Screen {
 
     @Composable
     override fun Content() {
@@ -90,7 +87,7 @@ data class SignUpScreen(
                     isMainButton = false,
                     onClickAction = {
                         navigator?.apply {
-                            replace(SignInScreen(strings))
+                            replace(SignInScreen())
                         }
                     }
                 )

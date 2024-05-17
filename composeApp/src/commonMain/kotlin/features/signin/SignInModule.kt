@@ -17,7 +17,7 @@ fun signInModule() = module {
         UserRepository(get(), get())
     }
     single {
-        SignInContainer(get(), get(), get())
+        SignInContainer(get(), get(), get(), get())
     }
     single {
         UserService(get(), get())

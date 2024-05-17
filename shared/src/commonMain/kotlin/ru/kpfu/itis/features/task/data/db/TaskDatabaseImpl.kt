@@ -63,6 +63,12 @@ class TaskDatabaseImpl(
         }
     }
 
+    internal fun deleteAllTasks() {
+        dbQuery.transaction {
+            dbQuery.deleteAllTasks()
+        }
+    }
+
     internal fun saveTask(task: TaskDto) {
         with(task) {
             dbQuery.insertTask(

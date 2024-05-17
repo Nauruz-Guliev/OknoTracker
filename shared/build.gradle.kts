@@ -56,6 +56,10 @@ kotlin {
             implementation(libs.runtime)
             implementation(libs.kotlinx.datetime)
             implementation(libs.koin.core)
+
+            // kstore
+            implementation(libs.kstore)
+            implementation(libs.kstore.file)
         }
     }
 }

@@ -1,21 +1,38 @@
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import cafe.adriel.voyager.navigator.Navigator
-import cafe.adriel.voyager.transitions.SlideTransition
+import features.signin.SignInScreen
 import features.tasks.main.MainScreen
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import org.koin.compose.koinInject
 import org.koin.core.context.startKoin
 import org.koin.core.module.Module
 import org.koin.dsl.KoinAppDeclaration
 import org.koin.dsl.module
-import ru.kpfu.itis.utils.Strings
+import ru.kpfu.itis.features.task.data.store.UserStore
 import theme.AppTheme
 
 @Composable
-fun App(
-    strings: Strings
-) {
+fun App() {
+    val store = koinInject<UserStore>()
+    var userId by remember { mutableStateOf<Long?>(null) }
+
+    LaunchedEffect(Unit) {
+        withContext(Dispatchers.IO) {
+            userId = store.getUserId()
+        }
+    }
+
     AppTheme {
-        Navigator(MainScreen()) { navigator: Navigator ->
-            SlideTransition(navigator)
+        if (userId != null) {
+            Navigator(MainScreen())
+        } else {
+            Navigator(SignInScreen())
         }
     }
 }

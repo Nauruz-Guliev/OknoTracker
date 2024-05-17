@@ -6,6 +6,7 @@ import ru.kpfu.itis.common.model.ErrorModel
 sealed interface MainTasksIntent : MVIIntent {
 
     data object LoadAllTasks : MainTasksIntent
+    data object ClearCache : MainTasksIntent
     data object LoadActiveTasks : MainTasksIntent
     data class DeleteTask(val taskId: Long) : MainTasksIntent
     data class EditTask(val taskId: Long) : MainTasksIntent

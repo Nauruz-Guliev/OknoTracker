@@ -10,4 +10,5 @@ sealed interface MainTasksAction : MVIAction {
     data class OpenTaskBottomSheet(val taskId: Long? = null) : MainTasksAction
     data class OpenErrorScreen(val errorModel: ErrorModel, val userId: Long) : MainTasksAction
     data class ShowSnackbar(val message: String) : MainTasksAction
+    data object SignOut : MainTasksAction
 }

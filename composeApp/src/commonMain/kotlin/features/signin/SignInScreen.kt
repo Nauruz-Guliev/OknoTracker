@@ -25,15 +25,13 @@ import design_system.screens.OErrorScreen
 import design_system.screens.OLoadingScreen
 import design_system.textfield.OTextField
 import features.signup.SignUpScreen
+import features.tasks.main.MainScreen
 import org.koin.compose.koinInject
 import pro.respawn.flowmvi.api.IntentReceiver
 import pro.respawn.flowmvi.compose.dsl.subscribe
 import pro.respawn.flowmvi.dsl.send
-import ru.kpfu.itis.utils.Strings
 
-data class SignInScreen(
-    val strings: Strings
-) : Screen {
+class SignInScreen : Screen {
 
     @Composable
     override fun Content() =
@@ -46,12 +44,12 @@ data class SignInScreen(
             val state by subscribe { action ->
                 when (action) {
                     is SignInAction.OpenRegisterScreen -> {
-                        navigator?.replace(SignUpScreen(strings))
+                        navigator?.replace(SignUpScreen())
                     }
 
                     is SignInAction.OpenMainScreen -> {
                         navigator?.apply {
-                            //   push(SignUpScreen())
+                            replaceAll(MainScreen())
                         }
                     }
 

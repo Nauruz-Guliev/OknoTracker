@@ -15,7 +15,7 @@ fun tasksModule() = module {
     }
 
     single {
-        MainTasksContainer(get(), get(), get())
+        MainTasksContainer(get(), get(), get(), get())
     }
 
     factory {
