@@ -57,6 +57,7 @@ object HomeTasksTab : Tab {
         var selectedTaskId by rememberSaveable { mutableStateOf<Long?>(null) }
         val snackbarHostState = remember { SnackbarHostState() }
         var isRefreshing by rememberSaveable { mutableStateOf(true) }
+        var taskModel by rememberSaveable { mutableStateOf<TaskModel?>(null) }
 
         val refreshState = rememberPullRefreshState(
             onRefresh = {
@@ -149,7 +150,10 @@ object HomeTasksTab : Tab {
                 sheetState = sheetState
             ) {
                 TaskBottomSheet(
-                    taskId = selectedTaskId
+                    taskId = selectedTaskId,
+                    taskDataAction = { model ->
+                        taskModel = model
+                    }
                 )
             }
         }

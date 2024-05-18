@@ -35,8 +35,7 @@ import pro.respawn.flowmvi.dsl.send
 class SignInScreen : Screen {
 
     @Composable
-    override fun Content() =
-        with(koinInject<SignInContainer>().store) {
+    override fun Content() = with(koinInject<SignInContainer>().store) {
 
             startFlowMvi()
 

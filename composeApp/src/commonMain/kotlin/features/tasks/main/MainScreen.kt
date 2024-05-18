@@ -49,6 +49,7 @@ import features.tasks.create.TaskBottomSheet
 import features.tasks.home.HomeTasksTab
 import org.koin.compose.koinInject
 import pro.respawn.flowmvi.compose.dsl.subscribe
+import ru.kpfu.itis.features.task.domain.model.TaskModel
 
 class MainScreen : Screen {
 
@@ -61,12 +62,14 @@ class MainScreen : Screen {
         var currentTabName by rememberSaveable { mutableStateOf<String?>(null) }
         var showBottomSheet by rememberSaveable { mutableStateOf(false) }
         val sheetState = rememberModalBottomSheetState()
+        var taskModel by rememberSaveable { mutableStateOf<TaskModel?>(null) }
 
         val state by subscribe { action ->
-            when(action) {
+            when (action) {
                 is MainAction.ShowSnackbar -> {
 
                 }
+
                 is MainAction.OpenTaskBottomSheet -> {
                     showBottomSheet = true
                 }
@@ -108,7 +111,11 @@ class MainScreen : Screen {
                 },
                 sheetState = sheetState
             ) {
-                TaskBottomSheet()
+                TaskBottomSheet(
+                    taskDataAction = { model ->
+                        taskModel = model
+                    }
+                )
             }
         }
     }

@@ -21,11 +21,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import design_system.textfield.OTextField
+import ru.kpfu.itis.features.task.domain.model.TaskModel
 
 @Composable
 fun TaskBottomSheet(
     taskId: Long? = null,
-    onButtonClickedAction: () -> Unit = {}
+    taskDataAction: (TaskModel) -> Unit
 ) {
     var taskTitle by rememberSaveable { mutableStateOf("") }
     var taskDescription by rememberSaveable { mutableStateOf("") }
@@ -37,13 +38,17 @@ fun TaskBottomSheet(
 
             OTextField(
                 text = taskTitle,
-                onValueChange = { },
+                onValueChange = {
+                    taskTitle = it
+                },
                 label = taskTitle
             )
 
             OTextField(
                 text = taskDescription,
-                onValueChange = { },
+                onValueChange = {
+                    taskDescription = it
+                },
                 label = taskDescription,
                 maxLines = 8
             )
@@ -55,10 +60,22 @@ fun TaskBottomSheet(
             horizontalArrangement = Arrangement.End
         ) {
             FloatingActionButton(
-                onClick = onButtonClickedAction,
+                onClick = {
+                    taskDataAction(
+                        TaskModel(
+                            name = taskTitle,
+                            description = taskDescription
+                        )
+                    )
+                },
                 containerColor = MaterialTheme.colorScheme.tertiaryContainer,
                 modifier = Modifier.size(56.dp),
-                elevation = FloatingActionButtonDefaults.elevation(0.dp),
+                elevation = FloatingActionButtonDefaults.elevation(
+                    defaultElevation = 0.dp,
+                    pressedElevation = 0.dp,
+                    hoveredElevation = 0.dp,
+                    focusedElevation = 0.dp
+                ),
                 contentColor = MaterialTheme.colorScheme.onBackground
             ) {
                 Icon(
