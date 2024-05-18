@@ -41,11 +41,11 @@ import cafe.adriel.voyager.navigator.tab.CurrentTab
 import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabNavigator
+import extensions.startFlowMvi
 import features.settings.SettingsTab
 import features.statistics.StatisticsTab
 import features.tasks.completed.CompletedTasksTab
 import features.tasks.create.TaskBottomSheet
-import features.tasks.home.HomeTasksIntent
 import features.tasks.home.HomeTasksTab
 import org.koin.compose.koinInject
 import pro.respawn.flowmvi.compose.dsl.subscribe
@@ -55,6 +55,8 @@ class MainScreen : Screen {
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     override fun Content() = with(koinInject<MainContainer>().store) {
+
+        startFlowMvi()
 
         var currentTabName by rememberSaveable { mutableStateOf<String?>(null) }
         var showBottomSheet by rememberSaveable { mutableStateOf(false) }

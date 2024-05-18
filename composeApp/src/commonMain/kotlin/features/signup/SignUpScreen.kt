@@ -27,6 +27,7 @@ class SignUpScreen : Screen {
 
     @Composable
     override fun Content() {
+
         Box(
             contentAlignment = Alignment.TopStart,
             modifier = Modifier.fillMaxSize()

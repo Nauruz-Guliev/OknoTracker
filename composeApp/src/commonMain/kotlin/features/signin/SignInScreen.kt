@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -24,6 +23,7 @@ import design_system.button.OButton
 import design_system.screens.OErrorScreen
 import design_system.screens.OLoadingScreen
 import design_system.textfield.OTextField
+import extensions.startFlowMvi
 import features.OTrackerState
 import features.signup.SignUpScreen
 import features.tasks.main.MainScreen
@@ -38,7 +38,7 @@ class SignInScreen : Screen {
     override fun Content() =
         with(koinInject<SignInContainer>().store) {
 
-            LaunchedEffect(Unit) { start(this).join() }
+            startFlowMvi()
 
             val navigator = LocalNavigator.current
 

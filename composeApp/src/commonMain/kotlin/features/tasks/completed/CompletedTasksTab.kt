@@ -30,6 +30,9 @@ object CompletedTasksTab : Tab {
 
     @Composable
     override fun Content() {
+
+        // startFlowMvi needed
+
         LazyColumn {
             val list = mutableListOf<String>()
             repeat(20) {

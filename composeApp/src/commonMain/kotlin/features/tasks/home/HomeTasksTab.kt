@@ -35,6 +35,7 @@ import cafe.adriel.voyager.navigator.tab.TabOptions
 import design_system.card.OTaskCard
 import design_system.screens.OErrorScreen
 import design_system.screens.OInitialScreen
+import extensions.startFlowMvi
 import features.OTrackerState
 import features.signin.SignInScreen
 import features.tasks.create.TaskBottomSheet
@@ -47,6 +48,9 @@ object HomeTasksTab : Tab {
     @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
     @Composable
     override fun Content() = with(koinInject<HomeTasksContainer>().store) {
+
+        startFlowMvi()
+
         val navigator = LocalNavigator.current
         var showBottomSheet by rememberSaveable { mutableStateOf(false) }
         val sheetState = rememberModalBottomSheetState()

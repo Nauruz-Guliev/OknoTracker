@@ -23,6 +23,7 @@ import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
 import design_system.screens.OErrorScreen
 import design_system.screens.OLoadingScreen
+import extensions.startFlowMvi
 import features.OTrackerState
 import org.koin.compose.koinInject
 import pro.respawn.flowmvi.compose.dsl.subscribe
@@ -31,6 +32,8 @@ object SettingsTab : Tab {
 
     @Composable
     override fun Content(): Unit = with(koinInject<SettingsContainer>().store) {
+
+        startFlowMvi()
 
         val navigator = LocalNavigator.current
         val isNotificationEnabled by rememberSaveable { mutableStateOf(false) }
