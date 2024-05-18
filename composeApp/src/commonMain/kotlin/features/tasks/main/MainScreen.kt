@@ -21,9 +21,11 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -42,16 +44,34 @@ import cafe.adriel.voyager.navigator.tab.TabNavigator
 import features.settings.SettingsTab
 import features.statistics.StatisticsTab
 import features.tasks.completed.CompletedTasksTab
+import features.tasks.create.TaskBottomSheet
+import features.tasks.home.HomeTasksIntent
+import features.tasks.home.HomeTasksTab
 import org.koin.compose.koinInject
+import pro.respawn.flowmvi.compose.dsl.subscribe
 
 class MainScreen : Screen {
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
-    override fun Content() = with(koinInject<MainTasksContainer>().store) {
-        var currentTabName by rememberSaveable { mutableStateOf<String?>(null) }
+    override fun Content() = with(koinInject<MainContainer>().store) {
 
-        TabNavigator(MainTasksTab) {
+        var currentTabName by rememberSaveable { mutableStateOf<String?>(null) }
+        var showBottomSheet by rememberSaveable { mutableStateOf(false) }
+        val sheetState = rememberModalBottomSheetState()
+
+        val state by subscribe { action ->
+            when(action) {
+                is MainAction.ShowSnackbar -> {
+
+                }
+                is MainAction.OpenTaskBottomSheet -> {
+                    showBottomSheet = true
+                }
+            }
+        }
+
+        TabNavigator(HomeTasksTab) {
 
             Scaffold(
                 topBar = {
@@ -72,11 +92,22 @@ class MainScreen : Screen {
                             currentTabName = it
                         },
                         onButtonClickedAction = {
-                            intent(MainTasksIntent.FloatingButtonClicked)
+                            intent(MainIntent.FloatingButtonClicked)
                         }
                     )
                 }
             )
+        }
+
+        if (showBottomSheet) {
+            ModalBottomSheet(
+                onDismissRequest = {
+                    showBottomSheet = false
+                },
+                sheetState = sheetState
+            ) {
+                TaskBottomSheet()
+            }
         }
     }
 
@@ -95,7 +126,7 @@ class MainScreen : Screen {
                 modifier = Modifier.width(220.dp)
                     .padding(vertical = 24.dp, horizontal = 16.dp)
             ) {
-                TabNavigationItem(MainTasksTab, onTabSelectedAction)
+                TabNavigationItem(HomeTasksTab, onTabSelectedAction)
                 TabNavigationItem(CompletedTasksTab, onTabSelectedAction)
                 TabNavigationItem(StatisticsTab, onTabSelectedAction)
                 TabNavigationItem(SettingsTab, onTabSelectedAction)

@@ -1,4 +1,4 @@
-package features.tasks.main
+package features.tasks.home
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -42,11 +42,11 @@ import org.koin.compose.koinInject
 import pro.respawn.flowmvi.compose.dsl.subscribe
 import ru.kpfu.itis.features.task.domain.model.TaskModel
 
-object MainTasksTab : Tab {
+object HomeTasksTab : Tab {
 
     @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
     @Composable
-    override fun Content() = with(koinInject<MainTasksContainer>().store) {
+    override fun Content() = with(koinInject<HomeTasksContainer>().store) {
         val navigator = LocalNavigator.current
         var showBottomSheet by rememberSaveable { mutableStateOf(false) }
         val sheetState = rememberModalBottomSheetState()
@@ -82,11 +82,11 @@ object MainTasksTab : Tab {
 
                 val state by subscribe { action ->
                     when (action) {
-                        is MainTasksAction.OpenTaskBottomSheet -> {
+                        is HomeTasksAction.OpenTaskBottomSheet -> {
                             showBottomSheet = true
                         }
 
-                        is MainTasksAction.OpenErrorScreen -> {
+                        is HomeTasksAction.OpenErrorScreen -> {
                             navigator?.push(
                                 OErrorScreen(
                                     errorModel = action.errorModel,
@@ -97,11 +97,11 @@ object MainTasksTab : Tab {
                             )
                         }
 
-                        is MainTasksAction.ShowSnackbar -> {
+                        is HomeTasksAction.ShowSnackbar -> {
                             snackbarHostState.showSnackbar(action.message)
                         }
 
-                        MainTasksAction.SignOut -> {
+                        HomeTasksAction.SignOut -> {
                             navigator?.replace(SignInScreen())
                         }
                     }

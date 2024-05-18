@@ -1,4 +1,4 @@
-package features.tasks.main
+package features.tasks.home
 
 import features.OTrackerState
 import flow_mvi.DefaultConfigurationFactory
@@ -13,14 +13,14 @@ import ru.kpfu.itis.features.task.data.repository.TaskRepository
 import ru.kpfu.itis.features.task.data.store.UserStore
 import ru.kpfu.itis.features.task.domain.model.TaskModel
 
-class MainTasksContainer(
+class HomeTasksContainer(
     private val errorMapper: ErrorMapper,
     private val repository: TaskRepository,
     private val configurationFactory: DefaultConfigurationFactory,
     private val userStore: UserStore,
-) : Container<OTrackerState<List<TaskModel>>, MainTasksIntent, MainTasksAction> {
+) : Container<OTrackerState<List<TaskModel>>, HomeTasksIntent, HomeTasksAction> {
 
-    override val store: Store<OTrackerState<List<TaskModel>>, MainTasksIntent, MainTasksAction> =
+    override val store: Store<OTrackerState<List<TaskModel>>, HomeTasksIntent, HomeTasksAction> =
         store(OTrackerState.Initial) {
 
             configure(configurationFactory, "Tasks")
@@ -33,42 +33,42 @@ class MainTasksContainer(
             reduce { intent ->
                 val userId = userStore.getUserId()
                 if (userId == null) {
-                    action(MainTasksAction.SignOut)
-                    intent(MainTasksIntent.ClearUserCache)
+                    action(HomeTasksAction.SignOut)
+                    intent(HomeTasksIntent.ClearUserCache)
                 } else {
                     when (intent) {
-                        is MainTasksIntent.LoadActiveTasks -> {
+                        is HomeTasksIntent.LoadActiveTasks -> {
                             updateState { OTrackerState.Loading }
                             val tasks = repository.getActiveTasks(userId)
                             updateState { OTrackerState.Success(tasks) }
                         }
 
-                        is MainTasksIntent.EditTask -> {
-                            action(MainTasksAction.OpenTaskBottomSheet(intent.taskId))
+                        is HomeTasksIntent.EditTask -> {
+                            action(HomeTasksAction.OpenTaskBottomSheet(intent.taskId))
                         }
 
-                        is MainTasksIntent.DeleteTask -> {
+                        is HomeTasksIntent.DeleteTask -> {
                             updateState { OTrackerState.Loading }
                             repository.deleteTask(intent.taskId)
                             val tasks = repository.getActiveTasks(userId)
                             updateState { OTrackerState.Success(tasks) }
                         }
 
-                        is MainTasksIntent.LoadAllTasks -> {
+                        is HomeTasksIntent.LoadAllTasks -> {
                             updateState { OTrackerState.Loading }
                             val tasks = repository.getActiveTasks(userId)
                             updateState { OTrackerState.Success(tasks) }
                         }
 
-                        MainTasksIntent.FloatingButtonClicked -> {
-                            action(MainTasksAction.OpenTaskBottomSheet())
+                        HomeTasksIntent.FloatingButtonClicked -> {
+                            action(HomeTasksAction.OpenTaskBottomSheet())
                         }
 
-                        is MainTasksIntent.ErrorOccurred -> {
-                            action(MainTasksAction.OpenErrorScreen(intent.errorModel, userId))
+                        is HomeTasksIntent.ErrorOccurred -> {
+                            action(HomeTasksAction.OpenErrorScreen(intent.errorModel, userId))
                         }
 
-                        is MainTasksIntent.ClearUserCache -> {
+                        is HomeTasksIntent.ClearUserCache -> {
                             repository.clearTasks()
                         }
                     }
