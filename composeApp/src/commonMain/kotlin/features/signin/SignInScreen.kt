@@ -37,38 +37,26 @@ class SignInScreen : Screen {
     @Composable
     override fun Content() = with(koinInject<SignInContainer>().store) {
 
-            startFlowMvi()
+        startFlowMvi()
 
-            val navigator = LocalNavigator.current
+        val navigator = LocalNavigator.current
 
-            val state by subscribe { action ->
-                when (action) {
-                    is SignInAction.OpenSignUpScreen -> {
-                        navigator?.replace(SignUpScreen())
-                    }
+        val state by subscribe { action ->
+            when (action) {
+                is SignInAction.OpenSignUpScreen -> {
+                    navigator?.replace(SignUpScreen())
+                }
 
-                    is SignInAction.OpenMainScreen -> {
-                        navigator?.apply {
-                            replaceAll(MainScreen())
-                        }
-                    }
-
-                    is SignInAction.OpenErrorScreen -> {
-                        navigator?.push(
-                            OErrorScreen(
-                                errorModel = action.errorModel,
-                                onClickAction = {
-                                    navigator.pop()
-                                },
-                                isTryAgain = false
-                            )
-                        )
+                is SignInAction.OpenMainScreen -> {
+                    navigator?.apply {
+                        replaceAll(MainScreen())
                     }
                 }
             }
-
-            HandleSignInState(state)
         }
+
+        HandleSignInState(state)
+    }
 
 
     @Composable
@@ -80,7 +68,12 @@ class SignInScreen : Screen {
             }
 
             is OTrackerState.Error -> {
-                send(SignInIntent.ErrorOccured(state.error))
+                OErrorScreen(
+                    errorModel = state.error,
+                    onClickAction = {
+                    },
+                    isTryAgain = false
+                )
             }
 
             OTrackerState.Initial, is OTrackerState.Success -> {

@@ -26,79 +26,76 @@ import cafe.adriel.voyager.core.screen.Screen
 import design_system.button.OButton
 import ru.kpfu.itis.common.model.ErrorModel
 
-data class OErrorScreen(
-    private val errorModel: ErrorModel,
-    private val icon: ImageVector = Icons.Rounded.Warning,
-    private val iconSize: Int = 120,
-    private val isTryAgain: Boolean = true,
-    private val buttonPadding: PaddingValues = PaddingValues(horizontal = 40.dp),
-    private val onClickAction: () -> Unit,
-) : Screen {
+@Composable
+fun OErrorScreen(
+    errorModel: ErrorModel,
+    icon: ImageVector = Icons.Rounded.Warning,
+    iconSize: Int = 120,
+    isTryAgain: Boolean = true,
+    buttonPadding: PaddingValues = PaddingValues(horizontal = 40.dp),
+    onClickAction: () -> Unit,
+) {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
 
-    @Composable
-    override fun Content() {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.fillMaxWidth()
         ) {
-
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.fillMaxWidth()
+            Box(
+                modifier = Modifier
+                    .size(iconSize.dp)
+                    .background(MaterialTheme.colorScheme.inverseSurface, CircleShape),
+                contentAlignment = Alignment.Center
             ) {
-                Box(
-                    modifier = Modifier
-                        .size(iconSize.dp)
-                        .background(MaterialTheme.colorScheme.inverseSurface, CircleShape),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = icon,
-                        contentDescription = "Warning",
-                        tint = MaterialTheme.colorScheme.onPrimary,
-                        modifier = Modifier.size(iconSize.dp)
-                            .padding(16.dp)
-                    )
-                }
-
-                Spacer(
-                    modifier = Modifier.height(16.dp)
-                )
-
-                Text(
-                    text = if (errorModel.title.length > 30) {
-                        errorModel.title.substringBefore(".")
-                    } else {
-                        errorModel.title
-                    },
-                    style = MaterialTheme.typography.headlineSmall,
-                    textAlign = TextAlign.Center
-                )
-
-                Spacer(
-                    modifier = Modifier.height(8.dp)
-                )
-
-                Text(
-                    text = errorModel.details,
-                    style = MaterialTheme.typography.bodyLarge,
-                    textAlign = TextAlign.Center
-                )
-
-                Spacer(
-                    modifier = Modifier.height(16.dp)
-                )
-
-                OButton(
-                    text = if (isTryAgain) {
-                        "Try again"
-                    } else {
-                        "Close"
-                    },
-                    onClickAction = onClickAction,
-                    outerPadding = buttonPadding
+                Icon(
+                    imageVector = icon,
+                    contentDescription = "Warning",
+                    tint = MaterialTheme.colorScheme.onPrimary,
+                    modifier = Modifier.size(iconSize.dp)
+                        .padding(16.dp)
                 )
             }
+
+            Spacer(
+                modifier = Modifier.height(16.dp)
+            )
+
+            Text(
+                text = if (errorModel.title.length > 30) {
+                    errorModel.title.substringBefore(".")
+                } else {
+                    errorModel.title
+                },
+                style = MaterialTheme.typography.headlineSmall,
+                textAlign = TextAlign.Center
+            )
+
+            Spacer(
+                modifier = Modifier.height(8.dp)
+            )
+
+            Text(
+                text = errorModel.details,
+                style = MaterialTheme.typography.bodyLarge,
+                textAlign = TextAlign.Center
+            )
+
+            Spacer(
+                modifier = Modifier.height(16.dp)
+            )
+
+            OButton(
+                text = if (isTryAgain) {
+                    "Try again"
+                } else {
+                    "Close"
+                },
+                onClickAction = onClickAction,
+                outerPadding = buttonPadding
+            )
         }
     }
 }

@@ -12,4 +12,6 @@ sealed interface HomeTasksIntent : MVIIntent {
     data class EditTask(val taskId: Long) : HomeTasksIntent
     data class ErrorOccurred(val errorModel: ErrorModel) : HomeTasksIntent
     data object FloatingButtonClicked : HomeTasksIntent
+    data class TaskChecked(val isCompleted: Boolean, val taskId: Long) : HomeTasksIntent
+
 }

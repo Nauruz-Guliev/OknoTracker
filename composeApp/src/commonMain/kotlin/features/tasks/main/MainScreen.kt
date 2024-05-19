@@ -151,7 +151,12 @@ class MainScreen : Screen {
                     onClick = onButtonClickedAction,
                     containerColor = MaterialTheme.colorScheme.tertiaryContainer,
                     modifier = Modifier.size(56.dp),
-                    elevation = FloatingActionButtonDefaults.elevation(0.dp),
+                    elevation = FloatingActionButtonDefaults.elevation(
+                        defaultElevation = 0.dp,
+                        pressedElevation = 0.dp,
+                        hoveredElevation = 0.dp,
+                        focusedElevation = 0.dp,
+                    ),
                     contentColor = MaterialTheme.colorScheme.onBackground
                 ) {
                     Icon(
@@ -170,7 +175,11 @@ class MainScreen : Screen {
         onTabSelected: (String?) -> Unit
     ) {
         val tabNavigator = LocalTabNavigator.current
-        val isSelected = tabNavigator.current == tab
+        val isSelected = if (tabNavigator.current is Screen) {
+            tabNavigator.current == tab
+        } else {
+            false
+        }
 
         Row(
             modifier = Modifier
@@ -183,7 +192,7 @@ class MainScreen : Screen {
                     CircleShape
                 )
                 .padding(4.dp)
-                .size(36.dp)
+                .size(32.dp)
         ) {
             val selectedTabName = tab.options.title
             BottomNavigationItem(

@@ -10,5 +10,4 @@ sealed interface SignInAction : MVIAction {
 
     data object OpenSignUpScreen : SignInAction
     data class OpenMainScreen(val userId: Long) : SignInAction
-    data class OpenErrorScreen(val errorModel: ErrorModel) : SignInAction
 }

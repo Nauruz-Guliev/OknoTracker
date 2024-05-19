@@ -65,11 +65,19 @@ class HomeTasksContainer(
                         }
 
                         is HomeTasksIntent.ErrorOccurred -> {
-                            action(HomeTasksAction.OpenErrorScreen(intent.errorModel, userId))
+                            updateState { OTrackerState.Error(intent.errorModel) }
                         }
 
                         is HomeTasksIntent.ClearUserCache -> {
                             repository.clearTasks()
+                        }
+                        is HomeTasksIntent.TaskChecked -> {
+                            if (intent.isCompleted) {
+                                repository.markAsUncompleted(intent.taskId)
+                            } else {
+                                repository.markAsCompleted(intent.taskId)
+                            }
+                            intent(HomeTasksIntent.LoadAllTasks)
                         }
                     }
                 }
