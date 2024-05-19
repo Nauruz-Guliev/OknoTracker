@@ -14,11 +14,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
@@ -41,6 +38,7 @@ import cafe.adriel.voyager.navigator.tab.CurrentTab
 import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabNavigator
+import design_system.button.OFloatingButton
 import extensions.startFlowMvi
 import features.settings.SettingsTab
 import features.statistics.StatisticsTab
@@ -148,24 +146,7 @@ class MainScreen : Screen {
                     .weight(1f),
                 horizontalAlignment = Alignment.End,
             ) {
-                FloatingActionButton(
-                    onClick = onButtonClickedAction,
-                    containerColor = MaterialTheme.colorScheme.tertiaryContainer,
-                    modifier = Modifier.size(56.dp),
-                    elevation = FloatingActionButtonDefaults.elevation(
-                        defaultElevation = 0.dp,
-                        pressedElevation = 0.dp,
-                        hoveredElevation = 0.dp,
-                        focusedElevation = 0.dp,
-                    ),
-                    contentColor = MaterialTheme.colorScheme.onBackground
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Add,
-                        contentDescription = "Add",
-                        modifier = Modifier.size(28.dp),
-                    )
-                }
+                OFloatingButton(onClickedAction = onButtonClickedAction)
             }
         }
     }
@@ -176,11 +157,7 @@ class MainScreen : Screen {
         onTabSelected: (String?) -> Unit
     ) {
         val tabNavigator = LocalTabNavigator.current
-        val isSelected = if (tabNavigator.current is Screen) {
-            tabNavigator.current == tab
-        } else {
-            false
-        }
+        val isSelected = tabNavigator.current == tab
 
         Row(
             modifier = Modifier
