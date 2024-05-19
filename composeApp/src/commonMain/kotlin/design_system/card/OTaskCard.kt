@@ -13,16 +13,23 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import design_system.chips.OChips
+import ru.kpfu.itis.features.task.domain.model.TaskModel
 
 @Composable
 fun OTaskCard(
-    onCheckedAction: (Boolean) -> Unit = { },
-    labels: List<String> = listOf(),
-    title: String
+    onCheckedAction: (Boolean, Long) -> Unit,
+    task: TaskModel,
+    labels: List<String> = emptyList(),
 ) {
+
+    val isTaskChecked by rememberSaveable { mutableStateOf(task.isCompleted) }
+
     OutlinedCard(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
@@ -34,15 +41,17 @@ fun OTaskCard(
 
         ) {
             Checkbox(
-                checked = false,
-                onCheckedChange = onCheckedAction,
+                checked = isTaskChecked,
+                onCheckedChange = {
+                    onCheckedAction(isTaskChecked, task.id)
+                },
             )
             Column(
                 modifier = Modifier.weight(1f)
                     .padding(vertical = 8.dp)
             ) {
                 Text(
-                    text = title,
+                    text = task.name,
                     style = MaterialTheme.typography.titleMedium
                 )
                 Row(

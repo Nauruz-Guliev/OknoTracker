@@ -3,8 +3,10 @@ package features.tasks.create
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
@@ -36,12 +38,16 @@ fun TaskBottomSheet(
     ) {
         Column {
 
+            Spacer(
+                modifier = Modifier.height(32.dp)
+            )
+
             OTextField(
                 text = taskTitle,
                 onValueChange = {
                     taskTitle = it
                 },
-                label = taskTitle
+                label = "Enter task name",
             )
 
             OTextField(
@@ -49,8 +55,8 @@ fun TaskBottomSheet(
                 onValueChange = {
                     taskDescription = it
                 },
-                label = taskDescription,
-                maxLines = 8
+                label = "Enter task description",
+                maxLines = 8,
             )
         }
         Row(
@@ -74,7 +80,7 @@ fun TaskBottomSheet(
                     defaultElevation = 0.dp,
                     pressedElevation = 0.dp,
                     hoveredElevation = 0.dp,
-                    focusedElevation = 0.dp
+                    focusedElevation = 0.dp,
                 ),
                 contentColor = MaterialTheme.colorScheme.onBackground
             ) {

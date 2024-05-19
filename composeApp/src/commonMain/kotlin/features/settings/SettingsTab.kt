@@ -65,13 +65,11 @@ object SettingsTab : Tab {
         when (state) {
             is OTrackerState.Success, is OTrackerState.Initial -> {}
             is OTrackerState.Error -> {
-                navigator?.push(
-                    OErrorScreen(
-                        errorModel = (state as OTrackerState.Error).error,
-                        onClickAction = {
-                            navigator.pop()
-                        }
-                    )
+                OErrorScreen(
+                    errorModel = (state as OTrackerState.Error).error,
+                    onClickAction = {
+                        // todo
+                    }
                 )
             }
             is OTrackerState.Loading -> {

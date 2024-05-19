@@ -48,8 +48,7 @@ class SignInContainer(
                         }
                     }
                     is SignInIntent.ErrorOccured -> {
-                        action(SignInAction.OpenErrorScreen(intent.errorModel))
-                        updateState { OTrackerState.Initial }
+                        updateState { OTrackerState.Error(intent.errorModel) }
                     }
 
                     SignInIntent.SignUpClicked -> {
