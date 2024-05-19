@@ -64,6 +64,12 @@ class HomeTasksContainer(
                             action(HomeTasksAction.OpenTaskBottomSheet())
                         }
 
+                        is HomeTasksIntent.LoadCachedTasks -> {
+                            updateState { OTrackerState.Loading }
+                            val tasks = repository.getCachedTasks(userId)
+                            updateState { OTrackerState.Success(tasks) }
+                        }
+
                         is HomeTasksIntent.ErrorOccurred -> {
                             updateState { OTrackerState.Error(intent.errorModel) }
                         }
@@ -72,12 +78,16 @@ class HomeTasksContainer(
                             repository.clearTasks()
                         }
                         is HomeTasksIntent.TaskChecked -> {
-                            if (intent.isCompleted) {
-                                repository.markAsUncompleted(intent.taskId)
-                            } else {
-                                repository.markAsCompleted(intent.taskId)
+                            try {
+                                if (intent.isCompleted) {
+                                    repository.markAsUncompleted(intent.taskId)
+                                } else {
+                                    repository.markAsCompleted(intent.taskId)
+                                }
+                                intent(HomeTasksIntent.LoadAllTasks)
+                            } catch (ex: Exception) {
+                                action(HomeTasksAction.ShowSnackbar(ex.message))
                             }
-                            intent(HomeTasksIntent.LoadAllTasks)
                         }
                     }
                 }

@@ -9,7 +9,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 
 @Composable
-fun OInitialScreen(
+fun EmptyTasksState(
     message: String? = null
 ) {
     Box(
@@ -17,7 +17,7 @@ fun OInitialScreen(
         contentAlignment = Alignment.Center
     ) {
         Text(
-            text = message ?: "No data available. Try to refresh",
+            text = message ?: "You have no active tasks yet",
             style = MaterialTheme.typography.headlineSmall
         )
     }

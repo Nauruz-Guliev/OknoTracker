@@ -45,10 +45,14 @@ class TaskRepository(
         val response = taskService.getActiveTasks(userId)
         if (response.data?.taskList != null) {
             taskDatabase.clearAndCreateActiveTasks(response.data.taskList)
-            return taskMapper.map(taskDatabase.getActiveTasks())
+            return getCachedTasks(userId)
         } else {
             throw taskMapper.mapToException(response.error)
         }
+    }
+
+    suspend fun getCachedTasks(userId: Long): List<TaskModel> {
+        return taskMapper.map(taskDatabase.getActiveTasks())
     }
 
     suspend fun clearTasks() {
