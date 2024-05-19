@@ -37,13 +37,13 @@ class CompletedTasksContainer(
 
                 val userId = userStore.getUserId()
                 if (userId == null) {
-                    action(CompletedTasksAction.Logout)
+                    action(CompletedTasksAction.SignOut)
                     intent(CompletedTasksIntent.ClearUserCache)
                 } else {
                     when (intent) {
                         is CompletedTasksIntent.LoadTasks -> {
                             updateState { OTrackerState.Loading }
-                            val tasks = repository.getActiveTasks(userId)
+                            val tasks = repository.getCompleteTasks(userId)
                             updateState { OTrackerState.Success(tasks) }
                         }
 
@@ -61,6 +61,19 @@ class CompletedTasksContainer(
 
                         is CompletedTasksIntent.ClearUserCache -> {
                             userStore.deleteUserId()
+                        }
+
+                        is CompletedTasksIntent.TaskChecked -> {
+                            try {
+                                if (intent.isCompleted) {
+                                    repository.markAsUncompleted(intent.taskId)
+                                } else {
+                                    repository.markAsCompleted(intent.taskId)
+                                }
+                                intent(CompletedTasksIntent.LoadTasks)
+                            } catch (ex: Exception) {
+                                ex.message?.let { action(CompletedTasksAction.ShowSnackbar(it)) }
+                            }
                         }
                     }
                 }

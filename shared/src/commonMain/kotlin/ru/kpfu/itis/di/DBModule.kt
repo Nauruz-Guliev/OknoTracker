@@ -5,6 +5,6 @@ import ru.kpfu.itis.features.task.data.store.UserStore
 
 fun dbModule() = module {
     single {
-        UserStore(get())
+        UserStore(get(), get())
     }
 }

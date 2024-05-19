@@ -95,15 +95,13 @@ class TaskService(
 
     suspend fun getCompletedTasks(
         userId: Long,
-        pageSize: Long = 20,
         page: Long = 1,
+        pageSize: Long = 20,
     ): TaskResponseList {
         return httpClient.get {
+            parameter("page", "$page")
+            parameter("pageSize", "$pageSize")
             url("${MR.strings.url.get()}task/completed_list/order_by_completed_desc/$userId")
-            parameters {
-                append("page", "$page")
-                append("pageSize", "$pageSize")
-            }
         }.body()
     }
 

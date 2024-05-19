@@ -10,6 +10,7 @@ import org.koin.dsl.module
 import ru.kpfu.itis.common.data.driver.databaseModule
 import ru.kpfu.itis.di.androidModule
 import ru.kpfu.itis.di.dbModule
+import ru.kpfu.itis.di.dispatcherModule
 import ru.kpfu.itis.di.networkModule
 
 class Application : Application() {
@@ -25,6 +26,7 @@ class Application : Application() {
             dbModule(),
             kstoreModule(cacheDir.path),
             settingsModule(),
+            dispatcherModule(),
         ) {
             androidContext(this@Application)
         }

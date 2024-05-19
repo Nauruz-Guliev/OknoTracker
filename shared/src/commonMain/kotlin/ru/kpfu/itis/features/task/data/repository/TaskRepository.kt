@@ -1,5 +1,7 @@
 package ru.kpfu.itis.features.task.data.repository
 
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.withContext
 import ru.kpfu.itis.features.task.data.db.TaskDatabaseImpl
 import ru.kpfu.itis.features.task.data.mapper.TaskMapper
 import ru.kpfu.itis.features.task.data.model.TaskResponseSingle
@@ -10,21 +12,22 @@ class TaskRepository(
     private val taskDatabase: TaskDatabaseImpl,
     private val taskService: TaskService,
     private val taskMapper: TaskMapper,
+    private val dispatcher: CoroutineDispatcher
 ) {
 
-    suspend fun getTask(taskId: Long): TaskModel {
-        return handleTask(taskService.getTask(taskId))
+    suspend fun getTask(taskId: Long): TaskModel = withContext(dispatcher) {
+        handleTask(taskService.getTask(taskId))
     }
 
-    suspend fun createTask(taskModel: TaskModel) {
+    suspend fun createTask(taskModel: TaskModel) = withContext(dispatcher) {
         handleTask(taskService.createTask(taskMapper.mapCreate(taskModel)))
     }
 
-    suspend fun changeTask(taskModel: TaskModel) {
+    suspend fun changeTask(taskModel: TaskModel) = withContext(dispatcher) {
         handleTask(taskService.changeTask(taskMapper.mapChange(taskModel)))
     }
 
-    suspend fun deleteTask(taskId: Long) {
+    suspend fun deleteTask(taskId: Long) = withContext(dispatcher) {
         val result = taskService.deleteTask(taskId)
         if (result.error != null) {
             throw taskMapper.mapToException(result.error)
@@ -33,29 +36,43 @@ class TaskRepository(
         }
     }
 
-    suspend fun markAsCompleted(taskId: Long) {
+    suspend fun markAsCompleted(taskId: Long) = withContext(dispatcher) {
         handleTask(taskService.markTaskCompleted(taskId))
     }
 
-    suspend fun markAsUncompleted(taskId: Long) {
+    suspend fun markAsUncompleted(taskId: Long) = withContext(dispatcher) {
         handleTask(taskService.markTaskUncompleted(taskId))
     }
 
-    suspend fun getActiveTasks(userId: Long): List<TaskModel> {
+    suspend fun getActiveTasks(userId: Long): List<TaskModel> = withContext(dispatcher) {
         val response = taskService.getActiveTasks(userId)
         if (response.data?.taskList != null) {
             taskDatabase.clearAndCreateActiveTasks(response.data.taskList)
-            return getCachedTasks(userId)
+            getActiveCachedTasks()
         } else {
             throw taskMapper.mapToException(response.error)
         }
     }
 
-    suspend fun getCachedTasks(userId: Long): List<TaskModel> {
-        return taskMapper.map(taskDatabase.getActiveTasks())
+    suspend fun getCompleteTasks(userId: Long): List<TaskModel> = withContext(dispatcher) {
+        val response = taskService.getCompletedTasks(userId)
+        if (response.data?.taskList != null) {
+            taskDatabase.clearAndCreateCompletedTasks(response.data.taskList)
+            getCompletedCachedTasks()
+        } else {
+            throw taskMapper.mapToException(response.error)
+        }
     }
 
-    suspend fun clearTasks() {
+    suspend fun getActiveCachedTasks(): List<TaskModel> = withContext(dispatcher) {
+        taskMapper.map(taskDatabase.getActiveTasks())
+    }
+
+    suspend fun getCompletedCachedTasks(): List<TaskModel> = withContext(dispatcher) {
+        taskMapper.map(taskDatabase.getCompletedTasks())
+    }
+
+    suspend fun clearTasks() = withContext(dispatcher) {
         taskDatabase.deleteAllTasks()
     }
 

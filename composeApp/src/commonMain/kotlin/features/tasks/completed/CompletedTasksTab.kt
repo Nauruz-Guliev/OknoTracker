@@ -7,32 +7,152 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.ListItem
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.pulltorefresh.PullToRefreshContainer
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
 import design_system.card.OTaskCard
-import kotlinx.coroutines.delay
+import design_system.screens.EmptyTasksState
+import design_system.screens.OErrorScreen
+import extensions.startFlowMvi
+import features.OTrackerState
+import features.signin.SignInScreen
+import features.tasks.create.TaskBottomSheet
+import org.koin.compose.koinInject
+import pro.respawn.flowmvi.compose.dsl.subscribe
+import ru.kpfu.itis.features.task.domain.model.TaskModel
 
 object CompletedTasksTab : Tab {
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Composable
+    override fun Content() = with(koinInject<CompletedTasksContainer>().store) {
+
+        startFlowMvi()
+
+
+        val navigator = LocalNavigator.current
+        var showBottomSheet by rememberSaveable { mutableStateOf(false) }
+        val sheetState = rememberModalBottomSheetState()
+        var selectedTaskId by rememberSaveable { mutableStateOf<Long?>(null) }
+        val snackbarHostState = remember { SnackbarHostState() }
+        var taskModel by rememberSaveable { mutableStateOf<TaskModel?>(null) }
+        val refreshState = rememberPullToRefreshState()
+        var itemList by rememberSaveable { mutableStateOf(listOf<TaskModel>()) }
+
+        if (refreshState.isRefreshing) {
+            intent(CompletedTasksIntent.LoadTasks)
+        }
+
+        Scaffold(
+            snackbarHost = {
+                SnackbarHost(snackbarHostState)
+            },
+            modifier = Modifier.nestedScroll(refreshState.nestedScrollConnection)
+        ) {
+
+            Box(
+                modifier = Modifier.fillMaxSize()
+                    .padding(it)
+            ) {
+
+                val state by subscribe { action ->
+                    when (action) {
+                        is CompletedTasksAction.OpenTaskBottomSheet -> {
+                            showBottomSheet = true
+                        }
+
+                        CompletedTasksAction.SignOut -> {
+                            navigator?.replace(SignInScreen())
+                        }
+
+                        is CompletedTasksAction.ShowSnackbar -> {
+                            action.message.let { it1 -> snackbarHostState.showSnackbar(it1) }
+                        }
+                    }
+                }
+
+                if (itemList.isEmpty()) {
+                    EmptyTasksState()
+                }
+
+                when (state) {
+                    is OTrackerState.Initial -> {
+                        refreshState.startRefresh()
+                        intent(CompletedTasksIntent.LoadTasks)
+                    }
+
+                    is OTrackerState.Success -> {
+                        itemList = (state as OTrackerState.Success<List<TaskModel>>).data
+                        refreshState.endRefresh()
+                    }
+
+                    is OTrackerState.Loading -> {}
+                    is OTrackerState.Error -> {
+                        refreshState.endRefresh()
+                        OErrorScreen(
+                            errorModel = (state as OTrackerState.Error).error,
+                            onClickAction = {
+                                intent(CompletedTasksIntent.LoadTasks)
+                            }
+                        )
+                    }
+                }
+
+                LazyColumn(modifier = Modifier.fillMaxSize()) {
+                    if (!refreshState.isRefreshing) {
+                        items(itemList) { task ->
+                            OTaskCard(
+                                onCheckedAction = { isChecked, taskId ->
+                                    intent(CompletedTasksIntent.TaskChecked(isChecked, taskId))
+                                },
+                                task
+                            )
+                        }
+                    }
+                }
+
+                PullToRefreshContainer(
+                    modifier = Modifier.align(Alignment.TopCenter),
+                    state = refreshState,
+                )
+            }
+        }
+
+        if (showBottomSheet) {
+            ModalBottomSheet(
+                onDismissRequest = {
+                    showBottomSheet = false
+                },
+                sheetState = sheetState
+            ) {
+                TaskBottomSheet(
+                    taskId = selectedTaskId,
+                    taskDataAction = { model ->
+                        taskModel = model
+                        showBottomSheet = false
+                    }
+                )
+            }
+        }
+    }
 
     override val options: TabOptions
         @Composable
@@ -48,65 +168,4 @@ object CompletedTasksTab : Tab {
                 )
             }
         }
-
-    @OptIn(ExperimentalMaterial3Api::class)
-    @Composable
-    override fun Content() {
-
-        // startFlowMvi needed
-
-        var itemCount by remember { mutableStateOf(15) }
-        val state = rememberPullToRefreshState()
-        if (state.isRefreshing) {
-            LaunchedEffect(true) {
-                // fetch something
-                delay(1500)
-                itemCount += 5
-                state.endRefresh()
-            }
-        }
-        Scaffold(
-            modifier = Modifier.nestedScroll(state.nestedScrollConnection),
-            topBar = {
-                TopAppBar(
-                    title = { Text("TopAppBar") },
-                    // Provide an accessible alternative to trigger refresh.
-                    actions = {
-                        IconButton(onClick = { state.startRefresh() }) {
-                            Icon(Icons.Filled.Refresh, "Trigger Refresh")
-                        }
-                    }
-                )
-            }
-        ) {
-            Box(Modifier.padding(it)) {
-                LazyColumn(Modifier.fillMaxSize()) {
-                    if (!state.isRefreshing) {
-                        items(itemCount) {
-                            ListItem({ Text(text = "Item ${itemCount - it}") })
-                        }
-                    }
-                }
-                PullToRefreshContainer(
-                    modifier = Modifier.align(Alignment.TopCenter),
-                    state = state,
-                )
-            }
-        }
-
-        /*LazyColumn {
-            val list = mutableListOf<String>()
-            repeat(20) {
-                list.apply {
-                    add("Number $it")
-                }
-            }
-            items(list) {
-                OTaskCard(
-                    title = it,
-                    labels = list
-                )
-            }
-        }*/
-    }
 }

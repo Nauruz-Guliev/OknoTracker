@@ -66,7 +66,7 @@ class HomeTasksContainer(
 
                         is HomeTasksIntent.LoadCachedTasks -> {
                             updateState { OTrackerState.Loading }
-                            val tasks = repository.getCachedTasks(userId)
+                            val tasks = repository.getActiveCachedTasks()
                             updateState { OTrackerState.Success(tasks) }
                         }
 

@@ -24,7 +24,7 @@ fun tasksModule() = module {
     }
 
     factory {
-        TaskRepository(get(), get(), get())
+        TaskRepository(get(), get(), get(), get())
     }
 
     factory {
