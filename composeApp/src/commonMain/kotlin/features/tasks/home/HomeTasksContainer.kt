@@ -77,6 +77,7 @@ class HomeTasksContainer(
                         is HomeTasksIntent.ClearUserCache -> {
                             repository.clearTasks()
                         }
+
                         is HomeTasksIntent.TaskChecked -> {
                             try {
                                 if (intent.isCompleted) {

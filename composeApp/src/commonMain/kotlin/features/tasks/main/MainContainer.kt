@@ -35,9 +35,11 @@ class MainContainer(
                     MainIntent.FloatingButtonClicked -> {
                         action(MainAction.OpenTaskBottomSheet())
                     }
+
                     is MainIntent.ErrorOccurred -> {
-                       action(MainAction.ShowSnackbar(intent.errorModel.title))
+                        action(MainAction.ShowSnackbar(intent.errorModel.title))
                     }
+
                     is MainIntent.CreateTask -> {
                         userStore.getUserId()?.let { userId ->
                             repository.createTask(

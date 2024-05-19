@@ -72,6 +72,7 @@ object SettingsTab : Tab {
                     }
                 )
             }
+
             is OTrackerState.Loading -> {
                 OLoadingScreen()
             }

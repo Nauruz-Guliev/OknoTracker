@@ -47,6 +47,7 @@ class SignInContainer(
                             }
                         }
                     }
+
                     is SignInIntent.ErrorOccured -> {
                         updateState { OTrackerState.Error(intent.errorModel) }
                     }
