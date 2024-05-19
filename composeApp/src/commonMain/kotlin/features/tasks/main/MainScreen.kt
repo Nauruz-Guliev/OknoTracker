@@ -66,7 +66,6 @@ class MainScreen : Screen {
         val state by subscribe { action ->
             when (action) {
                 is MainAction.ShowSnackbar -> {}
-
                 is MainAction.OpenTaskBottomSheet -> {
                     showBottomSheet = true
                 }

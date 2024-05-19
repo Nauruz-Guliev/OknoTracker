@@ -47,7 +47,6 @@ object CompletedTasksTab : Tab {
 
         startFlowMvi()
 
-
         val navigator = LocalNavigator.current
         var showBottomSheet by rememberSaveable { mutableStateOf(false) }
         val sheetState = rememberModalBottomSheetState()
@@ -56,6 +55,7 @@ object CompletedTasksTab : Tab {
         var taskModel by rememberSaveable { mutableStateOf<TaskModel?>(null) }
         val refreshState = rememberPullToRefreshState()
         var itemList by rememberSaveable { mutableStateOf(listOf<TaskModel>()) }
+        var showEmptyState by rememberSaveable { mutableStateOf(true) }
 
         if (refreshState.isRefreshing) {
             intent(CompletedTasksIntent.LoadTasks)
@@ -89,32 +89,11 @@ object CompletedTasksTab : Tab {
                     }
                 }
 
-                if (itemList.isEmpty()) {
+                if (itemList.isEmpty() && showEmptyState) {
                     EmptyTasksState()
                 }
 
-                when (state) {
-                    is OTrackerState.Initial -> {
-                        refreshState.startRefresh()
-                        intent(CompletedTasksIntent.LoadTasks)
-                    }
 
-                    is OTrackerState.Success -> {
-                        itemList = (state as OTrackerState.Success<List<TaskModel>>).data
-                        refreshState.endRefresh()
-                    }
-
-                    is OTrackerState.Loading -> {}
-                    is OTrackerState.Error -> {
-                        refreshState.endRefresh()
-                        OErrorScreen(
-                            errorModel = (state as OTrackerState.Error).error,
-                            onClickAction = {
-                                intent(CompletedTasksIntent.LoadTasks)
-                            }
-                        )
-                    }
-                }
 
                 LazyColumn(modifier = Modifier.fillMaxSize()) {
                     if (!refreshState.isRefreshing) {
@@ -133,6 +112,34 @@ object CompletedTasksTab : Tab {
                     modifier = Modifier.align(Alignment.TopCenter),
                     state = refreshState,
                 )
+
+                when (state) {
+                    is OTrackerState.Initial -> {
+                        refreshState.startRefresh()
+                        intent(CompletedTasksIntent.LoadTasks)
+                    }
+
+                    is OTrackerState.Success -> {
+                        showEmptyState = false
+                        itemList = (state as OTrackerState.Success<List<TaskModel>>).data
+                        refreshState.endRefresh()
+                    }
+
+                    is OTrackerState.Loading -> {
+                        showEmptyState = true
+                    }
+
+                    is OTrackerState.Error -> {
+                        showEmptyState = false
+                        refreshState.endRefresh()
+                        OErrorScreen(
+                            errorModel = (state as OTrackerState.Error).error,
+                            onClickAction = {
+                                intent(CompletedTasksIntent.LoadTasks)
+                            }
+                        )
+                    }
+                }
             }
         }
 

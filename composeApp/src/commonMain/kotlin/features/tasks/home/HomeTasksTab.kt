@@ -100,28 +100,6 @@ object HomeTasksTab : Tab {
                     EmptyTasksState()
                 }
 
-                when (state) {
-                    is OTrackerState.Initial -> {
-                        refreshState.startRefresh()
-                        intent(HomeTasksIntent.LoadCachedTasks)
-                    }
-                    is OTrackerState.Success -> {
-                        itemList = (state as OTrackerState.Success<List<TaskModel>>).data
-                        refreshState.endRefresh()
-                    }
-
-                    is OTrackerState.Loading -> {}
-                    is OTrackerState.Error -> {
-                        refreshState.endRefresh()
-                        OErrorScreen(
-                            errorModel = (state as OTrackerState.Error).error,
-                            onClickAction = {
-                                intent(HomeTasksIntent.LoadAllTasks)
-                            }
-                        )
-                    }
-                }
-
                 LazyColumn(modifier = Modifier.fillMaxSize()) {
                     if (!refreshState.isRefreshing) {
                         items(itemList) { task ->
@@ -139,6 +117,29 @@ object HomeTasksTab : Tab {
                     modifier = Modifier.align(Alignment.TopCenter),
                     state = refreshState,
                 )
+
+                when (state) {
+                    is OTrackerState.Initial -> {
+                        refreshState.startRefresh()
+                        intent(HomeTasksIntent.LoadCachedTasks)
+                    }
+
+                    is OTrackerState.Success -> {
+                        itemList = (state as OTrackerState.Success<List<TaskModel>>).data
+                        refreshState.endRefresh()
+                    }
+
+                    is OTrackerState.Loading -> {}
+                    is OTrackerState.Error -> {
+                        refreshState.endRefresh()
+                        OErrorScreen(
+                            errorModel = (state as OTrackerState.Error).error,
+                            onClickAction = {
+                                intent(HomeTasksIntent.LoadAllTasks)
+                            }
+                        )
+                    }
+                }
             }
         }
 
