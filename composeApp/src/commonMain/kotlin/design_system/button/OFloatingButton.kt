@@ -19,7 +19,9 @@ fun OFloatingButton(
     onClickedAction: () -> Unit
 ) {
     FloatingActionButton(
-        onClick = onClickedAction,
+        onClick = {
+            onClickedAction()
+        },
         containerColor = MaterialTheme.colorScheme.tertiaryContainer,
         modifier = modifier,
         elevation = FloatingActionButtonDefaults.elevation(

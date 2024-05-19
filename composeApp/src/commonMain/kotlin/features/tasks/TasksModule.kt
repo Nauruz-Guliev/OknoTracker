@@ -20,7 +20,7 @@ fun tasksModule() = module {
     }
 
     single {
-        MainContainer(get(), get(), get())
+        MainContainer(get(), get(), get(), get())
     }
 
     factory {

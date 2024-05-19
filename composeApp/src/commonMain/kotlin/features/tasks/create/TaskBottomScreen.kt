@@ -63,7 +63,8 @@ fun TaskBottomSheet(
         ) {
 
             OFloatingButton(icon = Icons.Default.Done) {
-                taskDataAction(
+
+            taskDataAction(
                     TaskModel(
                         name = taskTitle,
                         description = taskDescription

@@ -8,6 +8,5 @@ sealed interface MainIntent : MVIIntent {
 
     data class ErrorOccurred(val errorModel: ErrorModel) : MainIntent
     data class CreateTask(val taskModel: TaskModel) : MainIntent
-
     data object FloatingButtonClicked : MainIntent
 }

@@ -40,6 +40,7 @@ import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabNavigator
 import design_system.button.OFloatingButton
 import extensions.startFlowMvi
+import features.OTrackerState
 import features.settings.SettingsTab
 import features.statistics.StatisticsTab
 import features.tasks.completed.CompletedTasksTab
@@ -69,6 +70,16 @@ class MainScreen : Screen {
                 is MainAction.OpenTaskBottomSheet -> {
                     showBottomSheet = true
                 }
+            }
+        }
+
+        when (state) {
+            is OTrackerState.Success, is OTrackerState.Loading, is OTrackerState.Initial -> {
+
+            }
+
+            is OTrackerState.Error -> {
+                println((state as OTrackerState.Error).error.toString())
             }
         }
 

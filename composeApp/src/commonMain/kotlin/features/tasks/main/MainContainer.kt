@@ -10,12 +10,14 @@ import pro.respawn.flowmvi.plugins.recover
 import pro.respawn.flowmvi.plugins.reduce
 import ru.kpfu.itis.common.mapper.ErrorMapper
 import ru.kpfu.itis.features.task.data.repository.TaskRepository
+import ru.kpfu.itis.features.task.data.store.UserStore
 import ru.kpfu.itis.features.task.domain.model.TaskModel
 
 class MainContainer(
     private val errorMapper: ErrorMapper,
     private val configurationFactory: DefaultConfigurationFactory,
     private val repository: TaskRepository,
+    private val userStore: UserStore,
 ) : Container<OTrackerState<List<TaskModel>>, MainIntent, MainAction> {
 
     override val store: Store<OTrackerState<List<TaskModel>>, MainIntent, MainAction> =
@@ -37,9 +39,13 @@ class MainContainer(
                        action(MainAction.ShowSnackbar(intent.errorModel.title))
                     }
                     is MainIntent.CreateTask -> {
-                        with(intent) {
+                        userStore.getUserId()?.let { userId ->
+                            repository.createTask(
+                                intent.taskModel.copy(
+                                    userId = userId
+                                )
+                            )
                         }
-                        repository.createTask(intent.taskModel)
                     }
                 }
             }
