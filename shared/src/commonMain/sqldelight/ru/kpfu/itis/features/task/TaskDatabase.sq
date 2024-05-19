@@ -38,9 +38,9 @@ WHERE id = ?;
 getCompletedTasks:
 SELECT Task.*
 FROM Task
-WHERE isCompleted = 0;
+WHERE isCompleted = 1;
 
 getActiveTasks:
 SELECT Task.*
 FROM Task
-WHERE isCompleted = 1;
+WHERE isCompleted = 0;

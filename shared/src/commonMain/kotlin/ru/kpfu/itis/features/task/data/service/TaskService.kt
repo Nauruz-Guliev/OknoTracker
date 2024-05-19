@@ -5,6 +5,8 @@ import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.delete
 import io.ktor.client.request.get
+import io.ktor.client.request.header
+import io.ktor.client.request.parameter
 import io.ktor.client.request.post
 import io.ktor.client.request.put
 import io.ktor.client.request.setBody
@@ -26,53 +28,53 @@ class TaskService(
 
     suspend fun getTask(taskId: Long): TaskResponseSingle {
         return httpClient.get(
-            "${(MR.strings.url.get())}/task/$taskId"
+            "${(MR.strings.url.get())}task/$taskId"
         ).body()
     }
 
     suspend fun createTask(task: TaskCreateRequest): TaskResponseSingle {
         return httpClient.post {
-            url("${(MR.strings.url.get())}/task/")
+            url("${(MR.strings.url.get())}task/")
             setBody(task)
         }.body()
     }
 
     suspend fun changeTask(task: TaskChangeRequest): TaskResponseSingle {
         return httpClient.put {
-            url("${(MR.strings.url.get())}/task/")
+            url("${(MR.strings.url.get())}task/")
             setBody(task)
         }.body()
     }
 
     suspend fun deleteTask(taskId: Long): TaskResponseSingle {
         return httpClient.delete {
-            url("${(MR.strings.url.get())}/task/$taskId")
+            url("${(MR.strings.url.get())}task/$taskId")
         }.body()
     }
 
     suspend fun markTaskCompleted(taskId: Long): TaskResponseSingle {
         return httpClient.put {
-            url("${(MR.strings.url.get())}/task/mark_as_completed/$taskId")
+            url("${(MR.strings.url.get())}task/mark_as_completed/$taskId")
         }.body()
     }
 
     suspend fun markTaskUncompleted(taskId: Long): TaskResponseSingle {
         return httpClient.put {
-            url("${(MR.strings.url.get())}/task/mark_as_uncompleted/$taskId")
+            url("${(MR.strings.url.get())}task/mark_as_uncompleted/$taskId")
         }.body()
     }
 
     suspend fun getActiveTasks(
         userId: Long,
         pageSize: Long = 20,
-        page: Long = 0,
+        page: Long = 1,
     ): TaskResponseList {
+        println(userId)
         return httpClient.get {
-            url("${(MR.strings.url.get())}/task/uncompleted_list/order_by_deadline/$userId")
-            parameters {
-                append("page", "$page")
-                append("pageSize", "$pageSize")
-            }
+            header("Auth", "$userId")
+            parameter("page", "$page")
+            parameter("pageSize", "$pageSize")
+            url("${(MR.strings.url.get())}task/uncompleted_list/order_by_deadline/$userId")
         }.body()
     }
 
@@ -82,7 +84,7 @@ class TaskService(
         endDay: String,
     ): TaskStatisticResponse {
         return httpClient.get {
-            url("${(MR.strings.url.get())}/task/statistics")
+            url("${(MR.strings.url.get())}task/statistics")
             parameters {
                 append("user-id", "$userId")
                 append("startDay", startDay)
@@ -94,10 +96,10 @@ class TaskService(
     suspend fun getCompletedTasks(
         userId: Long,
         pageSize: Long = 20,
-        page: Long = 0,
+        page: Long = 1,
     ): TaskResponseList {
         return httpClient.get {
-            url("${MR.strings.url.get()}/task/completed_list/order_by_completed_desc/$userId")
+            url("${MR.strings.url.get()}task/completed_list/order_by_completed_desc/$userId")
             parameters {
                 append("page", "$page")
                 append("pageSize", "$pageSize")
