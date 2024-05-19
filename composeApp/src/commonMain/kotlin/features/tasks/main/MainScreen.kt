@@ -66,9 +66,7 @@ class MainScreen : Screen {
 
         val state by subscribe { action ->
             when (action) {
-                is MainAction.ShowSnackbar -> {
-
-                }
+                is MainAction.ShowSnackbar -> {}
 
                 is MainAction.OpenTaskBottomSheet -> {
                     showBottomSheet = true
@@ -114,6 +112,9 @@ class MainScreen : Screen {
                 TaskBottomSheet(
                     taskDataAction = { model ->
                         taskModel = model
+                        showBottomSheet = false
+                        taskModel?.let { intent(MainIntent.CreateTask(it)) }
+                        HomeTasksTab.listUpdateFlow.value = true
                     }
                 )
             }

@@ -9,7 +9,6 @@ import ru.kpfu.itis.features.task.data.db.TaskDatabaseImpl
 import ru.kpfu.itis.features.task.data.mapper.TaskMapper
 import ru.kpfu.itis.features.task.data.repository.TaskRepository
 import ru.kpfu.itis.features.task.data.service.TaskService
-import kotlin.math.sin
 
 fun tasksModule() = module {
     single {
@@ -21,7 +20,7 @@ fun tasksModule() = module {
     }
 
     single {
-        MainContainer(get(), get())
+        MainContainer(get(), get(), get())
     }
 
     factory {

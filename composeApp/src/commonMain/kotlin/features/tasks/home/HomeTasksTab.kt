@@ -16,6 +16,7 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshContainer
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -35,17 +36,24 @@ import extensions.startFlowMvi
 import features.OTrackerState
 import features.signin.SignInScreen
 import features.tasks.create.TaskBottomSheet
+import kotlinx.coroutines.flow.MutableStateFlow
 import org.koin.compose.koinInject
 import pro.respawn.flowmvi.compose.dsl.subscribe
 import ru.kpfu.itis.features.task.domain.model.TaskModel
 
 object HomeTasksTab : Tab {
 
+    val listUpdateFlow = MutableStateFlow(false)
+
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     override fun Content() = with(koinInject<HomeTasksContainer>().store) {
 
         startFlowMvi()
+
+        if (listUpdateFlow.collectAsState().value) {
+            intent(HomeTasksIntent.LoadAllTasks)
+        }
 
         val navigator = LocalNavigator.current
         var showBottomSheet by rememberSaveable { mutableStateOf(false) }
@@ -88,6 +96,10 @@ object HomeTasksTab : Tab {
                     }
                 }
 
+                if (itemList.isEmpty()) {
+                    EmptyTasksState()
+                }
+
                 when (state) {
                     is OTrackerState.Initial -> {
                         refreshState.startRefresh()
@@ -95,9 +107,6 @@ object HomeTasksTab : Tab {
                     }
                     is OTrackerState.Success -> {
                         itemList = (state as OTrackerState.Success<List<TaskModel>>).data
-                        if (itemList.isEmpty()) {
-                            EmptyTasksState()
-                        }
                         refreshState.endRefresh()
                     }
 
@@ -144,6 +153,7 @@ object HomeTasksTab : Tab {
                     taskId = selectedTaskId,
                     taskDataAction = { model ->
                         taskModel = model
+                        showBottomSheet = false
                     }
                 )
             }
