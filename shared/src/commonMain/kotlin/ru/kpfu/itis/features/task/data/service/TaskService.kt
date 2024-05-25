@@ -105,6 +105,18 @@ class TaskService(
         }.body()
     }
 
+    suspend fun getAllTasks(
+        userId: Long,
+        page: Long = 1,
+        pageSize: Long = 20,
+    ): TaskResponseList {
+        return httpClient.get {
+            parameter("page", "$page")
+            parameter("pageSize", "$pageSize")
+            url("${MR.strings.url.get()}task/all/$userId")
+        }.body()
+    }
+
     fun StringResource.get(): String {
         return strings.getString(this)
     }

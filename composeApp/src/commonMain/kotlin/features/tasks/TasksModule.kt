@@ -23,7 +23,7 @@ fun tasksModule() = module {
         MainContainer(get(), get(), get(), get())
     }
 
-    factory {
+    single {
         TaskRepository(get(), get(), get(), get())
     }
 
@@ -31,8 +31,8 @@ fun tasksModule() = module {
         TaskService(get(), get())
     }
 
-    factory {
-        TaskDatabaseImpl(get())
+    single {
+        TaskDatabaseImpl(get(), get())
     }
 
     factory {

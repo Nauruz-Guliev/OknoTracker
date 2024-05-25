@@ -12,20 +12,17 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.pulltorefresh.PullToRefreshContainer
-import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
@@ -36,14 +33,13 @@ import extensions.startFlowMvi
 import features.OTrackerState
 import features.signin.SignInScreen
 import features.tasks.create.TaskBottomSheet
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collectLatest
 import org.koin.compose.koinInject
 import pro.respawn.flowmvi.compose.dsl.subscribe
 import ru.kpfu.itis.features.task.domain.model.TaskModel
 
 object HomeTasksTab : Tab {
-
-    val listUpdateFlow = MutableStateFlow(false)
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
@@ -51,28 +47,18 @@ object HomeTasksTab : Tab {
 
         startFlowMvi()
 
-        if (listUpdateFlow.collectAsState().value) {
-            intent(HomeTasksIntent.LoadAllTasks)
-        }
-
         val navigator = LocalNavigator.current
         var showBottomSheet by rememberSaveable { mutableStateOf(false) }
         val sheetState = rememberModalBottomSheetState()
         var selectedTaskId by rememberSaveable { mutableStateOf<Long?>(null) }
         val snackbarHostState = remember { SnackbarHostState() }
         var taskModel by rememberSaveable { mutableStateOf<TaskModel?>(null) }
-        val refreshState = rememberPullToRefreshState()
-        var itemList by rememberSaveable { mutableStateOf(listOf<TaskModel>()) }
-
-        if (refreshState.isRefreshing) {
-            intent(HomeTasksIntent.LoadAllTasks)
-        }
+        val itemList = remember { mutableStateListOf<TaskModel>() }
 
         Scaffold(
             snackbarHost = {
                 SnackbarHost(snackbarHostState)
             },
-            modifier = Modifier.nestedScroll(refreshState.nestedScrollConnection)
         ) {
 
             Box(
@@ -81,6 +67,7 @@ object HomeTasksTab : Tab {
             ) {
 
                 val state by subscribe { action ->
+
                     when (action) {
                         is HomeTasksAction.OpenTaskBottomSheet -> {
                             showBottomSheet = true
@@ -101,7 +88,6 @@ object HomeTasksTab : Tab {
                 }
 
                 LazyColumn(modifier = Modifier.fillMaxSize()) {
-                    if (!refreshState.isRefreshing) {
                         items(itemList) { task ->
                             OTaskCard(
                                 onCheckedAction = { isChecked, taskId ->
@@ -109,29 +95,26 @@ object HomeTasksTab : Tab {
                                 },
                                 task
                             )
-                        }
+
                     }
                 }
 
-                PullToRefreshContainer(
-                    modifier = Modifier.align(Alignment.TopCenter),
-                    state = refreshState,
-                )
-
                 when (state) {
                     is OTrackerState.Initial -> {
-                        refreshState.startRefresh()
-                        intent(HomeTasksIntent.LoadCachedTasks)
+                        intent(HomeTasksIntent.LoadActiveTasks)
                     }
-
                     is OTrackerState.Success -> {
-                        itemList = (state as OTrackerState.Success<List<TaskModel>>).data
-                        refreshState.endRefresh()
+                        LaunchedEffect(Unit) {
+                            (state as OTrackerState.Success<Flow<List<TaskModel>>>).data.collectLatest {
+                                itemList.clear()
+                                itemList.addAll(it)
+                            }
+                        }
                     }
 
                     is OTrackerState.Loading -> {}
                     is OTrackerState.Error -> {
-                        refreshState.endRefresh()
+                        itemList.clear()
                         OErrorScreen(
                             errorModel = (state as OTrackerState.Error).error,
                             onClickAction = {

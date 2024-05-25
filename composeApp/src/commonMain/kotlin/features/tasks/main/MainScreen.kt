@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -122,7 +121,6 @@ class MainScreen : Screen {
                         taskModel = model
                         showBottomSheet = false
                         taskModel?.let { intent(MainIntent.CreateTask(it)) }
-                        HomeTasksTab.listUpdateFlow.value = true
                     }
                 )
             }
@@ -162,7 +160,7 @@ class MainScreen : Screen {
     }
 
     @Composable
-    private fun RowScope.TabNavigationItem(
+    private fun TabNavigationItem(
         tab: Tab,
         onTabSelected: (String?) -> Unit
     ) {

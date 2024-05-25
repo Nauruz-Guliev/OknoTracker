@@ -3,12 +3,15 @@ package features.tasks.home
 import features.OTrackerState
 import flow_mvi.DefaultConfigurationFactory
 import flow_mvi.configure
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.launch
 import pro.respawn.flowmvi.api.Container
 import pro.respawn.flowmvi.api.Store
 import pro.respawn.flowmvi.dsl.store
 import pro.respawn.flowmvi.plugins.recover
 import pro.respawn.flowmvi.plugins.reduce
 import ru.kpfu.itis.common.mapper.ErrorMapper
+import ru.kpfu.itis.features.task.data.model.TaskType
 import ru.kpfu.itis.features.task.data.repository.TaskRepository
 import ru.kpfu.itis.features.task.data.store.UserStore
 import ru.kpfu.itis.features.task.domain.model.TaskModel
@@ -18,9 +21,9 @@ class HomeTasksContainer(
     private val repository: TaskRepository,
     private val configurationFactory: DefaultConfigurationFactory,
     private val userStore: UserStore,
-) : Container<OTrackerState<List<TaskModel>>, HomeTasksIntent, HomeTasksAction> {
+) : Container<OTrackerState<Flow<List<TaskModel>>>, HomeTasksIntent, HomeTasksAction> {
 
-    override val store: Store<OTrackerState<List<TaskModel>>, HomeTasksIntent, HomeTasksAction> =
+    override val store: Store<OTrackerState<Flow<List<TaskModel>>>, HomeTasksIntent, HomeTasksAction> =
         store(OTrackerState.Initial) {
 
             configure(configurationFactory, "Tasks")
@@ -37,10 +40,18 @@ class HomeTasksContainer(
                     intent(HomeTasksIntent.ClearUserCache)
                 } else {
                     when (intent) {
-                        is HomeTasksIntent.LoadActiveTasks -> {
+                        is HomeTasksIntent.LoadActiveTasks, is HomeTasksIntent.LoadAllTasks -> {
                             updateState { OTrackerState.Loading }
-                            val tasks = repository.getActiveTasks(userId)
-                            updateState { OTrackerState.Success(tasks) }
+                            launch { repository.updateTasks(TaskType.ALL, userId) }
+                            if (intent is HomeTasksIntent.LoadActiveTasks) {
+                                repository.getCachedTasks(TaskType.ACTIVE).also { tasks ->
+                                    updateState { OTrackerState.Success(tasks) }
+                                }
+                            } else {
+                                repository.getCachedTasks(TaskType.ALL).also { tasks ->
+                                    updateState { OTrackerState.Success(tasks) }
+                                }
+                            }
                         }
 
                         is HomeTasksIntent.EditTask -> {
@@ -48,26 +59,11 @@ class HomeTasksContainer(
                         }
 
                         is HomeTasksIntent.DeleteTask -> {
-                            updateState { OTrackerState.Loading }
                             repository.deleteTask(intent.taskId)
-                            val tasks = repository.getActiveTasks(userId)
-                            updateState { OTrackerState.Success(tasks) }
-                        }
-
-                        is HomeTasksIntent.LoadAllTasks -> {
-                            updateState { OTrackerState.Loading }
-                            val tasks = repository.getActiveTasks(userId)
-                            updateState { OTrackerState.Success(tasks) }
                         }
 
                         HomeTasksIntent.FloatingButtonClicked -> {
                             action(HomeTasksAction.OpenTaskBottomSheet())
-                        }
-
-                        is HomeTasksIntent.LoadCachedTasks -> {
-                            updateState { OTrackerState.Loading }
-                            val tasks = repository.getActiveCachedTasks()
-                            updateState { OTrackerState.Success(tasks) }
                         }
 
                         is HomeTasksIntent.ErrorOccurred -> {
@@ -80,12 +76,11 @@ class HomeTasksContainer(
 
                         is HomeTasksIntent.TaskChecked -> {
                             try {
-                                if (intent.isCompleted) {
+                                if (!intent.isCompleted) {
                                     repository.markAsUncompleted(intent.taskId)
                                 } else {
                                     repository.markAsCompleted(intent.taskId)
                                 }
-                                intent(HomeTasksIntent.LoadAllTasks)
                             } catch (ex: Exception) {
                                 action(HomeTasksAction.ShowSnackbar(ex.message))
                             }
