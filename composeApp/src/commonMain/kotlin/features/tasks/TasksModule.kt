@@ -3,6 +3,7 @@ package features.tasks
 import features.tasks.completed.CompletedTasksContainer
 import features.tasks.home.HomeTasksContainer
 import features.tasks.main.MainContainer
+import features.tasks.single.SingleTaskContainer
 import flow_mvi.DefaultConfigurationFactory
 import org.koin.dsl.module
 import ru.kpfu.itis.features.task.data.db.TaskDatabaseImpl
@@ -21,6 +22,10 @@ fun tasksModule() = module {
 
     single {
         MainContainer(get(), get(), get(), get())
+    }
+
+    factory {
+        SingleTaskContainer(get(), get(), get(), get())
     }
 
     single {

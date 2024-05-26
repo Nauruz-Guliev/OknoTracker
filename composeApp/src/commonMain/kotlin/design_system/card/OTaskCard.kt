@@ -1,5 +1,7 @@
 package design_system.card
 
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -22,17 +24,22 @@ import androidx.compose.ui.unit.dp
 import design_system.chips.OChips
 import ru.kpfu.itis.features.task.domain.model.TaskModel
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun OTaskCard(
     onCheckedAction: (Boolean, Long) -> Unit,
     task: TaskModel,
     labels: List<String> = emptyList(),
+    onItemClicked: (Long) -> Unit
 ) {
 
     var isTaskChecked by remember { mutableStateOf(task.isCompleted) }
 
     OutlinedCard(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth()
+            .clickable {
+                onItemClicked(task.id)
+            },
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceContainerLowest,
         )

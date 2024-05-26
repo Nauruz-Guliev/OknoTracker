@@ -4,7 +4,6 @@ import features.OTrackerState
 import flow_mvi.DefaultConfigurationFactory
 import flow_mvi.configure
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.launch
 import pro.respawn.flowmvi.api.Container
 import pro.respawn.flowmvi.api.Store
 import pro.respawn.flowmvi.dsl.store
@@ -40,17 +39,13 @@ class HomeTasksContainer(
                     intent(HomeTasksIntent.ClearUserCache)
                 } else {
                     when (intent) {
-                        is HomeTasksIntent.LoadActiveTasks, is HomeTasksIntent.LoadAllTasks -> {
-                            updateState { OTrackerState.Loading }
-                            launch { repository.updateTasks(TaskType.ALL, userId) }
-                            if (intent is HomeTasksIntent.LoadActiveTasks) {
-                                repository.getCachedTasks(TaskType.ACTIVE).also { tasks ->
-                                    updateState { OTrackerState.Success(tasks) }
-                                }
-                            } else {
-                                repository.getCachedTasks(TaskType.ALL).also { tasks ->
-                                    updateState { OTrackerState.Success(tasks) }
-                                }
+                        is HomeTasksIntent.LoadTasks -> {
+                            runCatching {
+                                repository.updateTasks(TaskType.ALL, userId)
+                                updateState { OTrackerState.Loading }
+                                updateState { OTrackerState.Success(repository.getCachedTasks()) }
+                            }.onFailure {
+                                action(HomeTasksAction.ShowSnackbar(it.message))
                             }
                         }
 
@@ -59,7 +54,11 @@ class HomeTasksContainer(
                         }
 
                         is HomeTasksIntent.DeleteTask -> {
-                            repository.deleteTask(intent.taskId)
+                            runCatching {
+                                repository.deleteTask(intent.taskId)
+                            }.onFailure {
+                                action(HomeTasksAction.ShowSnackbar(it.message))
+                            }
                         }
 
                         HomeTasksIntent.FloatingButtonClicked -> {
@@ -75,14 +74,14 @@ class HomeTasksContainer(
                         }
 
                         is HomeTasksIntent.TaskChecked -> {
-                            try {
-                                if (!intent.isCompleted) {
+                            runCatching {
+                                if (!intent.isChecked) {
                                     repository.markAsUncompleted(intent.taskId)
                                 } else {
                                     repository.markAsCompleted(intent.taskId)
                                 }
-                            } catch (ex: Exception) {
-                                action(HomeTasksAction.ShowSnackbar(ex.message))
+                            }.onFailure {
+                                action(HomeTasksAction.ShowSnackbar(it.message))
                             }
                         }
                     }

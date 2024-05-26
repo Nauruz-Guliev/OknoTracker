@@ -97,12 +97,4 @@ class TaskDatabaseImpl(
     internal fun deleteTask(taskId: Long) {
         dbQuery.deleteTaskById(taskId)
     }
-
-    internal fun getCompletedTasks(): Flow<List<TaskDto>> {
-        return dbQuery.getCompletedTasks(::mapTask).asFlow().mapToList(dispatcher)
-    }
-
-    internal fun getActiveTasks(): Flow<List<TaskDto>> {
-        return dbQuery.getActiveTasks(::mapTask).asFlow().mapToList(dispatcher)
-    }
 }

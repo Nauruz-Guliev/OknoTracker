@@ -27,10 +27,12 @@ fun OTextField(
     icon: Icon? = null,
     characterMaxCount: Int? = null,
     maxLines: Int = 1,
+    isEnabled: Boolean = true,
 ) {
     TextField(
         modifier = modifier,
         value = text,
+        enabled = isEnabled,
         onValueChange = {
             if (characterMaxCount != null && it.length > characterMaxCount) {
                 onValueChange.invoke(it.take(characterMaxCount))

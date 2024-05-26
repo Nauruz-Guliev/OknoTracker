@@ -2,7 +2,6 @@ package ru.kpfu.itis.features.task.data.repository
 
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import ru.kpfu.itis.features.task.data.db.TaskDatabaseImpl
@@ -63,17 +62,10 @@ class TaskRepository(
         } else {
             throw taskMapper.mapToException(response.error)
         }
-        taskDatabase.getActiveTasks().collectLatest {
-            println(it)
-        }
     }
 
-    fun getCachedTasks(taskType: TaskType): Flow<List<TaskModel>> {
-        return when (taskType) {
-            TaskType.ALL -> taskDatabase.getAllTasks().map(taskMapper::map)
-            TaskType.ACTIVE -> taskDatabase.getActiveTasks().map(taskMapper::map)
-            TaskType.CLOSED -> taskDatabase.getCompletedTasks().map(taskMapper::map)
-        }
+    fun getCachedTasks(): Flow<List<TaskModel>> {
+        return taskDatabase.getAllTasks().map(taskMapper::map)
     }
 
     suspend fun clearTasks() = withContext(dispatcher) {

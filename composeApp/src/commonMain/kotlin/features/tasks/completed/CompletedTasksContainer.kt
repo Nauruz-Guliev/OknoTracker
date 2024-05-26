@@ -10,7 +10,6 @@ import pro.respawn.flowmvi.dsl.store
 import pro.respawn.flowmvi.plugins.recover
 import pro.respawn.flowmvi.plugins.reduce
 import ru.kpfu.itis.common.mapper.ErrorMapper
-import ru.kpfu.itis.features.task.data.model.TaskType
 import ru.kpfu.itis.features.task.data.repository.TaskRepository
 import ru.kpfu.itis.features.task.data.store.UserStore
 import ru.kpfu.itis.features.task.domain.model.TaskModel
@@ -45,7 +44,7 @@ class CompletedTasksContainer(
                     when (intent) {
                         is CompletedTasksIntent.LoadTasks -> {
                             updateState { OTrackerState.Loading }
-                            repository.getCachedTasks(TaskType.CLOSED).also {
+                            repository.getCachedTasks().also {
                                 updateState { OTrackerState.Success(it) }
                             }
                         }
@@ -81,3 +80,6 @@ class CompletedTasksContainer(
             }
         }
 }
+
+
+

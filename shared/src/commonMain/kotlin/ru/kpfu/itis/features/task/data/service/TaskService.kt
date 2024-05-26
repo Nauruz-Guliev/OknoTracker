@@ -42,14 +42,16 @@ class TaskService(
 
     suspend fun changeTask(task: TaskChangeRequest): TaskResponseSingle {
         return httpClient.put {
-            url("${(MR.strings.url.get())}task/")
+            header("Content-Type", "application/json")
             setBody(task)
+            url("${(MR.strings.url.get())}task")
         }.body()
     }
 
     suspend fun deleteTask(taskId: Long): TaskResponseSingle {
         return httpClient.delete {
             url("${(MR.strings.url.get())}task/$taskId")
+            header("Content-Type", "application/json")
         }.body()
     }
 
