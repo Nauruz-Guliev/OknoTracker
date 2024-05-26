@@ -60,7 +60,6 @@ class SignInScreen : Screen {
 
     @Composable
     private fun IntentReceiver<SignInIntent>.HandleSignInState(state: OTrackerState<Nothing>) {
-        val navigator = LocalNavigator.current
         InitialContent()
         when (state) {
             OTrackerState.Loading -> {

@@ -17,7 +17,14 @@ fun signInModule() = module {
         UserRepository(get(), get())
     }
     single {
-        SignInContainer(get(), get(), get(), get())
+        SignInContainer(
+            get(),
+            get(),
+            get(),
+            get(),
+            emailValidator = Validator("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$"),
+            passwordValidator = Validator("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@\$!%*?&])[A-Za-z\\d@\$!%*?&]{8,}$")
+        )
     }
     single {
         UserService(get(), get())
