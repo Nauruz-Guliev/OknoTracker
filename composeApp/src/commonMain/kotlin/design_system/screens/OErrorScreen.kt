@@ -24,6 +24,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import design_system.button.OButton
 import ru.kpfu.itis.common.model.ErrorModel
+import theme.LocalPaddingValues
 
 @Composable
 fun OErrorScreen(
@@ -35,13 +36,15 @@ fun OErrorScreen(
     onClickAction: () -> Unit,
 ) {
     Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
+        modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background),
+        contentAlignment = Alignment.Center,
     ) {
 
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .padding(LocalPaddingValues.current.medium)
+                .fillMaxWidth()
         ) {
             Box(
                 modifier = Modifier
@@ -86,15 +89,13 @@ fun OErrorScreen(
                 modifier = Modifier.height(16.dp)
             )
 
-            OButton(
-                text = if (isTryAgain) {
-                    "Try again"
-                } else {
-                    "Close"
-                },
-                onClickAction = onClickAction,
-                outerPadding = buttonPadding
-            )
+            if (isTryAgain) {
+                OButton(
+                    text = "Try again",
+                    onClickAction = onClickAction,
+                    outerPadding = buttonPadding,
+                )
+            }
         }
     }
 }

@@ -4,7 +4,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import ru.kpfu.itis.features.task.data.db.TaskDatabaseImpl
 import ru.kpfu.itis.features.task.data.mapper.TaskMapper
-import ru.kpfu.itis.features.task.data.model.TaskResponseSingle
+import ru.kpfu.itis.features.task.data.dto.TaskResponseSingle
 import ru.kpfu.itis.features.task.data.service.TaskService
 import ru.kpfu.itis.features.task.domain.model.TaskModel
 
@@ -65,11 +65,11 @@ class TaskRepository(
     }
 
     suspend fun getActiveCachedTasks(): List<TaskModel> = withContext(dispatcher) {
-        taskMapper.map(taskDatabase.getActiveTasks())
+        taskMapper.mapList(taskDatabase.getActiveTasks())
     }
 
     suspend fun getCompletedCachedTasks(): List<TaskModel> = withContext(dispatcher) {
-        taskMapper.map(taskDatabase.getCompletedTasks())
+        taskMapper.mapList(taskDatabase.getCompletedTasks())
     }
 
     suspend fun clearTasks() = withContext(dispatcher) {
@@ -79,7 +79,7 @@ class TaskRepository(
     private fun handleTask(task: TaskResponseSingle): TaskModel {
         return if (task.data != null) {
             taskDatabase.saveTask(task.data)
-            taskMapper.map(task.data)
+            taskMapper.mapItem(task.data)
         } else {
             throw taskMapper.mapToException(task.error)
         }

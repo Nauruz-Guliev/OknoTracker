@@ -1,16 +1,15 @@
 package ru.kpfu.itis.features.task.data.mapper
 
-import ru.kpfu.itis.common.model.BackendException
-import ru.kpfu.itis.common.model.ErrorDto
-import ru.kpfu.itis.features.task.data.model.TaskChangeRequest
-import ru.kpfu.itis.features.task.data.model.TaskCreateRequest
-import ru.kpfu.itis.features.task.data.model.TaskDto
+import ru.kpfu.itis.common.mapper.Mapper
+import ru.kpfu.itis.features.task.data.dto.TaskChangeRequest
+import ru.kpfu.itis.features.task.data.dto.TaskCreateRequest
+import ru.kpfu.itis.features.task.data.dto.TaskDto
 import ru.kpfu.itis.features.task.domain.model.TaskModel
 
-class TaskMapper {
+class TaskMapper : Mapper<TaskDto, TaskModel>{
 
-    fun map(task: TaskDto): TaskModel {
-        return with(task) {
+    override fun mapItem(input: TaskDto): TaskModel {
+        return with(input) {
             TaskModel(
                 id = id,
                 name = name,
@@ -23,10 +22,6 @@ class TaskMapper {
                 completedTime = completedTime
             )
         }
-    }
-
-    fun map(tasks: List<TaskDto>): List<TaskModel> {
-        return tasks.map(::map)
     }
 
     fun mapCreate(task: TaskModel): TaskCreateRequest {
@@ -48,15 +43,6 @@ class TaskMapper {
                 description = description,
                 userId = userId,
                 deadlineTime = deadlineTime,
-            )
-        }
-    }
-
-    fun mapToException(errorDto: ErrorDto?): BackendException {
-        return with(errorDto) {
-            BackendException(
-                title = this?.title,
-                details = this?.details
             )
         }
     }

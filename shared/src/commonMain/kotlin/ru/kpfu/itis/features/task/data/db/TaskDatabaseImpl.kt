@@ -2,7 +2,7 @@ package ru.kpfu.itis.features.task.data.db
 
 import ru.kpfu.itis.common.driver.DatabaseDriverFactory
 import ru.kpfu.itis.features.task.TaskDatabase
-import ru.kpfu.itis.features.task.data.model.TaskDto
+import ru.kpfu.itis.features.task.data.dto.TaskDto
 
 class TaskDatabaseImpl(
     databaseDriverFactory: DatabaseDriverFactory

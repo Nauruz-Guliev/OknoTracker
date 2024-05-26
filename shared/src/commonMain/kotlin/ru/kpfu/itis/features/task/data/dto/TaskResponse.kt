@@ -1,4 +1,4 @@
-package ru.kpfu.itis.features.task.data.model
+package ru.kpfu.itis.features.task.data.dto
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

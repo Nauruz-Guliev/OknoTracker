@@ -60,6 +60,7 @@ class SignInScreen : Screen {
 
     @Composable
     private fun IntentReceiver<SignInIntent>.HandleSignInState(state: OTrackerState<Nothing>) {
+        val navigator = LocalNavigator.current
         InitialContent()
         when (state) {
             OTrackerState.Loading -> {
@@ -69,9 +70,9 @@ class SignInScreen : Screen {
             is OTrackerState.Error -> {
                 OErrorScreen(
                     errorModel = state.error,
-                    onClickAction = {
+                    onClickAction = { // todo
                     },
-                    isTryAgain = false
+                    isTryAgain = true
                 )
             }
 
