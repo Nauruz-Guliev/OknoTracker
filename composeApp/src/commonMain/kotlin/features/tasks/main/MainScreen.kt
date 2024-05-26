@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -44,24 +43,20 @@ import features.OTrackerState
 import features.settings.SettingsTab
 import features.statistics.StatisticsTab
 import features.tasks.completed.CompletedTasksTab
-import features.tasks.create.TaskBottomSheet
 import features.tasks.home.HomeTasksTab
+import features.tasks.single.TaskBottomSheet
 import org.koin.compose.koinInject
 import pro.respawn.flowmvi.compose.dsl.subscribe
-import ru.kpfu.itis.features.task.domain.model.TaskModel
 
 class MainScreen : Screen {
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     override fun Content() = with(koinInject<MainContainer>().store) {
-
         startFlowMvi()
-
         var currentTabName by rememberSaveable { mutableStateOf<String?>(null) }
         var showBottomSheet by rememberSaveable { mutableStateOf(false) }
         val sheetState = rememberModalBottomSheetState()
-        var taskModel by rememberSaveable { mutableStateOf<TaskModel?>(null) }
 
         val state by subscribe { action ->
             when (action) {
@@ -118,12 +113,9 @@ class MainScreen : Screen {
                 sheetState = sheetState
             ) {
                 TaskBottomSheet(
-                    taskDataAction = { model ->
-                        taskModel = model
+                    closeAction = {
                         showBottomSheet = false
-                        taskModel?.let { intent(MainIntent.CreateTask(it)) }
-                        HomeTasksTab.listUpdateFlow.value = true
-                    }
+                    },
                 )
             }
         }
@@ -162,7 +154,7 @@ class MainScreen : Screen {
     }
 
     @Composable
-    private fun RowScope.TabNavigationItem(
+    private fun TabNavigationItem(
         tab: Tab,
         onTabSelected: (String?) -> Unit
     ) {

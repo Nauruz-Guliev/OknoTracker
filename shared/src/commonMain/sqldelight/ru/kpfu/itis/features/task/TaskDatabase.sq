@@ -13,7 +13,7 @@ CREATE TABLE Task (
 );
 
 insertTask:
-INSERT INTO Task(id, name, description, userId, isCompleted, lastModifiedTime, deadlineTime, completedTime, completedOnTime)
+INSERT OR REPLACE INTO Task(id, name, description, userId, isCompleted, lastModifiedTime, deadlineTime, completedTime, completedOnTime)
 VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?);
 
 deleteAllTasks:

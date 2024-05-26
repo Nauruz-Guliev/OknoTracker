@@ -1,5 +1,7 @@
 package design_system.card
 
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -15,23 +17,29 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import design_system.chips.OChips
 import ru.kpfu.itis.features.task.domain.model.TaskModel
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun OTaskCard(
     onCheckedAction: (Boolean, Long) -> Unit,
     task: TaskModel,
     labels: List<String> = emptyList(),
+    onItemClicked: (Long) -> Unit
 ) {
 
-    val isTaskChecked by rememberSaveable { mutableStateOf(task.isCompleted) }
+    var isTaskChecked by remember { mutableStateOf(task.isCompleted) }
 
     OutlinedCard(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth()
+            .clickable {
+                onItemClicked(task.id)
+            },
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceContainerLowest,
         )
@@ -41,8 +49,9 @@ fun OTaskCard(
 
         ) {
             Checkbox(
-                checked = isTaskChecked,
+                checked = task.isCompleted,
                 onCheckedChange = {
+                    isTaskChecked = it
                     onCheckedAction(isTaskChecked, task.id)
                 },
             )

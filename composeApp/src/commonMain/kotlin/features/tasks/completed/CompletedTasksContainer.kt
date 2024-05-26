@@ -3,6 +3,7 @@ package features.tasks.completed
 import features.OTrackerState
 import flow_mvi.DefaultConfigurationFactory
 import flow_mvi.configure
+import kotlinx.coroutines.flow.Flow
 import pro.respawn.flowmvi.api.Container
 import pro.respawn.flowmvi.api.Store
 import pro.respawn.flowmvi.dsl.store
@@ -18,9 +19,9 @@ class CompletedTasksContainer(
     private val repository: TaskRepository,
     private val configurationFactory: DefaultConfigurationFactory,
     private val userStore: UserStore,
-) : Container<OTrackerState<List<TaskModel>>, CompletedTasksIntent, CompletedTasksAction> {
+) : Container<OTrackerState<Flow<List<TaskModel>>>, CompletedTasksIntent, CompletedTasksAction> {
 
-    override val store: Store<OTrackerState<List<TaskModel>>, CompletedTasksIntent, CompletedTasksAction> =
+    override val store: Store<OTrackerState<Flow<List<TaskModel>>>, CompletedTasksIntent, CompletedTasksAction> =
         store(OTrackerState.Initial) {
 
 
@@ -43,8 +44,9 @@ class CompletedTasksContainer(
                     when (intent) {
                         is CompletedTasksIntent.LoadTasks -> {
                             updateState { OTrackerState.Loading }
-                            val tasks = repository.getCompleteTasks(userId)
-                            updateState { OTrackerState.Success(tasks) }
+                            repository.getCachedTasks().also {
+                                updateState { OTrackerState.Success(it) }
+                            }
                         }
 
                         is CompletedTasksIntent.EditTask -> {
@@ -55,8 +57,6 @@ class CompletedTasksContainer(
                         is CompletedTasksIntent.DeleteTask -> {
                             updateState { OTrackerState.Loading }
                             repository.deleteTask(intent.taskId)
-                            val tasks = repository.getActiveTasks(userId)
-                            updateState { OTrackerState.Success(tasks) }
                         }
 
                         is CompletedTasksIntent.ClearUserCache -> {
@@ -80,3 +80,6 @@ class CompletedTasksContainer(
             }
         }
 }
+
+
+

@@ -42,14 +42,16 @@ class TaskService(
 
     suspend fun changeTask(task: TaskChangeRequest): TaskResponseSingle {
         return httpClient.put {
-            url("${(MR.strings.url.get())}task/")
+            header("Content-Type", "application/json")
             setBody(task)
+            url("${(MR.strings.url.get())}task")
         }.body()
     }
 
     suspend fun deleteTask(taskId: Long): TaskResponseSingle {
         return httpClient.delete {
             url("${(MR.strings.url.get())}task/$taskId")
+            header("Content-Type", "application/json")
         }.body()
     }
 
@@ -98,6 +100,18 @@ class TaskService(
             parameter("page", "$page")
             parameter("pageSize", "$pageSize")
             url("${MR.strings.url.get()}task/completed_list/order_by_completed_desc/$userId")
+        }.body()
+    }
+
+    suspend fun getAllTasks(
+        userId: Long,
+        page: Long = 1,
+        pageSize: Long = 20,
+    ): TaskResponseList {
+        return httpClient.get {
+            parameter("page", "$page")
+            parameter("pageSize", "$pageSize")
+            url("${MR.strings.url.get()}task/all/$userId")
         }.body()
     }
 

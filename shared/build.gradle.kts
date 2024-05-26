@@ -41,11 +41,12 @@ kotlin {
     sourceSets {
         androidMain.dependencies {
             implementation(libs.ktor.client.android)
-            implementation(libs.android.driver)
+            implementation(libs.sqldelight.android.driver)
+            implementation(libs.sqldelight.extensions)
         }
         iosMain.dependencies {
             implementation(libs.ktor.client.darwin)
-            implementation(libs.native.driver)
+            implementation(libs.sqldelight.native.driver)
         }
         commonMain.dependencies {
             api(libs.resources)
@@ -53,8 +54,9 @@ kotlin {
             implementation(libs.ktor.client.core)
             implementation(libs.ktor.client.content.negotiation)
             implementation(libs.ktor.serialization.kotlinx.json)
-            implementation(libs.runtime)
+            implementation(libs.sqldelight.runtime)
             implementation(libs.kotlinx.datetime)
+            implementation(libs.sqldelight.extensions)
             implementation(libs.koin.core)
 
             // kstore

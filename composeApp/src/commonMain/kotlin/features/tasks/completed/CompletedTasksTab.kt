@@ -16,6 +16,7 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshContainer
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -34,7 +35,9 @@ import design_system.screens.OErrorScreen
 import extensions.startFlowMvi
 import features.OTrackerState
 import features.signin.SignInScreen
-import features.tasks.create.TaskBottomSheet
+import features.tasks.single.TaskBottomSheet
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collectLatest
 import org.koin.compose.koinInject
 import pro.respawn.flowmvi.compose.dsl.subscribe
 import ru.kpfu.itis.features.task.domain.model.TaskModel
@@ -52,7 +55,6 @@ object CompletedTasksTab : Tab {
         val sheetState = rememberModalBottomSheetState()
         var selectedTaskId by rememberSaveable { mutableStateOf<Long?>(null) }
         val snackbarHostState = remember { SnackbarHostState() }
-        var taskModel by rememberSaveable { mutableStateOf<TaskModel?>(null) }
         val refreshState = rememberPullToRefreshState()
         var itemList by rememberSaveable { mutableStateOf(listOf<TaskModel>()) }
         var showEmptyState by rememberSaveable { mutableStateOf(true) }
@@ -103,7 +105,9 @@ object CompletedTasksTab : Tab {
                                     intent(CompletedTasksIntent.TaskChecked(isChecked, taskId))
                                 },
                                 task
-                            )
+                            ) {
+                                intent(CompletedTasksIntent.EditTask(it))
+                            }
                         }
                     }
                 }
@@ -121,7 +125,11 @@ object CompletedTasksTab : Tab {
 
                     is OTrackerState.Success -> {
                         showEmptyState = false
-                        itemList = (state as OTrackerState.Success<List<TaskModel>>).data
+                        LaunchedEffect(Unit) {
+                            (state as OTrackerState.Success<Flow<List<TaskModel>>>).data.collectLatest {
+                                itemList = it
+                            }
+                        }
                         refreshState.endRefresh()
                     }
 
@@ -152,8 +160,7 @@ object CompletedTasksTab : Tab {
             ) {
                 TaskBottomSheet(
                     taskId = selectedTaskId,
-                    taskDataAction = { model ->
-                        taskModel = model
+                    closeAction = {
                         showBottomSheet = false
                     }
                 )
