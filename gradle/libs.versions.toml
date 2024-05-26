@@ -1,5 +1,5 @@
 [versions]
-agp = "8.4.0"
+agp = "8.2.0"
 android-compileSdk = "34"
 android-minSdk = "24"
 android-targetSdk = "34"
@@ -19,6 +19,7 @@ kotlin = "1.9.23"
 coroutinesVersion = "1.8.0"
 dateTimeVersion = "0.5.0"
 koin = "3.5.3"
+kotlinxDatetime = "0.6.0"
 ktor = "2.3.10"
 ktorClientOkhttp = "2.3.10"
 landscapistCoil3 = "2.3.3"
@@ -113,6 +114,7 @@ libres-compose = { module = "io.github.skeptick.libres:libres-compose", version.
 androidx-material3-android = { group = "androidx.compose.material3", name = "material3-android", version.ref = "material3Android" }
 androidx-ui-text-google-fonts = { group = "androidx.compose.ui", name = "ui-text-google-fonts", version.ref = "uiTextGoogleFonts" }
 
+#coil
 landscapist-coil3 = { module = "com.github.skydoves:landscapist-coil3", version.ref = "landscapistCoil3" }
 
 [plugins]

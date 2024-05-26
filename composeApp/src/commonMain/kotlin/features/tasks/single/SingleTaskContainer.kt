@@ -51,6 +51,10 @@ class SingleTaskContainer(
                             }
                         }
 
+                        is SingleTaskIntent.Error -> {
+                            action(SingleTaskAction.ShowSnackbar(intent.message))
+                        }
+
                         is SingleTaskIntent.Edit -> {
                             runCatching {
                                 repository.changeTask(
