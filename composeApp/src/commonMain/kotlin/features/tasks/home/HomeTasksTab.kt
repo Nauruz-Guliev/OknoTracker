@@ -1,5 +1,6 @@
 package features.tasks.home
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -8,10 +9,18 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.DismissDirection
+import androidx.compose.material.DismissValue
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.Icon
+import androidx.compose.material.SwipeToDismiss
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.rememberDismissState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -26,8 +35,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
@@ -46,7 +58,7 @@ import ru.kpfu.itis.features.task.domain.model.TaskModel
 
 object HomeTasksTab : Tab {
 
-    @OptIn(ExperimentalMaterial3Api::class)
+    @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
     @Composable
     override fun Content() = with(koinInject<HomeTasksContainer>().store) {
         startFlowMvi()
@@ -93,6 +105,7 @@ object HomeTasksTab : Tab {
                     } else {
                         Row(
                             modifier = Modifier.fillMaxWidth()
+                                .padding(horizontal = 16.dp)
                         ) {
                             FilterChip(
                                 selected = isAllTasksEnabled,
@@ -108,15 +121,51 @@ object HomeTasksTab : Tab {
                     }
 
                     LazyColumn(modifier = Modifier.fillMaxSize()) {
-                        items(itemList) { task ->
-                            OTaskCard(
-                                onCheckedAction = { isChecked, taskId ->
-                                    intent(HomeTasksIntent.TaskChecked(isChecked, taskId))
-                                },
-                                task
-                            ) {
-                                intent(HomeTasksIntent.EditTask(it))
+                        items(
+                            items = itemList,
+                            key = {
+                                it.id
                             }
+                        ) { task ->
+                            val dismissState = rememberDismissState(
+                                confirmStateChange = {
+                                    if (it == DismissValue.DismissedToStart) {
+                                        intent(HomeTasksIntent.DeleteTask(task.id))
+                                    }
+                                    true
+                                }
+                            )
+                            SwipeToDismiss(
+                                state = dismissState,
+                                background = {
+                                    val color = when (dismissState.dismissDirection) {
+                                        DismissDirection.EndToStart -> MaterialTheme.colorScheme.errorContainer
+                                        else -> Color.Transparent
+                                    }
+                                    Box(
+                                        modifier = Modifier.fillMaxSize()
+                                            .background(color)
+                                            .padding(8.dp),
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.Delete,
+                                            contentDescription = "Delete",
+                                            tint = MaterialTheme.colorScheme.onPrimary,
+                                            modifier = Modifier.align(Alignment.CenterEnd)
+                                        )
+                                    }
+                                },
+                                dismissContent = {
+                                    OTaskCard(
+                                        onCheckedAction = { isChecked, taskId ->
+                                            intent(HomeTasksIntent.TaskChecked(isChecked, taskId))
+                                        },
+                                        task
+                                    ) {
+                                        intent(HomeTasksIntent.EditTask(it))
+                                    }
+                                }
+                            )
                         }
                     }
                 }

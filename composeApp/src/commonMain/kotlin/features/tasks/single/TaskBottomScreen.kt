@@ -126,7 +126,6 @@ fun TaskBottomSheet(
                                     )
                                 )
                             }
-
                             else -> {
                                 taskModel?.let {
                                     intent(
@@ -140,9 +139,8 @@ fun TaskBottomSheet(
                                 }
                             }
                         }
-                    } else {
-                        isEditingMode = !isEditingMode
                     }
+                    isEditingMode = !isEditingMode
                 }
             }
         }

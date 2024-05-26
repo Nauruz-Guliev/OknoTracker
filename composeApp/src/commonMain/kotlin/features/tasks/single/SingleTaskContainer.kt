@@ -38,7 +38,11 @@ class SingleTaskContainer(
                     when (intent) {
                         is SingleTaskIntent.CreateNew -> {
                             runCatching {
-                                repository.changeTask(intent.model)
+                                repository.createTask(
+                                    intent.model.copy(
+                                        userId = userId
+                                    )
+                                )
                                 action(SingleTaskAction.CloseBottomSheet)
                             }.onFailure {
                                 it.message?.let {
@@ -49,7 +53,11 @@ class SingleTaskContainer(
 
                         is SingleTaskIntent.Edit -> {
                             runCatching {
-                                repository.changeTask(intent.model)
+                                repository.changeTask(
+                                    intent.model.copy(
+                                        userId = userId
+                                    )
+                                )
                                 action(SingleTaskAction.CloseBottomSheet)
                             }.onFailure {
                                 it.message?.let {
