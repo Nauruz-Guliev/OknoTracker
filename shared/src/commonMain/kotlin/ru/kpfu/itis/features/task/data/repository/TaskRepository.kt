@@ -37,6 +37,7 @@ class TaskRepository(
         } else {
             taskDatabase.deleteTask(taskId)
         }
+        result.data?.let { taskMapper.mapItem(it) }
     }
 
     suspend fun markAsCompleted(taskId: Long) = withContext(dispatcher) {
@@ -66,6 +67,10 @@ class TaskRepository(
 
     fun getCachedTasks(): Flow<List<TaskModel>> {
         return taskDatabase.getAllTasks().map(taskMapper::mapList)
+    }
+
+    fun getCachedCompletedTasks(): Flow<List<TaskModel>> {
+        return taskDatabase.getCompletedTasks().map(taskMapper::mapList)
     }
 
     suspend fun clearTasks() = withContext(dispatcher) {

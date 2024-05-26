@@ -68,10 +68,7 @@ class MainScreen : Screen {
         }
 
         when (state) {
-            is OTrackerState.Success, is OTrackerState.Loading, is OTrackerState.Initial -> {
-
-            }
-
+            is OTrackerState.Success, is OTrackerState.Loading, is OTrackerState.Initial -> {}
             is OTrackerState.Error -> {
                 println((state as OTrackerState.Error).error.toString())
             }

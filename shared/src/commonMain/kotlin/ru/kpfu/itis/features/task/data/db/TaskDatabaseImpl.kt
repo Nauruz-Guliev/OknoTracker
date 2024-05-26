@@ -23,6 +23,10 @@ class TaskDatabaseImpl(
         return dbQuery.getAllTasks(::mapTask).asFlow().mapToList(dispatcher)
     }
 
+    internal fun getCompletedTasks(): Flow<List<TaskDto>> {
+        return dbQuery.getCompletedTasks(::mapTask).asFlow().mapToList(dispatcher)
+    }
+
     private fun mapTask(
         id: Long,
         name: String,
