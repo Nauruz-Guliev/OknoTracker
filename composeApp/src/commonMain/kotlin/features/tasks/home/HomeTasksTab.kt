@@ -139,6 +139,7 @@ object HomeTasksTab : Tab {
                             )
                             SwipeToDismiss(
                                 state = dismissState,
+                                directions = setOf(DismissDirection.EndToStart),
                                 background = {
                                     val color = when (dismissState.dismissDirection) {
                                         DismissDirection.EndToStart -> MaterialTheme.colorScheme.errorContainer
