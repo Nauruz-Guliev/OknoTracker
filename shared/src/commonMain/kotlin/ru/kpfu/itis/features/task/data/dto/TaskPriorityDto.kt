@@ -4,7 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-enum class TaskPriority {
+enum class TaskPriorityDto {
     @SerialName("Low")
     LOW,
 

@@ -15,4 +15,6 @@ data class TaskChangeRequest(
     val userId: Long,
     @SerialName("deadlineTime")
     val deadlineTime: String? = null,
+    @SerialName("priority")
+    val priority: TaskPriorityDto,
 )

@@ -53,5 +53,5 @@ data class TaskDto(
     @SerialName("completedOnTime")
     val completedOnTime: Boolean? = null,
     @SerialName("priority")
-    val taskPriority: TaskPriority,
+    val priority: TaskPriorityDto,
 )
