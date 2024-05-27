@@ -55,7 +55,9 @@ class HomeTasksContainer(
 
                         is HomeTasksIntent.DeleteTask -> {
                             runCatching {
-                                repository.deleteTask(intent.taskId)
+                                repository.deleteTask(intent.taskId)?.let {
+                                    action(HomeTasksAction.ShowSnackbar("Task \"${it.name}\" was deleted"))
+                                }
                             }.onFailure {
                                 action(HomeTasksAction.ShowSnackbar(it.message))
                             }

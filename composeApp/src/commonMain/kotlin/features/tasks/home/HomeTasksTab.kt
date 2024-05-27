@@ -46,12 +46,14 @@ import cafe.adriel.voyager.navigator.tab.TabOptions
 import design_system.card.OTaskCard
 import design_system.screens.EmptyTasksState
 import design_system.screens.OErrorScreen
+import extensions.convertToString
 import extensions.startFlowMvi
 import features.OTrackerState
 import features.signin.SignInScreen
 import features.tasks.single.TaskBottomSheet
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.datetime.LocalDateTime
 import org.koin.compose.koinInject
 import pro.respawn.flowmvi.compose.dsl.subscribe
 import ru.kpfu.itis.features.task.domain.model.TaskModel
@@ -160,7 +162,12 @@ object HomeTasksTab : Tab {
                                         onCheckedAction = { isChecked, taskId ->
                                             intent(HomeTasksIntent.TaskChecked(isChecked, taskId))
                                         },
-                                        task
+                                        task = task,
+                                        labels = mutableListOf<String>().apply {
+                                            task.deadlineTime?.let {
+                                                add(LocalDateTime.parse(it).convertToString())
+                                            }
+                                        }
                                     ) {
                                         intent(HomeTasksIntent.EditTask(it))
                                     }

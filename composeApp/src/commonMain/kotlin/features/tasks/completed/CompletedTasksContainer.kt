@@ -6,6 +6,7 @@ import flow_mvi.configure
 import kotlinx.coroutines.flow.Flow
 import pro.respawn.flowmvi.api.Container
 import pro.respawn.flowmvi.api.Store
+import pro.respawn.flowmvi.dsl.action
 import pro.respawn.flowmvi.dsl.store
 import pro.respawn.flowmvi.plugins.recover
 import pro.respawn.flowmvi.plugins.reduce
@@ -44,19 +45,24 @@ class CompletedTasksContainer(
                     when (intent) {
                         is CompletedTasksIntent.LoadTasks -> {
                             updateState { OTrackerState.Loading }
-                            repository.getCachedTasks().also {
+                            repository.getCachedCompletedTasks().also {
                                 updateState { OTrackerState.Success(it) }
                             }
                         }
 
                         is CompletedTasksIntent.EditTask -> {
-                            val task = repository.getTask(intent.taskId)
-                            action(CompletedTasksAction.OpenTaskBottomSheet(task.id))
+                            action(CompletedTasksAction.OpenTaskBottomSheet(intent.taskId))
                         }
 
                         is CompletedTasksIntent.DeleteTask -> {
-                            updateState { OTrackerState.Loading }
-                            repository.deleteTask(intent.taskId)
+                            runCatching {
+                                repository.deleteTask(intent.taskId)?.let {
+                                    action(CompletedTasksAction.ShowSnackbar("Task \"${it.name}\" was deleted"))
+                                }
+                                action()
+                            }.onFailure {
+                                action(CompletedTasksAction.ShowSnackbar(it.message))
+                            }
                         }
 
                         is CompletedTasksIntent.ClearUserCache -> {

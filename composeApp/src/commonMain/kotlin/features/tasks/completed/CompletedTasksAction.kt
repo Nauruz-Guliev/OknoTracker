@@ -7,6 +7,6 @@ import pro.respawn.flowmvi.api.MVIAction
 sealed interface CompletedTasksAction : MVIAction {
 
     data class OpenTaskBottomSheet(val taskId: Long? = null) : CompletedTasksAction
-    data class ShowSnackbar(val message: String) : CompletedTasksAction
+    data class ShowSnackbar(val message: String?) : CompletedTasksAction
     data object SignOut : CompletedTasksAction
 }

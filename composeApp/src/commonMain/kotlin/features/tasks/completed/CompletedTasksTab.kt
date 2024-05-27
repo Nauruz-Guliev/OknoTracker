@@ -1,19 +1,26 @@
 package features.tasks.completed
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.DismissDirection
+import androidx.compose.material.DismissValue
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.Icon
+import androidx.compose.material.SwipeToDismiss
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.rememberDismissState
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.pulltorefresh.PullToRefreshContainer
-import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -24,50 +31,46 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
-import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
 import design_system.card.OTaskCard
 import design_system.screens.EmptyTasksState
 import design_system.screens.OErrorScreen
+import extensions.convertToString
 import extensions.startFlowMvi
 import features.OTrackerState
 import features.signin.SignInScreen
 import features.tasks.single.TaskBottomSheet
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.datetime.LocalDateTime
 import org.koin.compose.koinInject
 import pro.respawn.flowmvi.compose.dsl.subscribe
 import ru.kpfu.itis.features.task.domain.model.TaskModel
 
 object CompletedTasksTab : Tab {
 
-    @OptIn(ExperimentalMaterial3Api::class)
+    @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
     @Composable
     override fun Content() = with(koinInject<CompletedTasksContainer>().store) {
-
         startFlowMvi()
-
         val navigator = LocalNavigator.current
         var showBottomSheet by rememberSaveable { mutableStateOf(false) }
         val sheetState = rememberModalBottomSheetState()
         var selectedTaskId by rememberSaveable { mutableStateOf<Long?>(null) }
         val snackbarHostState = remember { SnackbarHostState() }
-        val refreshState = rememberPullToRefreshState()
         var itemList by rememberSaveable { mutableStateOf(listOf<TaskModel>()) }
         var showEmptyState by rememberSaveable { mutableStateOf(true) }
 
-        if (refreshState.isRefreshing) {
-            intent(CompletedTasksIntent.LoadTasks)
-        }
 
         Scaffold(
             snackbarHost = {
                 SnackbarHost(snackbarHostState)
             },
-            modifier = Modifier.nestedScroll(refreshState.nestedScrollConnection)
         ) {
 
             Box(
@@ -78,6 +81,7 @@ object CompletedTasksTab : Tab {
                 val state by subscribe { action ->
                     when (action) {
                         is CompletedTasksAction.OpenTaskBottomSheet -> {
+                            selectedTaskId = action.taskId
                             showBottomSheet = true
                         }
 
@@ -86,7 +90,7 @@ object CompletedTasksTab : Tab {
                         }
 
                         is CompletedTasksAction.ShowSnackbar -> {
-                            action.message.let { it1 -> snackbarHostState.showSnackbar(it1) }
+                            action.message?.let { it1 -> snackbarHostState.showSnackbar(it1) }
                         }
                     }
                 }
@@ -95,31 +99,63 @@ object CompletedTasksTab : Tab {
                     EmptyTasksState()
                 }
 
-
-
                 LazyColumn(modifier = Modifier.fillMaxSize()) {
-                    if (!refreshState.isRefreshing) {
-                        items(itemList) { task ->
-                            OTaskCard(
-                                onCheckedAction = { isChecked, taskId ->
-                                    intent(CompletedTasksIntent.TaskChecked(isChecked, taskId))
-                                },
-                                task
-                            ) {
-                                intent(CompletedTasksIntent.EditTask(it))
-                            }
+                    items(
+                        items = itemList,
+                        key = {
+                            it.id
                         }
+                    ) { task ->
+                        val dismissState = rememberDismissState(
+                            confirmStateChange = {
+                                if (it == DismissValue.DismissedToStart) {
+                                    intent(CompletedTasksIntent.DeleteTask(task.id))
+                                }
+                                true
+                            }
+                        )
+                        SwipeToDismiss(
+                            state = dismissState,
+                            directions = setOf(DismissDirection.EndToStart),
+                            background = {
+                                val color = when (dismissState.dismissDirection) {
+                                    DismissDirection.EndToStart -> MaterialTheme.colorScheme.errorContainer
+                                    else -> Color.Transparent
+                                }
+                                Box(
+                                    modifier = Modifier.fillMaxSize()
+                                        .background(color)
+                                        .padding(8.dp),
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Delete,
+                                        contentDescription = "Delete",
+                                        tint = MaterialTheme.colorScheme.onPrimary,
+                                        modifier = Modifier.align(Alignment.CenterEnd)
+                                    )
+                                }
+                            },
+                            dismissContent = {
+                                OTaskCard(
+                                    onCheckedAction = { isChecked, taskId ->
+                                        intent(CompletedTasksIntent.TaskChecked(isChecked, taskId))
+                                    },
+                                    task = task,
+                                    labels = mutableListOf<String>().apply {
+                                        task.deadlineTime?.let {
+                                            add(LocalDateTime.parse(it).convertToString())
+                                        }
+                                    }
+                                ) {
+                                    intent(CompletedTasksIntent.EditTask(it))
+                                }
+                            }
+                        )
                     }
                 }
 
-                PullToRefreshContainer(
-                    modifier = Modifier.align(Alignment.TopCenter),
-                    state = refreshState,
-                )
-
                 when (state) {
                     is OTrackerState.Initial -> {
-                        refreshState.startRefresh()
                         intent(CompletedTasksIntent.LoadTasks)
                     }
 
@@ -130,16 +166,10 @@ object CompletedTasksTab : Tab {
                                 itemList = it
                             }
                         }
-                        refreshState.endRefresh()
                     }
-
-                    is OTrackerState.Loading -> {
-                        showEmptyState = true
-                    }
-
+                    is OTrackerState.Loading -> {}
                     is OTrackerState.Error -> {
                         showEmptyState = false
-                        refreshState.endRefresh()
                         OErrorScreen(
                             errorModel = (state as OTrackerState.Error).error,
                             onClickAction = {

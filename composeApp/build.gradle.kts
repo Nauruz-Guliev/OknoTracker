@@ -66,6 +66,9 @@ kotlin {
             // resources
             api(libs.resources)
             api(libs.resources.compose)
+
+            // datetime
+            implementation(libs.kotlinx.datetime)
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)

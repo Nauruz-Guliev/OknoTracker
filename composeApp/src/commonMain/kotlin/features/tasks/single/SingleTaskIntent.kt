@@ -10,4 +10,5 @@ sealed interface SingleTaskIntent : MVIIntent {
     data class LoadTask(val taskId: Long) : SingleTaskIntent
     data class CreateNew(val model: TaskModel) : SingleTaskIntent
     data class Edit(val model: TaskModel) : SingleTaskIntent
+    data class Error(val message: String) : SingleTaskIntent
 }
