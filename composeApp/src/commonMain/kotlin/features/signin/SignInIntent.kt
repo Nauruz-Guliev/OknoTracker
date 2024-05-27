@@ -2,18 +2,23 @@ package features.signin
 
 import androidx.compose.runtime.Immutable
 import pro.respawn.flowmvi.api.MVIIntent
-import ru.kpfu.itis.common.model.ErrorModel
 
 @Immutable
 sealed interface SignInIntent : MVIIntent {
 
-    data class SignInClicked(
-        val email: String,
-        val password: String
-    ) : SignInIntent
+    sealed interface Internal : SignInIntent
 
-    data object SignUpClicked : SignInIntent
-    data class ErrorOccured(
-        val errorModel: ErrorModel
-    ) : SignInIntent
+    sealed interface Outer : SignInIntent {
+
+        data class Login(
+            val email: String,
+            val password: String
+        ) : Outer
+
+        data object SignUp : Outer
+
+        data object TryAgain : Outer
+    }
+
+
 }

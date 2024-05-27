@@ -8,4 +8,5 @@ sealed interface SignInAction : MVIAction {
 
     data object OpenSignUpScreen : SignInAction
     data class OpenMainScreen(val userId: Long) : SignInAction
+    data class ShowSnackbar(val text: String, val actionLabel: String): SignInAction
 }

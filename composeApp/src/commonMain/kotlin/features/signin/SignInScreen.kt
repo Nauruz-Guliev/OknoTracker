@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.Scaffold
+import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -24,21 +26,22 @@ import design_system.screens.OErrorScreen
 import design_system.screens.OLoadingScreen
 import design_system.textfield.OTextField
 import extensions.startFlowMvi
-import features.OTrackerState
 import features.signup.SignUpScreen
 import features.tasks.main.MainScreen
 import org.koin.compose.koinInject
 import pro.respawn.flowmvi.api.IntentReceiver
+import pro.respawn.flowmvi.api.Store
 import pro.respawn.flowmvi.compose.dsl.subscribe
 
 class SignInScreen : Screen {
 
     @Composable
     override fun Content() = with(koinInject<SignInContainer>().store) {
-
         startFlowMvi()
 
         val navigator = LocalNavigator.current
+
+        val scaffoldState = rememberScaffoldState()
 
         val state by subscribe { action ->
             when (action) {
@@ -51,110 +54,123 @@ class SignInScreen : Screen {
                         replaceAll(MainScreen())
                     }
                 }
+
+                is SignInAction.ShowSnackbar -> scaffoldState.snackbarHostState.showSnackbar(
+                    message = action.text,
+                    actionLabel = action.actionLabel
+                )
             }
         }
 
-        HandleSignInState(state)
+        Scaffold(
+            scaffoldState = scaffoldState,
+            modifier = Modifier.fillMaxSize()
+        ) {
+            HandleSignInState(state)
+        }
     }
 
 
     @Composable
-    private fun IntentReceiver<SignInIntent>.HandleSignInState(state: OTrackerState<Nothing>) {
-        InitialContent()
+    private fun Store<SignInState, SignInIntent, SignInAction>.HandleSignInState(state: SignInState) {
         when (state) {
-            OTrackerState.Loading -> {
+            SignInState.Loading -> {
                 OLoadingScreen()
             }
 
-            is OTrackerState.Error -> {
+            is SignInState.InternalError -> {
                 OErrorScreen(
                     errorModel = state.error,
-                    onClickAction = { // todo
-                    },
+                    onClickAction = { intent(SignInIntent.Outer.TryAgain) },
                     isTryAgain = true
                 )
             }
 
-            OTrackerState.Initial, is OTrackerState.Success -> {
-                // no need to do anything
-                // if u put InitialContent() here the loading screen will overlap
-                // InitialContent which is not expected behaviour
-            }
+            SignInState.Initial -> InitialContent(state)
+            is SignInState.ValidationError -> InitialContent(state)
+            is SignInState.NetworkError -> Unit
         }
     }
+}
 
-    @Composable
-    private fun IntentReceiver<SignInIntent>.InitialContent() {
-        Box(
-            contentAlignment = Alignment.TopStart,
-            modifier = Modifier.fillMaxSize()
-        ) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
 
-                var email by rememberSaveable { mutableStateOf("") }
-                var password by rememberSaveable { mutableStateOf("") }
+@Composable
+private fun IntentReceiver<SignInIntent>.InitialContent(
+    state: SignInState,
+    modifier: Modifier = Modifier
+) {
+    Box(
+        contentAlignment = Alignment.TopStart,
+        modifier = modifier.fillMaxSize()
+    ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
 
-                Spacer(
-                    modifier = Modifier.height(80.dp)
+            var email by rememberSaveable { mutableStateOf("") }
+            var password by rememberSaveable { mutableStateOf("") }
+
+            Spacer(
+                modifier = Modifier.height(80.dp)
+            )
+
+            CoilImage(
+                imageModel = { "https://s3-alpha-sig.figma.com/img/6704/ab02/52886121ea67657e459860dab9ae1ade?Expires=1716768000&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=IGPYUslolkAyOTZ0bZK1MY5dURI7Sc4YB1dSQR9cBQx-EemgRVQZSlb-6yg~8BDGAjhe50qq-l4WadOeAZtnPQLoBDkx6ViDdE7rPYlP3PZGcAccL6UFYWskOtv9w7begjko233UwaVKTTszzxQJqJJeW-Nt4jVlrUWjrIEJvMnMlMvbaTjdmyikKjmd3WyDS57Rkw3Ax3ZS4xNgE-1yrcnNC3REd9S3gu2jH740EtTQXSErP~4B3XAeJfcKEDvRvSJmkuVfHpBKXCCTCo29UaEgjrysq-VBDbqm4HHihuaHJ~4Q0SOwwUbrVyBUHOSFhaY5d1dnXwPj07K56EnGcw__" },
+                modifier = Modifier.size(200.dp),
+                imageOptions = ImageOptions(
+                    contentScale = ContentScale.Fit
                 )
+            )
 
-                CoilImage(
-                    imageModel = { "https://s3-alpha-sig.figma.com/img/6704/ab02/52886121ea67657e459860dab9ae1ade?Expires=1716768000&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=IGPYUslolkAyOTZ0bZK1MY5dURI7Sc4YB1dSQR9cBQx-EemgRVQZSlb-6yg~8BDGAjhe50qq-l4WadOeAZtnPQLoBDkx6ViDdE7rPYlP3PZGcAccL6UFYWskOtv9w7begjko233UwaVKTTszzxQJqJJeW-Nt4jVlrUWjrIEJvMnMlMvbaTjdmyikKjmd3WyDS57Rkw3Ax3ZS4xNgE-1yrcnNC3REd9S3gu2jH740EtTQXSErP~4B3XAeJfcKEDvRvSJmkuVfHpBKXCCTCo29UaEgjrysq-VBDbqm4HHihuaHJ~4Q0SOwwUbrVyBUHOSFhaY5d1dnXwPj07K56EnGcw__" },
-                    modifier = Modifier.size(200.dp),
-                    imageOptions = ImageOptions(
-                        contentScale = ContentScale.Fit
-                    )
-                )
+            Spacer(
+                modifier = Modifier.height(16.dp)
+            )
 
-                Spacer(
-                    modifier = Modifier.height(16.dp)
-                )
 
-                OTextField(
-                    onValueChange = { email = it },
-                    label = "Login",
-                    text = email,
-                    characterMaxCount = 20
-                )
+            OTextField(
+                onValueChange = { email = it },
+                label = InputField.EMAIL.labelText,
+                text = email,
+                characterMaxCount = InputField.PASSWORD.maxLength,
+                errorText = state.findFieldError(InputField.EMAIL)
+            )
 
-                Spacer(
-                    modifier = Modifier.height(16.dp)
-                )
+            Spacer(
+                modifier = Modifier.height(16.dp)
+            )
 
-                OTextField(
-                    onValueChange = { password = it },
-                    label = "Password",
-                    text = password,
-                    characterMaxCount = 20
-                )
+            OTextField(
+                onValueChange = { password = it },
+                label = InputField.PASSWORD.labelText,
+                text = password,
+                characterMaxCount = InputField.PASSWORD.maxLength,
+                errorText = state.findFieldError(InputField.PASSWORD)
+            )
 
-                Spacer(
-                    modifier = Modifier.height(16.dp)
-                )
+            Spacer(
+                modifier = Modifier.height(16.dp)
+            )
 
-                OButton(
-                    text = "Login",
-                    onClickAction = {
-                        intent(
-                            SignInIntent.SignInClicked(
-                                email, password
-                            )
+            OButton(
+                text = "Login",
+                onClickAction = {
+                    intent(
+                        SignInIntent.Outer.Login(
+                            email, password
                         )
-                    }
-                )
+                    )
+                }
+            )
 
-                Spacer(
-                    modifier = Modifier.height(8.dp)
-                )
+            Spacer(
+                modifier = Modifier.height(8.dp)
+            )
 
-                OButton(
-                    text = "Register",
-                    isMainButton = false,
-                    onClickAction = {
-                        intent(SignInIntent.SignUpClicked)
-                    }
-                )
-            }
+            OButton(
+                text = "Sign up",
+                isMainButton = false,
+                onClickAction = {
+                    intent(SignInIntent.Outer.SignUp)
+                }
+            )
         }
     }
 }

@@ -22,8 +22,8 @@ fun signInModule() = module {
             get(),
             get(),
             get(),
-            emailValidator = Validator("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$"),
-            passwordValidator = Validator("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@\$!%*?&])[A-Za-z\\d@\$!%*?&]{8,}$")
+            emailValidator = Validator(InputField.EMAIL.regex),
+            passwordValidator = Validator(InputField.PASSWORD.regex)
         )
     }
     single {

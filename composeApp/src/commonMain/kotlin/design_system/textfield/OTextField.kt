@@ -33,13 +33,7 @@ fun OTextField(
         modifier = modifier,
         value = text,
         enabled = isEnabled,
-        onValueChange = {
-            if (characterMaxCount != null && it.length > characterMaxCount) {
-                onValueChange.invoke(it.take(characterMaxCount))
-            } else {
-                onValueChange.invoke(it)
-            }
-        },
+        onValueChange = { onValueChange.invoke(it) },
         visualTransformation = if (isPassword) {
             PasswordVisualTransformation()
         } else {
@@ -47,16 +41,18 @@ fun OTextField(
         },
         label = { Text(label) },
         supportingText = {
-            Row {
-                Text(
-                    text = errorText ?: "",
-                    Modifier.weight(1f)
-                )
-                characterMaxCount?.let {
+            if(errorText != null){
+                Row {
                     Text(
-                        text = "${text.length} / $characterMaxCount",
-                        maxLines = 1
+                        text = errorText,
+                        Modifier.weight(1f)
                     )
+                    characterMaxCount?.let {
+                        Text(
+                            text = "${text.length} / $characterMaxCount",
+                            maxLines = 1
+                        )
+                    }
                 }
             }
         },
