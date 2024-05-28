@@ -69,7 +69,6 @@ object CompletedTasksTab : Tab {
         var itemList by rememberSaveable { mutableStateOf(listOf<TaskModel>()) }
         var showEmptyState by rememberSaveable { mutableStateOf(true) }
 
-
         Scaffold(
             snackbarHost = {
                 SnackbarHost(snackbarHostState)

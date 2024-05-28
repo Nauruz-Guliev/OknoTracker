@@ -27,6 +27,12 @@ kotlin {
 
             implementation(libs.koin.core)
             implementation(libs.koin.androidx.compose)
+
+            implementation(libs.picker.core)
+            implementation(libs.picker.compose)
+
+            implementation(libs.coil)
+            implementation(libs.coil.network.ktor)
         }
         commonMain.dependencies {
             implementation(libs.compose.ui.tooling.preview)
@@ -72,6 +78,9 @@ kotlin {
 
             // charts
             implementation(libs.charts)
+
+            // image loader (for files)
+            api(libs.image.loader)
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)

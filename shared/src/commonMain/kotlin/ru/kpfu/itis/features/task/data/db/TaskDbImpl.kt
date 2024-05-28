@@ -5,18 +5,16 @@ import app.cash.sqldelight.coroutines.mapToList
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import ru.kpfu.itis.common.driver.DatabaseDriverFactory
-import ru.kpfu.itis.features.task.TaskDatabase
+import ru.kpfu.itis.features.db.TaskDatabase
 import ru.kpfu.itis.features.task.data.dto.TaskDto
 import ru.kpfu.itis.features.task.data.dto.TaskPriorityDto
 
-class TaskDatabaseImpl(
+class TaskDbImpl(
     databaseDriverFactory: DatabaseDriverFactory,
     private val dispatcher: CoroutineDispatcher,
 ) {
 
-    private val database = TaskDatabase(
-        driver = databaseDriverFactory.createDriver(),
-    )
+    private val database = TaskDatabase(databaseDriverFactory.createDriver())
 
     private val dbQuery = database.taskDatabaseQueries
 

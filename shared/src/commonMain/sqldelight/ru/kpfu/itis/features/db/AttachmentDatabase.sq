@@ -1,0 +1,21 @@
+
+CREATE TABLE Attachment (
+    id INTEGER NOT NULL PRIMARY KEY,
+    name TEXT NOT NULL,
+    contentType TEXT NOT NULL,
+    taskId INTEGER NOT NULL,
+    content TEXT NOT NULL
+);
+
+insertAttachment:
+INSERT OR REPLACE INTO Attachment(
+id, name, contentType, taskId, content
+) VALUES (?,?,?,?,?);
+
+deleteAllAttachments:
+DELETE FROM Attachment;
+
+getAllAttachments:
+SELECT Attachment.*
+FROM Attachment
+WHERE taskId = ?;

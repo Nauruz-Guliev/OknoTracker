@@ -4,7 +4,8 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
-import ru.kpfu.itis.features.task.data.db.TaskDatabaseImpl
+import ru.kpfu.itis.features.attachments.repository.AttachmentRepository
+import ru.kpfu.itis.features.task.data.db.TaskDbImpl
 import ru.kpfu.itis.features.task.data.dto.TaskResponseSingle
 import ru.kpfu.itis.features.task.data.mapper.TaskMapper
 import ru.kpfu.itis.features.task.data.model.TaskType
@@ -12,21 +13,22 @@ import ru.kpfu.itis.features.task.data.service.TaskService
 import ru.kpfu.itis.features.task.domain.model.TaskModel
 
 class TaskRepository(
-    private val taskDatabase: TaskDatabaseImpl,
+    private val taskDatabase: TaskDbImpl,
     private val taskService: TaskService,
     private val taskMapper: TaskMapper,
-    private val dispatcher: CoroutineDispatcher
+    private val dispatcher: CoroutineDispatcher,
+    private val attachmentRepository: AttachmentRepository,
 ) {
 
     suspend fun getTask(taskId: Long): TaskModel = withContext(dispatcher) {
         handleTask(taskService.getTask(taskId))
     }
 
-    suspend fun createTask(taskModel: TaskModel) = withContext(dispatcher) {
+    suspend fun createTask(taskModel: TaskModel): TaskModel = withContext(dispatcher) {
         handleTask(taskService.createTask(taskMapper.mapCreate(taskModel)))
     }
 
-    suspend fun changeTask(taskModel: TaskModel) = withContext(dispatcher) {
+    suspend fun changeTask(taskModel: TaskModel): TaskModel = withContext(dispatcher) {
         handleTask(taskService.changeTask(taskMapper.mapChange(taskModel)))
     }
 
@@ -40,11 +42,11 @@ class TaskRepository(
         result.data?.let { taskMapper.mapItem(it) }
     }
 
-    suspend fun markAsCompleted(taskId: Long) = withContext(dispatcher) {
+    suspend fun markAsCompleted(taskId: Long): TaskModel = withContext(dispatcher) {
         handleTask(taskService.markTaskCompleted(taskId))
     }
 
-    suspend fun markAsUncompleted(taskId: Long) = withContext(dispatcher) {
+    suspend fun markAsUncompleted(taskId: Long): TaskModel = withContext(dispatcher) {
         handleTask(taskService.markTaskUncompleted(taskId))
     }
 
@@ -66,23 +68,41 @@ class TaskRepository(
     }
 
     fun getCachedTasks(): Flow<List<TaskModel>> {
-        return taskDatabase.getAllTasks().map(taskMapper::mapList)
+        return taskDatabase.getAllTasks().map(taskMapper::mapList).addAttachments()
     }
 
     fun getCachedCompletedTasks(): Flow<List<TaskModel>> {
-        return taskDatabase.getCompletedTasks().map(taskMapper::mapList)
+        return taskDatabase.getCompletedTasks().map(taskMapper::mapList).addAttachments()
     }
 
     suspend fun clearTasks() = withContext(dispatcher) {
         taskDatabase.deleteAllTasks()
     }
 
-    private fun handleTask(task: TaskResponseSingle): TaskModel {
+    private suspend fun handleTask(task: TaskResponseSingle): TaskModel {
         return if (task.data != null) {
             taskDatabase.saveTask(task.data)
             taskMapper.mapItem(task.data)
         } else {
             throw taskMapper.mapToException(task.error)
+        }.addAttachment()
+    }
+
+    private suspend fun TaskModel.addAttachment(): TaskModel {
+        return this.apply {
+            attachments.forEach {
+                attachmentRepository.saveAttachment(it)
+            }
+        }
+    }
+
+    private fun Flow<List<TaskModel>>.addAttachments(): Flow<List<TaskModel>> {
+        return map { taskList ->
+            taskList.map { task ->
+                task.copy(
+                    attachments = attachmentRepository.getCachedAttachments(task.id)
+                )
+            }
         }
     }
 }

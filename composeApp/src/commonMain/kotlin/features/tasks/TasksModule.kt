@@ -6,10 +6,8 @@ import features.tasks.main.MainContainer
 import features.tasks.single.SingleTaskContainer
 import flow_mvi.DefaultConfigurationFactory
 import org.koin.dsl.module
-import ru.kpfu.itis.features.task.data.db.TaskDatabaseImpl
+import ru.kpfu.itis.features.attachments.mapper.AttachmentMapper
 import ru.kpfu.itis.features.task.data.mapper.TaskMapper
-import ru.kpfu.itis.features.task.data.repository.TaskRepository
-import ru.kpfu.itis.features.task.data.service.TaskService
 
 fun tasksModule() = module {
     single {
@@ -25,19 +23,11 @@ fun tasksModule() = module {
     }
 
     factory {
-        SingleTaskContainer(get(), get(), get(), get())
-    }
-
-    single {
-        TaskRepository(get(), get(), get(), get())
+        SingleTaskContainer(get(), get(), get(), get(), get())
     }
 
     factory {
-        TaskService(get(), get())
-    }
-
-    single {
-        TaskDatabaseImpl(get(), get())
+        AttachmentMapper()
     }
 
     factory {

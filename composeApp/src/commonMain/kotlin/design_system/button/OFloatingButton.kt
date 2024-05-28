@@ -14,9 +14,9 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun OFloatingButton(
-    modifier: Modifier = Modifier.size(56.dp),
+    modifier: Modifier = Modifier.size(52.dp),
     icon: ImageVector = Icons.Default.Add,
-    onClickedAction: () -> Unit
+    onClickedAction: () -> Unit,
 ) {
     FloatingActionButton(
         onClick = {

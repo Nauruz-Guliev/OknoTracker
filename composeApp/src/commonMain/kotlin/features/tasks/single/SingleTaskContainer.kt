@@ -9,17 +9,23 @@ import pro.respawn.flowmvi.dsl.store
 import pro.respawn.flowmvi.plugins.recover
 import pro.respawn.flowmvi.plugins.reduce
 import ru.kpfu.itis.common.mapper.ErrorMapper
+import ru.kpfu.itis.features.attachments.repository.AttachmentRepository
 import ru.kpfu.itis.features.task.data.repository.TaskRepository
 import ru.kpfu.itis.features.task.data.store.UserStore
+import ru.kpfu.itis.features.task.domain.model.AttachmentModel
 import ru.kpfu.itis.features.task.domain.model.TaskModel
+import kotlin.io.encoding.Base64
+import kotlin.io.encoding.ExperimentalEncodingApi
 
 class SingleTaskContainer(
     private val errorMapper: ErrorMapper,
     private val repository: TaskRepository,
     private val configurationFactory: DefaultConfigurationFactory,
     private val userStore: UserStore,
+    private val attachmentRepository: AttachmentRepository,
 ) : Container<OTrackerState<TaskModel>, SingleTaskIntent, SingleTaskAction> {
 
+    @OptIn(ExperimentalEncodingApi::class)
     override val store: Store<OTrackerState<TaskModel>, SingleTaskIntent, SingleTaskAction> =
         store(OTrackerState.Initial) {
 
@@ -81,11 +87,31 @@ class SingleTaskContainer(
                                 }
                             }
                         }
+
+                        is SingleTaskIntent.OnFileSelected -> {
+                            try {
+                                intent.file?.readBytes()?.let {
+                                    attachmentRepository.saveAttachment(
+                                        AttachmentModel(
+                                            name = intent.file.name,
+                                            contentType = intent.file.name.substring(
+                                                intent.file.name.lastIndexOf(
+                                                    "."
+                                                ) + 1, intent.file.name.length
+                                            ),
+                                            taskId = intent.taskId,
+                                            content = Base64.encode(it)
+                                        )
+                                    )
+                                    action(SingleTaskAction.AddSelectedImage(it))
+                                }
+                            } catch (ex: Exception) {
+                                ex.message?.let { action(SingleTaskAction.ShowSnackbar(it)) }
+                            }
+                        }
                     }
                 }
             }
         }
 }
-
-
 
