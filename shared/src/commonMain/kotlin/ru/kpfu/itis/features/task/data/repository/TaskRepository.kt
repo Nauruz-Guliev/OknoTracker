@@ -4,7 +4,8 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
-import ru.kpfu.itis.features.task.data.db.TaskDatabaseImpl
+import ru.kpfu.itis.features.attachments.repository.AttachmentRepository
+import ru.kpfu.itis.features.task.data.db.TaskDbImpl
 import ru.kpfu.itis.features.task.data.dto.TaskResponseSingle
 import ru.kpfu.itis.features.task.data.mapper.TaskMapper
 import ru.kpfu.itis.features.task.data.model.TaskType
@@ -12,21 +13,22 @@ import ru.kpfu.itis.features.task.data.service.TaskService
 import ru.kpfu.itis.features.task.domain.model.TaskModel
 
 class TaskRepository(
-    private val taskDatabase: TaskDatabaseImpl,
+    private val taskDatabase: TaskDbImpl,
     private val taskService: TaskService,
     private val taskMapper: TaskMapper,
-    private val dispatcher: CoroutineDispatcher
+    private val dispatcher: CoroutineDispatcher,
+    private val attachmentRepository: AttachmentRepository,
 ) {
 
     suspend fun getTask(taskId: Long): TaskModel = withContext(dispatcher) {
         handleTask(taskService.getTask(taskId))
-    }
+    }.addAttachment()
 
-    suspend fun createTask(taskModel: TaskModel) = withContext(dispatcher) {
+    suspend fun createTask(taskModel: TaskModel): TaskModel = withContext(dispatcher) {
         handleTask(taskService.createTask(taskMapper.mapCreate(taskModel)))
     }
 
-    suspend fun changeTask(taskModel: TaskModel) = withContext(dispatcher) {
+    suspend fun changeTask(taskModel: TaskModel): TaskModel = withContext(dispatcher) {
         handleTask(taskService.changeTask(taskMapper.mapChange(taskModel)))
     }
 
@@ -40,11 +42,11 @@ class TaskRepository(
         result.data?.let { taskMapper.mapItem(it) }
     }
 
-    suspend fun markAsCompleted(taskId: Long) = withContext(dispatcher) {
+    suspend fun markAsCompleted(taskId: Long): TaskModel = withContext(dispatcher) {
         handleTask(taskService.markTaskCompleted(taskId))
     }
 
-    suspend fun markAsUncompleted(taskId: Long) = withContext(dispatcher) {
+    suspend fun markAsUncompleted(taskId: Long): TaskModel = withContext(dispatcher) {
         handleTask(taskService.markTaskUncompleted(taskId))
     }
 
@@ -84,5 +86,27 @@ class TaskRepository(
         } else {
             throw taskMapper.mapToException(task.error)
         }
+    }
+
+    private suspend fun TaskModel.addAttachment(): TaskModel {
+        return this.copy(
+            attachments = buildList {
+                attachmentRepository.getCachedAttachments(id).map { attachment ->
+                    add(
+                        if (attachment.content.isBlank() || attachment.content.isEmpty()) {
+                            try {
+                                attachment.copy(
+                                    content = attachmentRepository.getAttachment(attachment.id).content
+                                )
+                            } catch (ex: Exception) {
+                                attachment
+                            }
+                        } else {
+                            attachment
+                        }
+                    )
+                }
+            }
+        )
     }
 }

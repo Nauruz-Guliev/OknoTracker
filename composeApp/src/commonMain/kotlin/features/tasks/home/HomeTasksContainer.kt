@@ -4,6 +4,7 @@ import features.OTrackerState
 import flow_mvi.DefaultConfigurationFactory
 import flow_mvi.configure
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.launch
 import pro.respawn.flowmvi.api.Container
 import pro.respawn.flowmvi.api.Store
 import pro.respawn.flowmvi.dsl.store
@@ -40,9 +41,9 @@ class HomeTasksContainer(
                 } else {
                     when (intent) {
                         is HomeTasksIntent.LoadTasks -> {
+                            updateState { OTrackerState.Loading }
+                            launch { repository.updateTasks(TaskType.ALL, userId) }
                             runCatching {
-                                repository.updateTasks(TaskType.ALL, userId)
-                                updateState { OTrackerState.Loading }
                                 updateState { OTrackerState.Success(repository.getCachedTasks()) }
                             }.onFailure {
                                 action(HomeTasksAction.ShowSnackbar(it.message))

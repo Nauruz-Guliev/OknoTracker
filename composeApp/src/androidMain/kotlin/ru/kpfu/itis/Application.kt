@@ -13,6 +13,8 @@ import ru.kpfu.itis.di.androidModule
 import ru.kpfu.itis.di.dbModule
 import ru.kpfu.itis.di.dispatcherModule
 import ru.kpfu.itis.di.networkModule
+import ru.kpfu.itis.di.repositoryModule
+import ru.kpfu.itis.di.serviceModule
 
 class Application : Application() {
 
@@ -29,6 +31,8 @@ class Application : Application() {
             settingsModule(),
             dispatcherModule(),
             statisticsModule(),
+            repositoryModule(),
+            serviceModule(),
         ) {
             androidContext(this@Application)
         }

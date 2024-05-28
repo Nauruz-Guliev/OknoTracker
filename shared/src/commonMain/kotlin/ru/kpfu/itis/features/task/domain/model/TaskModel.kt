@@ -11,5 +11,6 @@ data class TaskModel(
     val lastModifiedTime: String? = null,
     val deadlineTime: String? = null,
     val completedTime: String? = null,
-    val priority: String
+    val priority: String,
+    val attachments: List<AttachmentModel> = emptyList(),
 )

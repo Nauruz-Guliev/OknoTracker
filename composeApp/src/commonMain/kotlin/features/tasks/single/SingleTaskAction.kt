@@ -8,4 +8,5 @@ sealed interface SingleTaskAction : MVIAction {
 
     data class ShowSnackbar(val message: String) : SingleTaskAction
     data object CloseBottomSheet : SingleTaskAction
+    data class AddSelectedImage(val image: ByteArray) : SingleTaskAction
 }

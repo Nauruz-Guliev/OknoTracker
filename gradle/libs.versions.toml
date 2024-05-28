@@ -13,6 +13,7 @@ androidx-test-junit = "1.1.5"
 coil = "3.0.0-alpha06"
 compose = "1.6.7"
 compose-plugin = "1.6.2"
+imageLoader = "1.7.8"
 junit = "4.13.2"
 kamelImage = "x.x.x"
 kotlin = "1.9.23"
@@ -23,6 +24,7 @@ kotlinxDatetime = "0.6.0"
 ktor = "2.3.10"
 ktorClientOkhttp = "2.3.10"
 landscapistCoil3 = "2.3.3"
+pickerCompose = "0.3.2"
 resourcesGenerator = "0.24.0-beta-2"
 sqlDelight = "2.0.2"
 lifecycleViewmodelCompose = "2.8.0"
@@ -42,6 +44,7 @@ charts = "Beta-0.0.5"
 [libraries]
 coil-network-ktor = { module = "io.coil-kt.coil3:coil-network-ktor", version.ref = "coil" }
 coil = { module = "io.coil-kt.coil3:coil", version.ref = "coil" }
+image-loader = { module = "io.github.qdsfdhvh:image-loader", version.ref = "imageLoader" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 kotlin-test-junit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -77,6 +80,8 @@ ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "kto
 ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
 
 # sqldelight
+picker-compose = { module = "io.github.vinceglb:picker-compose", version.ref = "pickerCompose" }
+picker-core = { module = "io.github.vinceglb:picker-core", version.ref = "pickerCompose" }
 sqldelight-android-driver = { module = "app.cash.sqldelight:android-driver", version.ref = "sqlDelight" }
 sqldelight-native-driver = { module = "app.cash.sqldelight:native-driver", version.ref = "sqlDelight" }
 sqldelight-runtime = { module = "app.cash.sqldelight:runtime", version.ref = "sqlDelight" }

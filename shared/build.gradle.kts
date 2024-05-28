@@ -10,7 +10,7 @@ kotlin {
     sqldelight {
         databases {
             create("TaskDatabase") {
-                packageName.set("ru.kpfu.itis.features.task")
+                packageName = "ru.kpfu.itis.features.db"
             }
         }
     }

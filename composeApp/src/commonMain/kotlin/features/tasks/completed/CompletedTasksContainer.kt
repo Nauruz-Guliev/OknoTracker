@@ -4,6 +4,7 @@ import features.OTrackerState
 import flow_mvi.DefaultConfigurationFactory
 import flow_mvi.configure
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.launch
 import pro.respawn.flowmvi.api.Container
 import pro.respawn.flowmvi.api.Store
 import pro.respawn.flowmvi.dsl.action
@@ -11,6 +12,7 @@ import pro.respawn.flowmvi.dsl.store
 import pro.respawn.flowmvi.plugins.recover
 import pro.respawn.flowmvi.plugins.reduce
 import ru.kpfu.itis.common.mapper.ErrorMapper
+import ru.kpfu.itis.features.task.data.model.TaskType
 import ru.kpfu.itis.features.task.data.repository.TaskRepository
 import ru.kpfu.itis.features.task.data.store.UserStore
 import ru.kpfu.itis.features.task.domain.model.TaskModel
@@ -43,10 +45,9 @@ class CompletedTasksContainer(
                 } else {
                     when (intent) {
                         is CompletedTasksIntent.LoadTasks -> {
+                            launch { repository.updateTasks(TaskType.ALL, userId) }
                             updateState { OTrackerState.Loading }
-                            repository.getCachedCompletedTasks().also {
-                                updateState { OTrackerState.Success(it) }
-                            }
+                            updateState { OTrackerState.Success(repository.getCachedCompletedTasks()) }
                         }
 
                         is CompletedTasksIntent.EditTask -> {

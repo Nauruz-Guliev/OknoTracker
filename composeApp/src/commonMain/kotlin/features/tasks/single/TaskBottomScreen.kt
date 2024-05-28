@@ -1,5 +1,6 @@
 package features.tasks.single
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -8,10 +9,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.selection.selectableGroup
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Lock
@@ -33,20 +37,29 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import com.seiko.imageloader.component.fetcher.ByteArrayFetcher
+import com.seiko.imageloader.model.ImageRequest
+import com.seiko.imageloader.rememberImagePainter
 import design_system.button.OFloatingButton
 import design_system.button.ORadioButton
 import design_system.textfield.OTextField
 import extensions.convertToString
 import extensions.isPastTime
+import extensions.mapToByteArray
 import extensions.startFlowMvi
 import features.OTrackerState
 import features.TaskPriority
 import features.mapToColor
+import io.github.vinceglb.picker.core.Picker
+import io.github.vinceglb.picker.core.PickerSelectionMode
+import io.github.vinceglb.picker.core.PickerSelectionType
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
@@ -55,7 +68,7 @@ import org.koin.compose.koinInject
 import pro.respawn.flowmvi.compose.dsl.subscribe
 import ru.kpfu.itis.features.task.domain.model.TaskModel
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TaskBottomSheet(
     taskId: Long? = null,
@@ -73,7 +86,9 @@ fun TaskBottomSheet(
     val confirmEnabled = derivedStateOf { datePickerState.selectedDateMillis != null }
     var pickedDate by remember { mutableStateOf<LocalDateTime?>(null) }
     val openPriorityAlert = remember { mutableStateOf(false) }
-    val selectedPriority = remember { mutableStateOf(TaskPriority[taskModel?.priority.orEmpty()]) }
+    val pickedPriority = remember { mutableStateOf(TaskPriority[taskModel?.priority.orEmpty()]) }
+    val openFilePicker = remember { mutableStateOf(false) }
+    val listOfImages = remember { mutableStateListOf<ByteArray>() }
 
     val state by subscribe { action ->
         when (action) {
@@ -84,17 +99,27 @@ fun TaskBottomSheet(
             is SingleTaskAction.ShowSnackbar -> {
                 snackbarHostState.showSnackbar(action.message)
             }
+
+            is SingleTaskAction.AddSelectedImage -> {
+                listOfImages.add(action.image)
+            }
         }
     }
 
     when (state) {
         is OTrackerState.Success -> {
             taskModel = (state as OTrackerState.Success<TaskModel>).data
-            taskTitle = taskModel?.name ?: ""
-            taskDescription = taskModel?.description ?: ""
+            taskTitle = taskModel?.name.orEmpty()
+            taskDescription = taskModel?.description.orEmpty()
             pickedDate = taskModel?.deadlineTime?.let {
                 LocalDateTime.parse(it)
             }
+            pickedPriority.value = TaskPriority[taskModel?.priority ?: TaskPriority.LOW.name]
+            taskModel?.attachments?.mapToByteArray()?.let {
+                listOfImages.clear()
+                listOfImages.addAll(it)
+            }
+            println(taskModel)
         }
 
         is OTrackerState.Initial -> {
@@ -144,87 +169,99 @@ fun TaskBottomSheet(
                     .padding(horizontal = 16.dp),
                 horizontalArrangement = Arrangement.End
             ) {
-
-                SuggestionChip(
-                    onClick = {
-                        openDateDialog = true
-                    },
-                    enabled = isEditingMode,
-                    label = {
-                        Text(pickedDate?.convertToString() ?: "Deadline")
-                    },
-                    icon = {
-                        Icon(
-                            imageVector = Icons.Default.DateRange,
-                            contentDescription = "Date"
-                        )
-                    }
-                )
-
-                Spacer(Modifier.width(8.dp))
-
-                SuggestionChip(
-                    onClick = {
-                        openPriorityAlert.value = true
-                    },
-                    enabled = isEditingMode,
-                    label = {
-                        Text("Priority: ${selectedPriority.value}")
-                    },
-                    colors = SuggestionChipDefaults.suggestionChipColors(
-                        containerColor = selectedPriority.value.mapToColor()
+                Column {
+                    SuggestionChip(
+                        onClick = {
+                            openDateDialog = true
+                        },
+                        enabled = isEditingMode,
+                        label = {
+                            Text(pickedDate?.convertToString() ?: "Deadline")
+                        },
+                        icon = {
+                            Icon(
+                                imageVector = Icons.Default.DateRange,
+                                contentDescription = "Date"
+                            )
+                        }
                     )
-                )
+
+                    SuggestionChip(
+                        onClick = {
+                            openPriorityAlert.value = true
+                        },
+                        enabled = isEditingMode,
+                        label = {
+                            Text("Priority: ${pickedPriority.value}")
+                        },
+                        colors = SuggestionChipDefaults.suggestionChipColors(
+                            containerColor = pickedPriority.value.mapToColor()
+                        )
+                    )
+                }
 
                 Spacer(Modifier.weight(1f))
 
+                if (taskId != null && isEditingMode) {
+                    OFloatingButton(
+                        icon = Icons.Default.Add,
+                        onClickedAction = {
+                            openFilePicker.value = true
+                        },
+                    )
+                }
+
+                Spacer(Modifier.width(8.dp))
+
                 OFloatingButton(
                     icon = if (isEditingMode) Icons.Default.Done
-                    else Icons.Default.Lock
-                ) {
-                    if (isEditingMode) {
-                        when (taskModel) {
-                            null -> {
-                                intent(
-                                    SingleTaskIntent.CreateNew(
-                                        TaskModel(
-                                            description = taskDescription,
-                                            name = taskTitle,
-                                            deadlineTime = pickedDate?.toString(),
-                                            priority = selectedPriority.value.name
-                                        )
-                                    )
-                                )
-                            }
-
-                            else -> {
-                                taskModel?.let {
+                    else Icons.Default.Lock,
+                    onClickedAction = {
+                        if (isEditingMode) {
+                            when (taskModel) {
+                                null -> {
                                     intent(
-                                        SingleTaskIntent.Edit(
-                                            it.copy(
+                                        SingleTaskIntent.CreateNew(
+                                            TaskModel(
                                                 description = taskDescription,
                                                 name = taskTitle,
                                                 deadlineTime = pickedDate?.toString(),
-                                                priority = selectedPriority.value.name
+                                                priority = pickedPriority.value.name
                                             )
                                         )
                                     )
                                 }
+
+                                else -> {
+                                    taskModel?.let {
+                                        intent(
+                                            SingleTaskIntent.Edit(
+                                                it.copy(
+                                                    description = taskDescription,
+                                                    name = taskTitle,
+                                                    deadlineTime = pickedDate?.toString(),
+                                                    priority = pickedPriority.value.name
+                                                ),
+                                                listOfImages
+                                            )
+                                        )
+                                    }
+                                }
                             }
                         }
+                        isEditingMode = !isEditingMode
                     }
-                    isEditingMode = !isEditingMode
-                }
+                )
 
                 @Composable
                 fun PriorityRadioButton(taskPriority: TaskPriority) {
                     ORadioButton(
                         onPrioritySelected = {
-                            selectedPriority.value = taskPriority
+                            pickedPriority.value = taskPriority
                             openPriorityAlert.value = false
                         },
                         text = taskPriority.name,
-                        selected = selectedPriority.value == taskPriority,
+                        selected = pickedPriority.value == taskPriority,
                         color = taskPriority.mapToColor()
                     )
                 }
@@ -245,6 +282,18 @@ fun TaskBottomSheet(
                             }
                         }
                     )
+                }
+                if (openFilePicker.value && taskId != null) {
+                    LaunchedEffect(Unit) {
+                        val file = Picker.pickFile(
+                            type = PickerSelectionType.Image,
+                            mode = PickerSelectionMode.Single,
+                            title = "Pick an image",
+                            initialDirectory = "/"
+                        )
+                        openFilePicker.value = false
+                        intent(SingleTaskIntent.OnFileSelected(file, taskId))
+                    }
                 }
 
                 if (openDateDialog) {
@@ -279,6 +328,23 @@ fun TaskBottomSheet(
                 }
             }
             SnackbarHost(snackbarHostState)
+            LazyRow(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
+                items(listOfImages) {
+                    Image(
+                        modifier = Modifier.size(120.dp)
+                            .padding(horizontal = 8.dp),
+                        painter = rememberImagePainter(
+                            ImageRequest(data = it) {
+                                components {
+                                    add(ByteArrayFetcher.Factory())
+                                }
+                            }
+                        ),
+                        contentDescription = "Image",
+                        contentScale = ContentScale.FillBounds
+                    )
+                }
+            }
         }
     }
 }
