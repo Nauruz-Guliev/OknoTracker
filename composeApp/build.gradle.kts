@@ -124,6 +124,7 @@ android {
 dependencies {
     implementation(libs.androidx.material3.android)
     implementation(libs.androidx.ui.text.google.fonts)
+    implementation(project(":shared"))
 }
 
 compose.desktop {

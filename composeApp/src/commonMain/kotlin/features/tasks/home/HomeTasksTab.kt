@@ -158,7 +158,7 @@ object HomeTasksTab : Tab {
         @Composable
         get() {
             val title = "Home"
-            val icon = rememberVectorPainter(Icons.Default.Home)
+            val icon = rememberVectorPainter(Icons.Filled.Home)
 
             return remember {
                 TabOptions(

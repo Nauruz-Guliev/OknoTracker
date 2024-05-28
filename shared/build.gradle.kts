@@ -77,6 +77,9 @@ android {
         minSdk = libs.versions.android.minSdk.get().toInt()
     }
 }
+dependencies {
+    implementation(libs.androidx.core)
+}
 
 multiplatformResources {
     resourcesPackage = "ru.kpfu.itis.shared"
