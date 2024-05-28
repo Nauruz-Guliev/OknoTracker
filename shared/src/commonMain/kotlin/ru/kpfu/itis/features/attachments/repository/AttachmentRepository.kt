@@ -4,8 +4,8 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import ru.kpfu.itis.features.attachments.dto.AttachmentSingleResponse
 import ru.kpfu.itis.features.attachments.mapper.AttachmentMapper
+import ru.kpfu.itis.features.attachments.service.AttachmentService
 import ru.kpfu.itis.features.task.data.db.AttachmentDbImpl
-import ru.kpfu.itis.features.task.data.service.AttachmentService
 import ru.kpfu.itis.features.task.domain.model.AttachmentModel
 
 class AttachmentRepository(
@@ -18,9 +18,22 @@ class AttachmentRepository(
     suspend fun getCachedAttachments(taskId: Long): List<AttachmentModel> =
         withContext(dispatcher) {
             attachmentDbImpl.getAllAttachments(taskId).map(mapper::mapItem).ifEmpty {
-                service.getAllAttachments(taskId).data.map(mapper::mapItem)
+                updateAttachments(taskId)
             }
         }
+
+    suspend fun updateAttachments(taskId: Long): List<AttachmentModel> = withContext(dispatcher) {
+        val response = service.getAllAttachments(taskId).data
+        response?.data?.map {
+            if (it.content.isNullOrBlank() || it.content.isEmpty()) {
+                service.getAttachment(it.id).data
+            } else {
+                it
+            } ?: it
+        }.also {
+            it?.let { attachmentDbImpl.clearAndCreateAttachments(it) }
+        }?.map(mapper::mapItem) ?: emptyList()
+    }
 
     suspend fun getAttachment(id: Long): AttachmentModel = withContext(dispatcher) {
         handleResponse(service.getAttachment(id))

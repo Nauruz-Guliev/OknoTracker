@@ -1,10 +1,11 @@
-package ru.kpfu.itis.features.task.data.service
+package ru.kpfu.itis.features.attachments.service
 
 import dev.icerock.moko.resources.StringResource
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.request.header
+import io.ktor.client.request.parameter
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.request.url
@@ -26,10 +27,16 @@ class AttachmentService(
         ).body()
     }
 
-    suspend fun getAllAttachments(taskId: Long): AttachmentMultipleResponse {
-        return httpClient.get(
-            "${(MR.strings.url())}attachment/list_by_task/$taskId"
-        ).body()
+    suspend fun getAllAttachments(
+        taskId: Long,
+        pageSize: Long = 1000,
+        page: Long = 1,
+    ): AttachmentMultipleResponse {
+        return httpClient.get {
+            parameter("page", "$page")
+            parameter("pageSize", "$pageSize")
+            url("${(MR.strings.url())}attachment/list_by_task/$taskId")
+        }.body()
     }
 
     suspend fun saveAttachment(request: AttachmentRequest): AttachmentSingleResponse {

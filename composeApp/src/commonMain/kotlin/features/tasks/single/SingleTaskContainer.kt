@@ -3,6 +3,7 @@ package features.tasks.single
 import features.OTrackerState
 import flow_mvi.DefaultConfigurationFactory
 import flow_mvi.configure
+import kotlinx.coroutines.launch
 import pro.respawn.flowmvi.api.Container
 import pro.respawn.flowmvi.api.Store
 import pro.respawn.flowmvi.dsl.store
@@ -77,6 +78,7 @@ class SingleTaskContainer(
                         }
 
                         is SingleTaskIntent.LoadTask -> {
+                            launch { attachmentRepository.updateAttachments(intent.taskId) }
                             runCatching {
                                 repository.getTask(intent.taskId).also {
                                     updateState { OTrackerState.Success(it) }
