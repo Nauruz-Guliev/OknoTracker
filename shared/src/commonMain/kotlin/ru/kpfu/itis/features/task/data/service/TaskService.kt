@@ -84,6 +84,58 @@ class TaskService(
     suspend fun getStatistics(
         userId: Long,
     ): TaskStatisticsResponse {
+        // TODO()
+        return TaskStatisticsResponse(
+            data = listOf(
+                TaskStatisticDto(
+                    date = "metus",
+                    countOfTasks = 2842,
+                    countOfNotCompletedTasks = 7576,
+                    countOfCompletedTasks = 8482,
+                    countOfOverdueTasks = 4830,
+                    countOfCompletedOnTimeTasks = 4465
+                ),
+                TaskStatisticDto(
+                    date = "possim",
+                    countOfTasks = 8886,
+                    countOfNotCompletedTasks = 5866,
+                    countOfCompletedTasks = 5145,
+                    countOfOverdueTasks = 7067,
+                    countOfCompletedOnTimeTasks = 7371
+                ),
+                TaskStatisticDto(
+                    date = "partiendo",
+                    countOfTasks = 5643,
+                    countOfNotCompletedTasks = 5741,
+                    countOfCompletedTasks = 4789,
+                    countOfOverdueTasks = 3242,
+                    countOfCompletedOnTimeTasks = 8870),
+                TaskStatisticDto(
+                    date = "referrentur",
+                    countOfTasks = 2774,
+                    countOfNotCompletedTasks = 9644,
+                    countOfCompletedTasks = 8176,
+                    countOfOverdueTasks = 7174,
+                    countOfCompletedOnTimeTasks = 9942
+                ),
+                TaskStatisticDto(
+                    date = "torquent",
+                    countOfTasks = 8157,
+                    countOfNotCompletedTasks = 8402,
+                    countOfCompletedTasks = 8265,
+                    countOfOverdueTasks = 5490,
+                    countOfCompletedOnTimeTasks = 6904
+                ),
+                TaskStatisticDto(
+                    date = "option",
+                    countOfTasks = 12064,
+                    countOfNotCompletedTasks = 5944,
+                    countOfCompletedTasks = 8501,
+                    countOfOverdueTasks = 6004,
+                    countOfCompletedOnTimeTasks = 3287
+                ),
+            ), isSuccess = false, error = null
+        )
         return httpClient.get {
             url("${(MR.strings.url.get())}task/statistics")
             parameters {
