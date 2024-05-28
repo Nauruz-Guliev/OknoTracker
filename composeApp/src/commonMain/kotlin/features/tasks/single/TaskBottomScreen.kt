@@ -86,7 +86,7 @@ fun TaskBottomSheet(
     val confirmEnabled = derivedStateOf { datePickerState.selectedDateMillis != null }
     var pickedDate by remember { mutableStateOf<LocalDateTime?>(null) }
     val openPriorityAlert = remember { mutableStateOf(false) }
-    val selectedPriority = remember { mutableStateOf(TaskPriority[taskModel?.priority.orEmpty()]) }
+    val pickedPriority = remember { mutableStateOf(TaskPriority[taskModel?.priority.orEmpty()]) }
     val openFilePicker = remember { mutableStateOf(false) }
     val listOfImages = remember { mutableStateListOf<ByteArray>() }
 
@@ -114,6 +114,7 @@ fun TaskBottomSheet(
             pickedDate = taskModel?.deadlineTime?.let {
                 LocalDateTime.parse(it)
             }
+            pickedPriority.value = TaskPriority[taskModel?.priority ?: TaskPriority.LOW.name]
             taskModel?.attachments?.mapToByteArray()?.let { listOfImages.addAll(it) }
             println(taskModel)
         }
@@ -190,10 +191,10 @@ fun TaskBottomSheet(
                     },
                     enabled = isEditingMode,
                     label = {
-                        Text("Priority: ${selectedPriority.value}")
+                        Text("Priority: ${pickedPriority.value}")
                     },
                     colors = SuggestionChipDefaults.suggestionChipColors(
-                        containerColor = selectedPriority.value.mapToColor()
+                        containerColor = pickedPriority.value.mapToColor()
                     )
                 )
 
@@ -223,7 +224,7 @@ fun TaskBottomSheet(
                                                 description = taskDescription,
                                                 name = taskTitle,
                                                 deadlineTime = pickedDate?.toString(),
-                                                priority = selectedPriority.value.name
+                                                priority = pickedPriority.value.name
                                             )
                                         )
                                     )
@@ -237,7 +238,7 @@ fun TaskBottomSheet(
                                                     description = taskDescription,
                                                     name = taskTitle,
                                                     deadlineTime = pickedDate?.toString(),
-                                                    priority = selectedPriority.value.name
+                                                    priority = pickedPriority.value.name
                                                 ),
                                                 listOfImages
                                             )
@@ -254,11 +255,11 @@ fun TaskBottomSheet(
                 fun PriorityRadioButton(taskPriority: TaskPriority) {
                     ORadioButton(
                         onPrioritySelected = {
-                            selectedPriority.value = taskPriority
+                            pickedPriority.value = taskPriority
                             openPriorityAlert.value = false
                         },
                         text = taskPriority.name,
-                        selected = selectedPriority.value == taskPriority,
+                        selected = pickedPriority.value == taskPriority,
                         color = taskPriority.mapToColor()
                     )
                 }

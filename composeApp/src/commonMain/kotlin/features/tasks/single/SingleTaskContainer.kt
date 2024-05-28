@@ -81,8 +81,9 @@ class SingleTaskContainer(
                                 repository.getTask(intent.taskId).also {
                                     updateState { OTrackerState.Success(it) }
                                 }
-                            }.onFailure {
-                                it.message?.let {
+                            }.onFailure { throwable ->
+                                println("error $throwable")
+                                throwable.message?.let {
                                     action(SingleTaskAction.ShowSnackbar(it))
                                 }
                             }

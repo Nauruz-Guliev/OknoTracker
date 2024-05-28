@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 import ru.kpfu.itis.common.model.ErrorDto
 
 @Serializable
-data class AttachmentResponse(
+data class AttachmentSingleResponse(
     @SerialName("data")
     val data: AttachmentDto? = null,
     @SerialName("isSuccess")

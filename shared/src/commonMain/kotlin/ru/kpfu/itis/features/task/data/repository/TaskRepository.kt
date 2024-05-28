@@ -68,11 +68,11 @@ class TaskRepository(
     }
 
     fun getCachedTasks(): Flow<List<TaskModel>> {
-        return taskDatabase.getAllTasks().map(taskMapper::mapList).addAttachments()
+        return taskDatabase.getAllTasks().map(taskMapper::mapList)
     }
 
     fun getCachedCompletedTasks(): Flow<List<TaskModel>> {
-        return taskDatabase.getCompletedTasks().map(taskMapper::mapList).addAttachments()
+        return taskDatabase.getCompletedTasks().map(taskMapper::mapList)
     }
 
     suspend fun clearTasks() = withContext(dispatcher) {
@@ -89,20 +89,24 @@ class TaskRepository(
     }
 
     private suspend fun TaskModel.addAttachment(): TaskModel {
-        return this.apply {
-            attachments.forEach {
-                attachmentRepository.saveAttachment(it)
-            }
-        }
-    }
-
-    private fun Flow<List<TaskModel>>.addAttachments(): Flow<List<TaskModel>> {
-        return map { taskList ->
-            taskList.map { task ->
-                task.copy(
-                    attachments = attachmentRepository.getCachedAttachments(task.id)
+        return this.copy(
+            attachments = buildList {
+                addAll(
+                    attachmentRepository.getCachedAttachments(id).map { attachment ->
+                        if (attachment.content.isBlank() || attachment.content.isEmpty()) {
+                            try {
+                                attachment.copy(
+                                    content = attachmentRepository.getAttachment(attachment.id).content
+                                )
+                            } catch (ex: Exception) {
+                                attachment
+                            }
+                        } else {
+                            attachment
+                        }
+                    }
                 )
             }
-        }
+        )
     }
 }

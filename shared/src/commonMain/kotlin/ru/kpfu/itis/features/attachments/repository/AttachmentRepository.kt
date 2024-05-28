@@ -2,7 +2,7 @@ package ru.kpfu.itis.features.attachments.repository
 
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
-import ru.kpfu.itis.features.attachments.dto.AttachmentResponse
+import ru.kpfu.itis.features.attachments.dto.AttachmentSingleResponse
 import ru.kpfu.itis.features.attachments.mapper.AttachmentMapper
 import ru.kpfu.itis.features.task.data.db.AttachmentDbImpl
 import ru.kpfu.itis.features.task.data.service.AttachmentService
@@ -17,7 +17,9 @@ class AttachmentRepository(
 
     suspend fun getCachedAttachments(taskId: Long): List<AttachmentModel> =
         withContext(dispatcher) {
-            attachmentDbImpl.getAllAttachments(taskId).map(mapper::mapItem)
+            attachmentDbImpl.getAllAttachments(taskId).map(mapper::mapItem).ifEmpty {
+                service.getAllAttachments(taskId).data.map(mapper::mapItem)
+            }
         }
 
     suspend fun getAttachment(id: Long): AttachmentModel = withContext(dispatcher) {
@@ -26,12 +28,13 @@ class AttachmentRepository(
 
     suspend fun saveAttachment(attachmentModel: AttachmentModel): AttachmentModel =
         withContext(dispatcher) {
-            handleResponse(service.saveAttachment(mapper.map(attachmentModel)))
+            handleResponse(service.saveAttachment(mapper.map(attachmentModel)).also {
+                it.data?.let { it1 -> attachmentDbImpl.saveAttachment(it1) }
+            })
         }
 
-    private fun handleResponse(response: AttachmentResponse): AttachmentModel {
+    private fun handleResponse(response: AttachmentSingleResponse): AttachmentModel {
         return if (response.data != null) {
-            attachmentDbImpl.saveAttachment(response.data)
             mapper.mapItem(response.data)
         } else {
             throw mapper.mapToException(response.error)

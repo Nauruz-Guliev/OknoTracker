@@ -68,7 +68,7 @@ class TaskService(
 
     suspend fun getActiveTasks(
         userId: Long,
-        pageSize: Long = 20,
+        pageSize: Long = 1000,
         page: Long = 1,
     ): TaskResponseList {
         println(userId)
@@ -143,7 +143,7 @@ class TaskService(
     suspend fun getCompletedTasks(
         userId: Long,
         page: Long = 1,
-        pageSize: Long = 20,
+        pageSize: Long = 1000,
     ): TaskResponseList {
         return httpClient.get {
             parameter("page", "$page")
@@ -155,7 +155,7 @@ class TaskService(
     suspend fun getAllTasks(
         userId: Long,
         page: Long = 1,
-        pageSize: Long = 20,
+        pageSize: Long = 1000,
     ): TaskResponseList {
         return httpClient.get {
             parameter("page", "$page")

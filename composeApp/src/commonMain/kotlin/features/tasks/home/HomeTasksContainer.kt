@@ -41,7 +41,13 @@ class HomeTasksContainer(
                 } else {
                     when (intent) {
                         is HomeTasksIntent.LoadTasks -> {
-                            launch { repository.updateTasks(TaskType.ALL, userId) }
+                            launch {
+                                try {
+                                    repository.updateTasks(TaskType.ALL, userId)
+                                } catch (ex: Exception) {
+                                    action(HomeTasksAction.ShowSnackbar(ex.toString()))
+                                }
+                            }
                             runCatching {
                                 updateState { OTrackerState.Loading }
                                 updateState { OTrackerState.Success(repository.getCachedTasks()) }
