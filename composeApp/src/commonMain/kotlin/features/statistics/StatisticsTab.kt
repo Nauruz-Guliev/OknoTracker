@@ -15,7 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -55,7 +55,7 @@ object StatisticsTab : Tab {
         @Composable
         get() {
             val title = stringResource(OResources.Statistics.title())
-            val icon = rememberVectorPainter(Icons.Outlined.Info)
+            val icon = rememberVectorPainter(Icons.Filled.DateRange)
 
             return remember {
                 TabOptions(
@@ -68,7 +68,7 @@ object StatisticsTab : Tab {
 
     @Composable
     override fun Content() {
-        val store: Store<OTrackerState<UiStatistics>, StatisticsIntent, StatisticsAction> =
+        val store: Store<OTrackerState<UiStatisticsState>, StatisticsIntent, StatisticsAction> =
             koinInject<StatisticsContainer>().store
 
         store.startFlowMvi()
@@ -89,7 +89,12 @@ object StatisticsTab : Tab {
             }
 
             OTrackerState.Loading -> OLoadingScreen()
-            is OTrackerState.Success -> Statistics(currState.data)
+            is OTrackerState.Success -> {
+                when (currState.data) {
+                    UiStatiscticsEmpty -> EmptyStatistics()
+                    is UiStatistics -> Statistics(currState.data)
+                }
+            }
         }
     }
 }

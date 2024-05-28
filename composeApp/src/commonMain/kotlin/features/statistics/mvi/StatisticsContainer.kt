@@ -2,6 +2,7 @@ package features.statistics.mvi
 
 import features.OTrackerState
 import features.statistics.UiStatistics
+import features.statistics.UiStatisticsState
 import features.statistics.mapper.mapStatistics
 import flow_mvi.ConfigurationFactory
 import flow_mvi.configure
@@ -19,9 +20,9 @@ class StatisticsContainer(
     private val configurationFactory: ConfigurationFactory,
     private val errorMapper: ErrorMapper,
     private val repository: StatisticsRepository,
-) : Container<OTrackerState<UiStatistics>, StatisticsIntent, StatisticsAction> {
+) : Container<OTrackerState<UiStatisticsState>, StatisticsIntent, StatisticsAction> {
 
-    override val store: Store<OTrackerState<UiStatistics>, StatisticsIntent, StatisticsAction> =
+    override val store: Store<OTrackerState<UiStatisticsState>, StatisticsIntent, StatisticsAction> =
         store(initial = OTrackerState.Initial) {
 
             configure(configurationFactory, "Statistics")
@@ -42,7 +43,7 @@ class StatisticsContainer(
             }
         }
 
-    private suspend fun PipelineContext<OTrackerState<UiStatistics>, StatisticsIntent, StatisticsAction>.loadStatistics() {
+    private suspend fun PipelineContext<OTrackerState<UiStatisticsState>, StatisticsIntent, StatisticsAction>.loadStatistics() {
         updateState { OTrackerState.Loading }
         runCatching { repository.getStatistics() }.fold(
             onSuccess = { statisticsModel ->
