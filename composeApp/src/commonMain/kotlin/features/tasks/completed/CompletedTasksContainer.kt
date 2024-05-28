@@ -25,7 +25,6 @@ class CompletedTasksContainer(
     override val store: Store<OTrackerState<Flow<List<TaskModel>>>, CompletedTasksIntent, CompletedTasksAction> =
         store(OTrackerState.Initial) {
 
-
             configure(configurationFactory, "Tasks")
 
             recover { exception ->

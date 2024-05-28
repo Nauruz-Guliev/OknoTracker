@@ -9,12 +9,13 @@ CREATE TABLE Task (
     lastModifiedTime TEXT,
     deadlineTime TEXT,
     completedTime TEXT,
-    completedOnTime INTEGER AS Boolean DEFAULT 0
+    completedOnTime INTEGER AS Boolean DEFAULT 0,
+    taskPriority TEXT NOT NULL
 );
 
 insertTask:
-INSERT OR REPLACE INTO Task(id, name, description, userId, isCompleted, lastModifiedTime, deadlineTime, completedTime, completedOnTime)
-VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?);
+INSERT OR REPLACE INTO Task(id, name, description, userId, isCompleted, lastModifiedTime, deadlineTime, completedTime, completedOnTime, taskPriority)
+VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 
 deleteAllTasks:
 DELETE FROM Task;

@@ -43,6 +43,8 @@ import design_system.screens.OErrorScreen
 import extensions.convertToString
 import extensions.startFlowMvi
 import features.OTrackerState
+import features.TaskPriority
+import features.mapToColor
 import features.signin.SignInScreen
 import features.tasks.single.TaskBottomSheet
 import kotlinx.coroutines.flow.Flow
@@ -51,6 +53,7 @@ import kotlinx.datetime.LocalDateTime
 import org.koin.compose.koinInject
 import pro.respawn.flowmvi.compose.dsl.subscribe
 import ru.kpfu.itis.features.task.domain.model.TaskModel
+import theme.secondaryContainerLight
 
 object CompletedTasksTab : Tab {
 
@@ -141,9 +144,16 @@ object CompletedTasksTab : Tab {
                                         intent(CompletedTasksIntent.TaskChecked(isChecked, taskId))
                                     },
                                     task = task,
-                                    labels = mutableListOf<String>().apply {
+                                    labels = buildList {
+                                        add(
+                                            task.priority to TaskPriority.get(task.priority)
+                                                .mapToColor()
+                                        )
                                         task.deadlineTime?.let {
-                                            add(LocalDateTime.parse(it).convertToString())
+                                            add(
+                                                LocalDateTime.parse(it)
+                                                    .convertToString() to secondaryContainerLight
+                                            )
                                         }
                                     }
                                 ) {
@@ -167,6 +177,7 @@ object CompletedTasksTab : Tab {
                             }
                         }
                     }
+
                     is OTrackerState.Loading -> {}
                     is OTrackerState.Error -> {
                         showEmptyState = false

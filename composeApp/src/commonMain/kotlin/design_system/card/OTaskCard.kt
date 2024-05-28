@@ -1,6 +1,5 @@
 package design_system.card
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -20,16 +19,16 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import design_system.chips.OChips
 import ru.kpfu.itis.features.task.domain.model.TaskModel
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun OTaskCard(
     onCheckedAction: (Boolean, Long) -> Unit,
     task: TaskModel,
-    labels: List<String> = emptyList(),
+    labels: List<Pair<String, Color>> = emptyList(),
     onItemClicked: (Long) -> Unit
 ) {
 
@@ -73,7 +72,8 @@ fun OTaskCard(
                             OChips(
                                 enabled = false,
                                 onClick = {},
-                                text = it,
+                                text = it.first,
+                                containerColor = it.second
                             )
                         }
                     }

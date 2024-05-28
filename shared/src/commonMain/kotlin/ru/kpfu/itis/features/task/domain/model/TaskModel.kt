@@ -1,5 +1,6 @@
 package ru.kpfu.itis.features.task.domain.model
 
+
 data class TaskModel(
     val id: Long = -1,
     val name: String,
@@ -10,4 +11,5 @@ data class TaskModel(
     val lastModifiedTime: String? = null,
     val deadlineTime: String? = null,
     val completedTime: String? = null,
+    val priority: String
 )

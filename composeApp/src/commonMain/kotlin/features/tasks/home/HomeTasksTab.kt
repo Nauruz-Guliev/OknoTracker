@@ -49,6 +49,8 @@ import design_system.screens.OErrorScreen
 import extensions.convertToString
 import extensions.startFlowMvi
 import features.OTrackerState
+import features.TaskPriority
+import features.mapToColor
 import features.signin.SignInScreen
 import features.tasks.single.TaskBottomSheet
 import kotlinx.coroutines.flow.Flow
@@ -139,6 +141,7 @@ object HomeTasksTab : Tab {
                             )
                             SwipeToDismiss(
                                 state = dismissState,
+                                directions = setOf(DismissDirection.EndToStart),
                                 background = {
                                     val color = when (dismissState.dismissDirection) {
                                         DismissDirection.EndToStart -> MaterialTheme.colorScheme.errorContainer
@@ -163,9 +166,13 @@ object HomeTasksTab : Tab {
                                             intent(HomeTasksIntent.TaskChecked(isChecked, taskId))
                                         },
                                         task = task,
-                                        labels = mutableListOf<String>().apply {
+                                        labels = buildList {
+                                            add(task.priority to TaskPriority[task.priority].mapToColor())
                                             task.deadlineTime?.let {
-                                                add(LocalDateTime.parse(it).convertToString())
+                                                add(
+                                                    LocalDateTime.parse(it)
+                                                        .convertToString() to MaterialTheme.colorScheme.surfaceContainerLow
+                                                )
                                             }
                                         }
                                     ) {
@@ -181,6 +188,7 @@ object HomeTasksTab : Tab {
                     is OTrackerState.Initial -> {
                         intent(HomeTasksIntent.LoadTasks)
                     }
+
                     is OTrackerState.Success -> {
                         LaunchedEffect(Unit) {
                             (state as OTrackerState.Success<Flow<List<TaskModel>>>).data.collectLatest { tasks ->

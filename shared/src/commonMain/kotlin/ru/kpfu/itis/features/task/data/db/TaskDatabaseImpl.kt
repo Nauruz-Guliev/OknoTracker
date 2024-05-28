@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.Flow
 import ru.kpfu.itis.common.driver.DatabaseDriverFactory
 import ru.kpfu.itis.features.task.TaskDatabase
 import ru.kpfu.itis.features.task.data.dto.TaskDto
+import ru.kpfu.itis.features.task.data.dto.TaskPriorityDto
 
 class TaskDatabaseImpl(
     databaseDriverFactory: DatabaseDriverFactory,
@@ -37,6 +38,7 @@ class TaskDatabaseImpl(
         deadlineTime: String?,
         completedTime: String?,
         completedOnTime: Boolean?,
+        taskPriority: String,
     ): TaskDto {
         return TaskDto(
             id = id,
@@ -47,7 +49,8 @@ class TaskDatabaseImpl(
             lastModifiedTime = lastModifiedTime,
             deadlineTime = deadlineTime,
             completedTime = completedTime,
-            completedOnTime = completedOnTime
+            completedOnTime = completedOnTime,
+            priority = TaskPriorityDto.valueOf(taskPriority.uppercase())
         )
     }
 
@@ -90,7 +93,8 @@ class TaskDatabaseImpl(
                     lastModifiedTime = lastModifiedTime,
                     deadlineTime = deadlineTime,
                     completedTime = completedTime,
-                    completedOnTime = completedOnTime
+                    completedOnTime = completedOnTime,
+                    taskPriority = task.priority.name
                 )
             } catch (ex: Exception) {
                 println(ex)

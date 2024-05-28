@@ -4,6 +4,7 @@ import ru.kpfu.itis.common.mapper.Mapper
 import ru.kpfu.itis.features.task.data.dto.TaskChangeRequest
 import ru.kpfu.itis.features.task.data.dto.TaskCreateRequest
 import ru.kpfu.itis.features.task.data.dto.TaskDto
+import ru.kpfu.itis.features.task.data.dto.TaskPriorityDto
 import ru.kpfu.itis.features.task.domain.model.TaskModel
 
 class TaskMapper : Mapper<TaskDto, TaskModel>{
@@ -19,7 +20,8 @@ class TaskMapper : Mapper<TaskDto, TaskModel>{
                 description = description,
                 lastModifiedTime = lastModifiedTime,
                 deadlineTime = deadlineTime,
-                completedTime = completedTime
+                completedTime = completedTime,
+                priority = priority.name
             )
         }
     }
@@ -30,7 +32,8 @@ class TaskMapper : Mapper<TaskDto, TaskModel>{
                 name = name,
                 description = description,
                 userId = userId,
-                deadlineTime = deadlineTime
+                deadlineTime = deadlineTime,
+                priority = TaskPriorityDto.valueOf(priority.uppercase())
             )
         }
     }
@@ -43,6 +46,7 @@ class TaskMapper : Mapper<TaskDto, TaskModel>{
                 description = description,
                 userId = userId,
                 deadlineTime = deadlineTime,
+                priority = TaskPriorityDto.valueOf(priority.uppercase())
             )
         }
     }
