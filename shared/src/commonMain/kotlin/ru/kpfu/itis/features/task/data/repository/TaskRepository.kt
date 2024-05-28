@@ -22,7 +22,7 @@ class TaskRepository(
 
     suspend fun getTask(taskId: Long): TaskModel = withContext(dispatcher) {
         handleTask(taskService.getTask(taskId))
-    }
+    }.addAttachment()
 
     suspend fun createTask(taskModel: TaskModel): TaskModel = withContext(dispatcher) {
         handleTask(taskService.createTask(taskMapper.mapCreate(taskModel)))
@@ -79,20 +79,20 @@ class TaskRepository(
         taskDatabase.deleteAllTasks()
     }
 
-    private suspend fun handleTask(task: TaskResponseSingle): TaskModel {
+    private fun handleTask(task: TaskResponseSingle): TaskModel {
         return if (task.data != null) {
             taskDatabase.saveTask(task.data)
             taskMapper.mapItem(task.data)
         } else {
             throw taskMapper.mapToException(task.error)
-        }.addAttachment()
+        }
     }
 
     private suspend fun TaskModel.addAttachment(): TaskModel {
         return this.copy(
             attachments = buildList {
-                addAll(
-                    attachmentRepository.getCachedAttachments(id).map { attachment ->
+                attachmentRepository.getCachedAttachments(id).map { attachment ->
+                    add(
                         if (attachment.content.isBlank() || attachment.content.isEmpty()) {
                             try {
                                 attachment.copy(
@@ -104,8 +104,8 @@ class TaskRepository(
                         } else {
                             attachment
                         }
-                    }
-                )
+                    )
+                }
             }
         )
     }

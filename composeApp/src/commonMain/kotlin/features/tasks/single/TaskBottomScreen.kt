@@ -115,7 +115,10 @@ fun TaskBottomSheet(
                 LocalDateTime.parse(it)
             }
             pickedPriority.value = TaskPriority[taskModel?.priority ?: TaskPriority.LOW.name]
-            taskModel?.attachments?.mapToByteArray()?.let { listOfImages.addAll(it) }
+            taskModel?.attachments?.mapToByteArray()?.let {
+                listOfImages.clear()
+                listOfImages.addAll(it)
+            }
             println(taskModel)
         }
 
@@ -166,37 +169,36 @@ fun TaskBottomSheet(
                     .padding(horizontal = 16.dp),
                 horizontalArrangement = Arrangement.End
             ) {
-
-                SuggestionChip(
-                    onClick = {
-                        openDateDialog = true
-                    },
-                    enabled = isEditingMode,
-                    label = {
-                        Text(pickedDate?.convertToString() ?: "Deadline")
-                    },
-                    icon = {
-                        Icon(
-                            imageVector = Icons.Default.DateRange,
-                            contentDescription = "Date"
-                        )
-                    }
-                )
-
-                Spacer(Modifier.width(8.dp))
-
-                SuggestionChip(
-                    onClick = {
-                        openPriorityAlert.value = true
-                    },
-                    enabled = isEditingMode,
-                    label = {
-                        Text("Priority: ${pickedPriority.value}")
-                    },
-                    colors = SuggestionChipDefaults.suggestionChipColors(
-                        containerColor = pickedPriority.value.mapToColor()
+                Column {
+                    SuggestionChip(
+                        onClick = {
+                            openDateDialog = true
+                        },
+                        enabled = isEditingMode,
+                        label = {
+                            Text(pickedDate?.convertToString() ?: "Deadline")
+                        },
+                        icon = {
+                            Icon(
+                                imageVector = Icons.Default.DateRange,
+                                contentDescription = "Date"
+                            )
+                        }
                     )
-                )
+
+                    SuggestionChip(
+                        onClick = {
+                            openPriorityAlert.value = true
+                        },
+                        enabled = isEditingMode,
+                        label = {
+                            Text("Priority: ${pickedPriority.value}")
+                        },
+                        colors = SuggestionChipDefaults.suggestionChipColors(
+                            containerColor = pickedPriority.value.mapToColor()
+                        )
+                    )
+                }
 
                 Spacer(Modifier.weight(1f))
 

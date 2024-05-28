@@ -82,7 +82,6 @@ class SingleTaskContainer(
                                     updateState { OTrackerState.Success(it) }
                                 }
                             }.onFailure { throwable ->
-                                println("error $throwable")
                                 throwable.message?.let {
                                     action(SingleTaskAction.ShowSnackbar(it))
                                 }
@@ -91,7 +90,8 @@ class SingleTaskContainer(
 
                         is SingleTaskIntent.OnFileSelected -> {
                             try {
-                                intent.file?.readBytes()?.let {
+                                val bytes = intent.file?.readBytes()
+                                if (bytes != null) {
                                     attachmentRepository.saveAttachment(
                                         AttachmentModel(
                                             name = intent.file.name,
@@ -101,10 +101,10 @@ class SingleTaskContainer(
                                                 ) + 1, intent.file.name.length
                                             ),
                                             taskId = intent.taskId,
-                                            content = Base64.encode(it)
+                                            content = Base64.encode(bytes)
                                         )
                                     )
-                                    action(SingleTaskAction.AddSelectedImage(it))
+                                    action(SingleTaskAction.AddSelectedImage(bytes))
                                 }
                             } catch (ex: Exception) {
                                 ex.message?.let { action(SingleTaskAction.ShowSnackbar(it)) }
