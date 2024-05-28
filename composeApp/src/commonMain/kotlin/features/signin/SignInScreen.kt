@@ -1,5 +1,6 @@
 package features.signin
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -15,16 +16,14 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
-import com.skydoves.landscapist.ImageOptions
-import com.skydoves.landscapist.coil3.CoilImage
 import design_system.button.OButton
 import design_system.screens.OErrorScreen
 import design_system.screens.OLoadingScreen
 import design_system.textfield.OTextField
+import dev.icerock.moko.resources.compose.painterResource
 import dev.icerock.moko.resources.compose.stringResource
 import extensions.startFlowMvi
 import features.fileds.InputField
@@ -119,18 +118,15 @@ private fun IntentReceiver<SignInIntent>.InitialContent(
                 modifier = Modifier.height(80.dp)
             )
 
-            CoilImage(
-                imageModel = { "https://s3-alpha-sig.figma.com/img/6704/ab02/52886121ea67657e459860dab9ae1ade?Expires=1716768000&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=IGPYUslolkAyOTZ0bZK1MY5dURI7Sc4YB1dSQR9cBQx-EemgRVQZSlb-6yg~8BDGAjhe50qq-l4WadOeAZtnPQLoBDkx6ViDdE7rPYlP3PZGcAccL6UFYWskOtv9w7begjko233UwaVKTTszzxQJqJJeW-Nt4jVlrUWjrIEJvMnMlMvbaTjdmyikKjmd3WyDS57Rkw3Ax3ZS4xNgE-1yrcnNC3REd9S3gu2jH740EtTQXSErP~4B3XAeJfcKEDvRvSJmkuVfHpBKXCCTCo29UaEgjrysq-VBDbqm4HHihuaHJ~4Q0SOwwUbrVyBUHOSFhaY5d1dnXwPj07K56EnGcw__" },
+            Image(
+                painter = painterResource(OResources.Login.icon()),
                 modifier = Modifier.size(200.dp),
-                imageOptions = ImageOptions(
-                    contentScale = ContentScale.Fit
-                )
+                contentDescription = "Login icon: girl with a laptop"
             )
 
             Spacer(
                 modifier = Modifier.height(16.dp)
             )
-
 
             OTextField(
                 onValueChange = { email = it },

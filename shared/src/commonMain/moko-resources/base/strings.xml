@@ -9,9 +9,13 @@
     <!--    login-->
     <string name="login_title">Login</string>
     <string name="login_password_label">Password</string>
-    <string name="login_email_label">The email must contain characters, followed by an '@' symbol, a domain name with alphanumeric characters and periods, and ends with a top-level domain that is 2 to 6 letters long, the use of Cyrillic alphabet is prohibited</string>
-    <string name="login_email_error">Email</string>
-    <string name="login_password_error">The password must consist of 8 to 20 characters, the use of Cyrillic alphabet is prohibited</string>
+    <string name="login_email_label">Email
+    </string>
+    <string name="login_email_error">The email must contain '@' symbol, domain name and top-level domain that
+        is 2 to 6 letters long, the use of Cyrillic alphabet is prohibited</string>
+    <string name="login_password_error">The password must consist of 8 to 20 characters, the use of
+        Cyrillic alphabet is prohibited
+    </string>
 
     <!--    statistics-->
     <string name="statistics_title">Achievements</string>
@@ -21,5 +25,19 @@
     <string name="statistics_remaining_tasks">Remaining</string>
     <string name="statistics_man_with_prize_image">Man holding a prize</string>
     <string name="statistics_empty">Statistics are empty</string>
-    <string name="statistics_empty_description">Complete tasks so that statistics are displayed</string>
+    <string name="statistics_empty_description">Complete tasks so that statistics are displayed
+    </string>
+
+    <!--    settings-->
+    <string name="settings_title">Settings</string>
+    <string name="settings_item_dark_theme">Dark theme</string>
+    <string name="settings_item_notifications">Reminders</string>
+
+<!--    notifications-->
+    <string name="notifications_channel_name">Reminder</string>
+    <string name="notifications_channel_description">Daily reminder to finish tasks</string>
+    <string name="notifications_channel_id">dwdko23kf0de9w</string>
+    <string name="notifications_content">Check your tasks</string>
+    <string name="notifications_are_not_enabled">Enable notifications in app settings</string>
+
 </resources>

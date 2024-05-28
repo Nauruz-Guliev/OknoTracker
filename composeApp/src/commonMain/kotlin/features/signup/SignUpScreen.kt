@@ -1,5 +1,6 @@
 package features.signup
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -21,7 +22,9 @@ import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.coil3.CoilImage
 import design_system.button.OButton
 import design_system.textfield.OTextField
+import dev.icerock.moko.resources.compose.painterResource
 import features.signin.SignInScreen
+import ru.kpfu.itis.OResources
 
 class SignUpScreen : Screen {
 
@@ -42,12 +45,10 @@ class SignUpScreen : Screen {
                     modifier = Modifier.height(80.dp)
                 )
 
-                CoilImage(
-                    imageModel = { "https://s3-alpha-sig.figma.com/img/bf8e/4923/90c261ed8639b249faddaf86d551f5c6?Expires=1716768000&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=MjA~rq5~z5Jnc0LX861Q2Vki2ffdEo1LN~m416MratviEFW4INKo0xfrWFNOkQvqpeFppJ4YoDdEmnuXcTt0OayRRUmqNKOPCpJjefmjTL4mMaFax5jXoG5P645av~GJmo2UrkDP6GpzPA8Ud3xpUJcT61-JI7JilZ-UvJXUPXsrvnmULJpVxRVlwBGRXFdHI7uY~jPOP2I1J65pbpDIjdmP6e62IA6-zJR-u9vBr3vyjNv6fGoXKw97bJrg1GkqWEVa4sMSkk~0kUxGcBIyGRDlZlBpIgRYNTDiIVfQhDxFdVPdHRRm9pJpuQr9t1rntvlROQETSli-aHGkMZxW4g__" },
+                Image(
+                    painter = painterResource(OResources.SignUp.icon()),
                     modifier = Modifier.size(200.dp),
-                    imageOptions = ImageOptions(
-                        contentScale = ContentScale.Fit
-                    )
+                    contentDescription = "Signup icon: girl with a laptop"
                 )
 
                 Spacer(
