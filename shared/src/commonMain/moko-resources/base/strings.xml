@@ -5,4 +5,22 @@
     <string name="unknown_error_details">
         We are aware of this issue and are actively working to resolve it
     </string>
+
+    <!--    login-->
+    <string name="login_title">Login</string>
+    <string name="login_password_label">Password</string>
+    <string name="login_email_label">The email must contain characters, followed by an '@' symbol, a domain name with alphanumeric characters and periods, and ends with a top-level domain that is 2 to 6 letters long, the use of Cyrillic alphabet is prohibited</string>
+    <string name="login_email_error">Email</string>
+    <string name="login_password_error">The password must consist of 8 to 20 characters, the use of Cyrillic alphabet is prohibited</string>
+
+    <!--    statistics-->
+    <string name="statistics_title">Achievements</string>
+    <string name="statistics_description">Well done</string>
+    <string name="statistics_completed_tasks">Completed</string>
+    <string name="statistics_completed_on_time_tasks">Completed on time</string>
+    <string name="statistics_remaining_tasks">Remaining</string>
+    <string name="statistics_man_with_prize_image">Man holding a prize</string>
+    <string name="statistics_empty">Statistics are empty</string>
+    <string name="statistics_empty_description">Complete tasks so that statistics are displayed</string>
+
 </resources>

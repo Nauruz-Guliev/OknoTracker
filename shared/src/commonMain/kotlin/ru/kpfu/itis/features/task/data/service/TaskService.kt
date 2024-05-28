@@ -13,11 +13,12 @@ import io.ktor.client.request.setBody
 import io.ktor.client.request.url
 import io.ktor.http.parameters
 import ru.kpfu.itis.extensions.getString
-import ru.kpfu.itis.features.task.data.dto.StatisticsResponse
 import ru.kpfu.itis.features.task.data.dto.TaskChangeRequest
 import ru.kpfu.itis.features.task.data.dto.TaskCreateRequest
 import ru.kpfu.itis.features.task.data.dto.TaskResponseList
 import ru.kpfu.itis.features.task.data.dto.TaskResponseSingle
+import ru.kpfu.itis.features.task.data.dto.TaskStatisticDto
+import ru.kpfu.itis.features.task.data.dto.TaskStatisticsResponse
 import ru.kpfu.itis.shared.MR
 import ru.kpfu.itis.utils.Strings
 
@@ -82,7 +83,7 @@ class TaskService(
 
     suspend fun getStatistics(
         userId: Long,
-    ): StatisticsResponse {
+    ): TaskStatisticsResponse {
         return httpClient.get {
             url("${(MR.strings.url.get())}task/statistics")
             parameters {

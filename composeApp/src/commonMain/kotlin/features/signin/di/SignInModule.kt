@@ -1,5 +1,8 @@
-package features.signin
+package features.signin.di
 
+import features.fileds.InputField
+import features.fileds.Validator
+import features.signin.mvi.SignInContainer
 import flow_mvi.ConfigurationFactory
 import flow_mvi.DefaultConfigurationFactory
 import kotlinx.coroutines.CoroutineDispatcher

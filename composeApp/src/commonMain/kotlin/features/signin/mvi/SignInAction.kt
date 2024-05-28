@@ -1,4 +1,4 @@
-package features.signin
+package features.signin.mvi
 
 import androidx.compose.runtime.Immutable
 import pro.respawn.flowmvi.api.MVIAction

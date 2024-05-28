@@ -2,8 +2,8 @@ package ru.kpfu.itis
 
 import android.app.Application
 import features.settings.settingsModule
-import features.signin.signInModule
-import features.statistics.statisticsModule
+import features.signin.di.signInModule
+import features.statistics.di.statisticsModule
 import features.tasks.tasksModule
 import initKoin
 import org.koin.android.ext.koin.androidContext

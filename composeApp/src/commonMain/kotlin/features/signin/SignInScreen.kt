@@ -25,13 +25,20 @@ import design_system.button.OButton
 import design_system.screens.OErrorScreen
 import design_system.screens.OLoadingScreen
 import design_system.textfield.OTextField
+import dev.icerock.moko.resources.compose.stringResource
 import extensions.startFlowMvi
+import features.fileds.InputField
+import features.signin.mvi.SignInAction
+import features.signin.mvi.SignInContainer
+import features.signin.mvi.SignInIntent
+import features.signin.mvi.SignInState
 import features.signup.SignUpScreen
 import features.tasks.main.MainScreen
 import org.koin.compose.koinInject
 import pro.respawn.flowmvi.api.IntentReceiver
 import pro.respawn.flowmvi.api.Store
 import pro.respawn.flowmvi.compose.dsl.subscribe
+import ru.kpfu.itis.OResources
 
 class SignInScreen : Screen {
 
@@ -127,7 +134,7 @@ private fun IntentReceiver<SignInIntent>.InitialContent(
 
             OTextField(
                 onValueChange = { email = it },
-                label = InputField.EMAIL.labelText,
+                label = stringResource(InputField.EMAIL.labelText),
                 text = email,
                 characterMaxCount = InputField.PASSWORD.maxLength,
                 errorText = state.findFieldError(InputField.EMAIL)
@@ -139,7 +146,7 @@ private fun IntentReceiver<SignInIntent>.InitialContent(
 
             OTextField(
                 onValueChange = { password = it },
-                label = InputField.PASSWORD.labelText,
+                label = stringResource(InputField.PASSWORD.labelText),
                 text = password,
                 characterMaxCount = InputField.PASSWORD.maxLength,
                 errorText = state.findFieldError(InputField.PASSWORD)
@@ -150,7 +157,7 @@ private fun IntentReceiver<SignInIntent>.InitialContent(
             )
 
             OButton(
-                text = "Login",
+                text = stringResource(OResources.Login.title()),
                 onClickAction = {
                     intent(
                         SignInIntent.Outer.Login(

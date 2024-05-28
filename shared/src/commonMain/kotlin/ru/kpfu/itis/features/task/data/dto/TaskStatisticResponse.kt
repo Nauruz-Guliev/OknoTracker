@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 import ru.kpfu.itis.common.model.ErrorDto
 
 @Serializable
-data class TaskStatisticResponse(
+data class TaskStatisticsResponse(
     @SerialName("taskList")
     val data: List<TaskStatisticDto>? = null,
     @SerialName("isSuccess")

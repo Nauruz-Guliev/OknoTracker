@@ -11,9 +11,9 @@ actual class Strings {
         args: List<Any>
     ): String {
         return if (args.isEmpty()) {
-            StringDesc.Resource(id).localized()
+            StringDesc.Resource(id).toString()
         } else {
-            id.format(*args.toTypedArray()).localized()
+            id.format(*args.toTypedArray()).toString()
         }
     }
 }

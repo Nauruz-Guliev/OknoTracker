@@ -12,7 +12,7 @@ class ErrorMapper(
 
     fun map(
         errorDto: ErrorDto? = null,
-        exception: Exception? = null,
+        exception: Throwable? = null,
     ): ErrorModel {
         return when {
             errorDto != null -> ErrorModel(
