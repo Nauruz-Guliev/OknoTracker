@@ -27,7 +27,7 @@ fun OLoadingScreen(
                 contentAlignment = Alignment.Center
             ) {
                 CircularProgressIndicator(
-                    modifier = Modifier.size(108.dp),
+                    modifier = Modifier.size(80.dp),
                     color = progressColor,
                     strokeWidth = 10.dp,
                     trackColor = trackColor
