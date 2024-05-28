@@ -28,7 +28,7 @@ fun networkModule() = module {
                 withContext(Dispatchers.IO) {
                     request.headers.apply {
                         append("Content-Type", "application/json")
-                        userId?.let { append("Auth", "${userId}") }
+                        userId?.let { append("Auth", "$userId") }
                     }
                     execute(request)
                 }

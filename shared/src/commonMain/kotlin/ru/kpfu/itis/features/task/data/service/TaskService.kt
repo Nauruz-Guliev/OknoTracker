@@ -17,7 +17,6 @@ import ru.kpfu.itis.features.task.data.dto.TaskChangeRequest
 import ru.kpfu.itis.features.task.data.dto.TaskCreateRequest
 import ru.kpfu.itis.features.task.data.dto.TaskResponseList
 import ru.kpfu.itis.features.task.data.dto.TaskResponseSingle
-import ru.kpfu.itis.features.task.data.dto.TaskStatisticDto
 import ru.kpfu.itis.features.task.data.dto.TaskStatisticsResponse
 import ru.kpfu.itis.shared.MR
 import ru.kpfu.itis.utils.Strings
@@ -138,9 +137,13 @@ class TaskService(
 //        )
         return httpClient.get {
             url("${(MR.strings.url.get())}task/statistics")
+            headers.apply {
+                append("Content-Type", "application/json")
+                append("Auth", "$userId")
+            }
             parameters {
                 append("user-id", "$userId")
-            }
+            } // TODO() remove
         }.body()
     }
 

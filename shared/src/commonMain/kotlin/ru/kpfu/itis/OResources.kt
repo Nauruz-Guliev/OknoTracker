@@ -7,6 +7,10 @@ import ru.kpfu.itis.shared.MR
 // TODO() to generate resources use `./gradlew generateMRcommonMain`
 object OResources {
 
+    object Common{
+        fun errorIcon() = MR.images.wifi_sign
+    }
+
     object Login {
         fun title() = MR.strings.login_title
 
@@ -30,6 +34,6 @@ object OResources {
 
         fun emptyStatisticsImage(): ImageResource = MR.images.statistics_team
         fun emptyStatisticsLabel(): StringResource = MR.strings.statistics_empty
-        fun emptyStatiscticsDescription() = MR.strings.statistics_empty_description
+        fun emptyStatisticsDescription() = MR.strings.statistics_empty_description
     }
 }

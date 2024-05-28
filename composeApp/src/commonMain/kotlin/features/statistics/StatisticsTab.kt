@@ -114,7 +114,7 @@ private fun EmptyStatistics() {
             fontSize = 20.sp,
         )
         Text(
-            text = stringResource(OResources.Statistics.emptyStatiscticsDescription())
+            text = stringResource(OResources.Statistics.emptyStatisticsDescription())
         )
     }
 }
