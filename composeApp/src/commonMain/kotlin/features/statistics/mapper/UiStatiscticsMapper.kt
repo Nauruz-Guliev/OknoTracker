@@ -20,4 +20,5 @@ private fun map(item: DayStatistics): UiDayStatistics =
         date = item.date,
         completedTasksCount = item.completedTasksCount,
         completedOnTimeTasksCount = item.completedOnTimeTasksCount,
+        remainingTasksCount = item.remainingTaskCount
     )

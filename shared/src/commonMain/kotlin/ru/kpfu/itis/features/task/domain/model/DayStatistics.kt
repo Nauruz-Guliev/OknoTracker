@@ -4,5 +4,6 @@ class DayStatistics(
     val date: String,
     val tasksCount: Int,
     val completedTasksCount: Int,
-    val completedOnTimeTasksCount: Int
+    val completedOnTimeTasksCount: Int,
+    val remainingTaskCount: Int
 )

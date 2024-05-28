@@ -37,6 +37,7 @@ material3Android = "1.2.1"
 uiTextGoogleFonts = "1.6.7"
 flowmvi = "2.4.1"
 
+charts = "Beta-0.0.5"
 
 [libraries]
 coil-network-ktor = { module = "io.coil-kt.coil3:coil-network-ktor", version.ref = "coil" }
@@ -116,6 +117,9 @@ androidx-ui-text-google-fonts = { group = "androidx.compose.ui", name = "ui-text
 
 #coil
 landscapist-coil3 = { module = "com.github.skydoves:landscapist-coil3", version.ref = "landscapistCoil3" }
+
+#charts
+charts = { module = "io.github.thechance101:chart", version.ref = "charts" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

@@ -19,7 +19,8 @@ class DtoStatisticsMapper : Mapper<TaskStatisticDto, DayStatistics> {
             date = input.date,
             tasksCount = input.countOfTasks.toInt(),
             completedTasksCount = input.countOfCompletedTasks.toInt(),
-            completedOnTimeTasksCount = input.countOfCompletedOnTimeTasks.toInt()
+            completedOnTimeTasksCount = input.countOfCompletedOnTimeTasks.toInt(),
+            remainingTaskCount = input.countOfNotCompletedTasks.toInt()
         )
     }
 

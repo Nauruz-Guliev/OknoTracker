@@ -11,4 +11,5 @@ data class UiDayStatistics(
     val date: String,
     val completedTasksCount: Int,
     val completedOnTimeTasksCount: Int,
+    val remainingTasksCount: Int
 )

@@ -69,6 +69,9 @@ kotlin {
 
             // datetime
             implementation(libs.kotlinx.datetime)
+
+            // charts
+            implementation(libs.charts)
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)

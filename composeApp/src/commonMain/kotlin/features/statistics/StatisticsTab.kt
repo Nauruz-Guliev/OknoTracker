@@ -1,15 +1,19 @@
 package features.statistics
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.MaterialTheme
@@ -21,12 +25,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
+import com.aay.compose.barChart.BarChart
+import com.aay.compose.barChart.model.BarParameters
 import design_system.screens.OErrorScreen
 import design_system.screens.OLoadingScreen
 import dev.icerock.moko.resources.compose.stringResource
@@ -123,46 +130,96 @@ private fun Statistics(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Text(
-            text = stringResource(OResources.Statistics.description()),
-            style = MaterialTheme.typography.titleMedium,
-            fontSize = 24.sp,
-            color = MaterialTheme.colorScheme.tertiary
+        StatisticsBlock(state)
+
+        Spacer(modifier = Modifier.size(LocalPaddingValues.current.extraLarge))
+
+        StatisticsChart(state)
+
+    }
+}
+
+@Composable
+private fun StatisticsChart(state: UiStatistics) {
+    val chartParameters = listOf(
+        BarParameters(
+            dataName = stringResource(OResources.Statistics.completedTasks()),
+            data = state.days.map(UiDayStatistics::completedTasksCount).map(Int::toDouble),
+            barColor = MaterialTheme.colorScheme.primary
+        ),
+        BarParameters(
+            dataName = stringResource(OResources.Statistics.completedOnTimeTasks()),
+            data = state.days.map(UiDayStatistics::completedOnTimeTasksCount).map(Int::toDouble),
+            barColor = MaterialTheme.colorScheme.outline
+        ),
+        BarParameters(
+            dataName = stringResource(OResources.Statistics.remainingTasks()),
+            data = state.days.map(UiDayStatistics::remainingTasksCount).map(Int::toDouble),
+            barColor = MaterialTheme.colorScheme.secondary
+        ),
+    )
+    Box(Modifier.fillMaxWidth()) {
+        BarChart(
+            chartParameters = chartParameters,
+            gridColor = Color.DarkGray,
+            xAxisData = state.days.map(UiDayStatistics::date),
+            isShowGrid = true,
+            animateChart = true,
+            showGridWithSpacer = true,
+            yAxisStyle = TextStyle(
+                fontSize = 14.sp,
+                color = Color.DarkGray,
+            ),
+            xAxisStyle = TextStyle(
+                fontSize = 14.sp,
+                color = Color.DarkGray,
+                fontWeight = FontWeight.W400
+            ),
+            yAxisRange = 15,
+            barWidth = 20.dp,
+            barCornerRadius = 5.dp
+        )
+    }
+}
+
+@Composable
+private fun StatisticsBlock(state: UiStatistics) {
+    Row(
+        horizontalArrangement = Arrangement.Center,
+        modifier = Modifier
+            .background(
+                shape = RoundedCornerShape(size = 10.dp),
+                color = MaterialTheme.colorScheme.surfaceContainer
+            )
+            .padding(LocalPaddingValues.current.medium),
+    ) {
+        StatisticItem(
+            label = stringResource(OResources.Statistics.completedTasks()),
+            value = state.completedTasksCount.toString(),
         )
 
-        Spacer(modifier = Modifier.size(LocalPaddingValues.current.large))
+        Spacer(modifier = Modifier.height(LocalPaddingValues.current.medium))
+
+        StatisticItem(
+            label = stringResource(OResources.Statistics.completedOnTimeTasks()),
+            value = state.completedOnTimeTasksCount.toString(),
+        )
+
+        Spacer(modifier = Modifier.height(LocalPaddingValues.current.medium))
+
+        StatisticItem(
+            label = stringResource(OResources.Statistics.remainingTasks()),
+            value = state.remainingTasksCount.toString()
+        )
+
+        Spacer(modifier = Modifier.height(LocalPaddingValues.current.medium))
 
         Image(
-            modifier = Modifier.size(200.dp),
+            modifier = Modifier.size(100.dp),
             painter = mokoPainterResource(OResources.Statistics.statisticsImage()),
             contentDescription = OResources.Statistics.statisticsImageContentDescription()
                 .toString()
         )
-
-        Spacer(modifier = Modifier.size(LocalPaddingValues.current.large))
-
-        Row(
-            horizontalArrangement = Arrangement.Center,
-        ) {
-            StatisticItem(
-                label = stringResource(OResources.Statistics.completedTasks()),
-                value = state.completedTasksCount.toString(),
-            )
-
-            Spacer(modifier = Modifier.height(LocalPaddingValues.current.medium))
-
-            StatisticItem(
-                label = stringResource(OResources.Statistics.completedOnTimeTasks()),
-                value = state.completedOnTimeTasksCount.toString(),
-            )
-
-            Spacer(modifier = Modifier.height(LocalPaddingValues.current.medium))
-
-            StatisticItem(
-                label = stringResource(OResources.Statistics.remainingTasks()),
-                value = state.remainingTasksCount.toString()
-            )
-        }
     }
 }
 
@@ -177,15 +234,14 @@ private fun RowScope.StatisticItem(label: String, value: String) {
             text = value,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.primary,
-            fontSize = 20.sp,
+            fontSize = 18.sp,
         )
         Spacer(modifier = Modifier.height(LocalPaddingValues.current.extraSmall))
         Text(
             text = label,
             color = Color.Gray,
             textAlign = TextAlign.Center,
-            modifier = Modifier
-                .padding(LocalPaddingValues.current.small)
+            fontSize = 14.sp,
         )
     }
 }
