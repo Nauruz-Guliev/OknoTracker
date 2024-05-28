@@ -10,11 +10,11 @@ import ru.kpfu.itis.features.settings.data.SettingStorage
 fun settingsModule() = module {
     single {
         SettingsContainer(
-            get(),
-            get(),
-            get(),
-            get(),
-            isNotificationsEnabled = { get<CommonNotificationManager>().areNotificationsEnabled() },
+            userStore = get(),
+            configurationFactory = get(),
+            errorMapper = get(),
+            settingsStorage = get(),
+            commonNotificationManager = get<CommonNotificationManager>(),
             elapsedRealtimeProvider = { elapsedRealtimeProvider() },
             commonNotificationsScheduler = get<CommonNotificationsScheduler>()
         )

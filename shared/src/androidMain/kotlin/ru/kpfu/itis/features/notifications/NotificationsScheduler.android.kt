@@ -1,29 +1,29 @@
 package ru.kpfu.itis.features.notifications
 
-import android.app.AlarmManager
-import android.app.PendingIntent
-import android.content.Context
-import org.koin.java.KoinJavaComponent.inject
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.PeriodicWorkRequest
+import androidx.work.WorkManager
+import org.koin.java.KoinJavaComponent.getKoin
+import java.util.concurrent.TimeUnit
 
-private val notificationScheduler: NotificationScheduler by inject(NotificationScheduler::class.java)
-
-actual fun commonNotificationScheduler(): CommonNotificationsScheduler = notificationScheduler
+actual fun commonNotificationScheduler(): CommonNotificationsScheduler {
+    return getKoin().get<CommonNotificationsScheduler>()
+}
 
 class NotificationScheduler(
-    private val alarmManager: AlarmManager,
-    private val context: Context
+    private val workManager: WorkManager
 ) : CommonNotificationsScheduler {
 
+    //    TODO() refactor
     override fun schedule(notificationId: Int, repeatInterval: Long, triggerTime: Long) {
-        val intent = NotificationBroadcastReceiver.createIntent(context, notificationId)
-        val pendingIntent = PendingIntent.getBroadcast(
-            context, 0, intent,
-            PendingIntent.FLAG_IMMUTABLE)
-        alarmManager.setInexactRepeating(
-            AlarmManager.ELAPSED_REALTIME_WAKEUP,
-            triggerTime,
-            repeatInterval,
-            pendingIntent
+        val workRequest: PeriodicWorkRequest = PeriodicWorkRequest
+            .Builder(NotificationWorker::class.java, repeatInterval, TimeUnit.MILLISECONDS)
+            .setInitialDelay(triggerTime, TimeUnit.MILLISECONDS)
+            .build()
+        workManager.enqueueUniquePeriodicWork(
+            "PeriodicNotification",
+            ExistingPeriodicWorkPolicy.KEEP,
+            workRequest
         )
     }
 

@@ -15,10 +15,9 @@ import ru.kpfu.itis.di.dbModule
 import ru.kpfu.itis.di.dispatcherModule
 import ru.kpfu.itis.di.networkModule
 import ru.kpfu.itis.di.notifications.notificationsModule
-import ru.kpfu.itis.di.platformModule
 import ru.kpfu.itis.di.repositoryModule
 import ru.kpfu.itis.di.serviceModule
-import ru.kpfu.itis.features.notifications.NotificationProvider
+import ru.kpfu.itis.features.notifications.AndroidNotificationChannelProvider
 
 class Application : Application() {
 
@@ -38,7 +37,6 @@ class Application : Application() {
             repositoryModule(),
             serviceModule(),
             notificationsModule(),
-            platformModule()
         ) {
             androidContext(this@Application)
         }
@@ -47,7 +45,7 @@ class Application : Application() {
     }
 
     private fun createNotificationChannel(){
-        val notificationProvider: NotificationProvider by inject()
+        val notificationProvider: AndroidNotificationChannelProvider by inject()
         notificationProvider.createNotificationChannel(
             channelId = getString(OResources.Notification.notificationChannelId().resourceId),
             channelName = getString(OResources.Notification.notificationChannelName().resourceId),

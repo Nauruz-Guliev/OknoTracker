@@ -1,7 +1,6 @@
 package ru.kpfu.itis.features.notifications
 
 import dev.icerock.moko.resources.StringResource
-import ru.kpfu.itis.features.notifications.CommonNotificationManager
 
 actual fun commonNotificationManager() = object : CommonNotificationManager {
     override fun showNotification(
@@ -14,3 +13,6 @@ actual fun commonNotificationManager() = object : CommonNotificationManager {
 
 }
 // TODO someday i will show this on ios, but not todoy
+actual fun notificationManager(): CommonNotificationManager {
+    TODO("Not yet implemented")
+}

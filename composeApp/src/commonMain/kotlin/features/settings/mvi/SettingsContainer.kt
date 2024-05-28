@@ -17,6 +17,7 @@ import pro.respawn.flowmvi.plugins.init
 import pro.respawn.flowmvi.plugins.recover
 import pro.respawn.flowmvi.plugins.reduce
 import ru.kpfu.itis.common.mapper.ErrorMapper
+import ru.kpfu.itis.features.notifications.CommonNotificationManager
 import ru.kpfu.itis.features.notifications.CommonNotificationsScheduler
 import ru.kpfu.itis.features.notifications.ScheduleIntervals
 import ru.kpfu.itis.features.settings.data.SettingStorage
@@ -29,7 +30,7 @@ class SettingsContainer(
     private val configurationFactory: ConfigurationFactory,
     private val errorMapper: ErrorMapper,
     private val settingsStorage: SettingStorage,
-    private val isNotificationsEnabled: () -> Boolean,
+    private val commonNotificationManager: CommonNotificationManager,
     private val elapsedRealtimeProvider: () -> Long,
     private val commonNotificationsScheduler: CommonNotificationsScheduler
 ) : Container<OTrackerState<SettingsState>, SettingsIntent, SettingsAction> {
@@ -88,7 +89,7 @@ class SettingsContainer(
         item: UiSettingItem
     ) {
         when (item.key) {
-            SettingKey.NOTIFICATION -> manageNotifications(item)
+            SettingKey.NOTIFICATION -> manageReminder(item)
 
             SettingKey.DARK_MODE -> {
                 // TODO()
@@ -101,11 +102,11 @@ class SettingsContainer(
         }
     }
 
-    private suspend fun PipelineContext<OTrackerState<SettingsState>, SettingsIntent, SettingsAction>.manageNotifications(
+    private suspend fun PipelineContext<OTrackerState<SettingsState>, SettingsIntent, SettingsAction>.manageReminder(
         item: UiSettingItem
     ) {
         if (!item.isChecked) {
-            if (!isNotificationsEnabled()) {
+            if (!commonNotificationManager.areNotificationsEnabled()) {
                 action(SettingsAction.ShowSnackbar("Notification are not enabled"))// TODO()
                 return
             }
@@ -121,7 +122,7 @@ class SettingsContainer(
             // select time intent
             // setup notification
         } else {
-            // todo remove notifications
+            commonNotificationsScheduler.removeScheduling(REMINDER_NOTIFICATION_ID)
         }
     }
 }

@@ -41,6 +41,7 @@ flowmvi = "2.4.1"
 
 charts = "Beta-0.0.5"
 core = "1.13.1"
+workRuntimeKtx = "2.9.0"
 
 [libraries]
 coil-network-ktor = { module = "io.coil-kt.coil3:coil-network-ktor", version.ref = "coil" }
@@ -127,6 +128,7 @@ landscapist-coil3 = { module = "com.github.skydoves:landscapist-coil3", version.
 #charts
 charts = { module = "io.github.thechance101:chart", version.ref = "charts" }
 androidx-core = { group = "androidx.core", name = "core", version.ref = "core" }
+androidx-work-runtime-ktx = { group = "androidx.work", name = "work-runtime-ktx", version.ref = "workRuntimeKtx" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
