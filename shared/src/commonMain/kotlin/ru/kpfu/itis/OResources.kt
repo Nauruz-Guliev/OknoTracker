@@ -62,4 +62,10 @@ object OResources {
         fun notificationAreNotEnabled() = MR.strings.notifications_are_not_enabled
     }
 
+    object SingleTask {
+        fun singleTaskNameError() = MR.strings.task_name_error
+        fun singleTaskNameLabel() = MR.strings.task_name_label
+        fun singleTaskDescriptionError() = MR.strings.task_description_error
+        fun singleTaskDescriptionLabel() = MR.strings.task_description_label
+    }
 }

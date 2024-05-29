@@ -48,4 +48,9 @@
     <string name="date_picker_dialog_title">Select date</string>
 
 
+    <!-- single task -->
+    <string name="task_name_error">Title should contain 1-20 characters</string>
+    <string name="task_name_label">Name</string>
+    <string name="task_description_error">Description should contain 1-200 characters</string>
+    <string name="task_description_label">Description</string>
 </resources>

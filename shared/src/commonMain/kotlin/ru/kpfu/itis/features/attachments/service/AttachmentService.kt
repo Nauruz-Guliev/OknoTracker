@@ -3,6 +3,7 @@ package ru.kpfu.itis.features.attachments.service
 import dev.icerock.moko.resources.StringResource
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
+import io.ktor.client.request.delete
 import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.parameter
@@ -23,6 +24,12 @@ class AttachmentService(
 
     suspend fun getAttachment(id: Long): AttachmentSingleResponse {
         return httpClient.get(
+            "${(MR.strings.url())}attachment/$id"
+        ).body()
+    }
+
+    suspend fun deleteAttachment(id: Long): AttachmentSingleResponse {
+        return httpClient.delete(
             "${(MR.strings.url())}attachment/$id"
         ).body()
     }

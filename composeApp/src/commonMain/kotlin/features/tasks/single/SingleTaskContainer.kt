@@ -1,10 +1,12 @@
 package features.tasks.single
 
-import features.OTrackerState
+import features.fileds.InputField
+import features.fileds.Validator
 import flow_mvi.DefaultConfigurationFactory
 import flow_mvi.configure
 import kotlinx.coroutines.launch
 import pro.respawn.flowmvi.api.Container
+import pro.respawn.flowmvi.api.PipelineContext
 import pro.respawn.flowmvi.api.Store
 import pro.respawn.flowmvi.dsl.store
 import pro.respawn.flowmvi.plugins.recover
@@ -24,97 +26,138 @@ class SingleTaskContainer(
     private val configurationFactory: DefaultConfigurationFactory,
     private val userStore: UserStore,
     private val attachmentRepository: AttachmentRepository,
-) : Container<OTrackerState<TaskModel>, SingleTaskIntent, SingleTaskAction> {
+    private val nameValidator: Validator,
+    private val descriptionValidator: Validator,
+) : Container<SingleTaskState, SingleTaskIntent, SingleTaskAction> {
 
     @OptIn(ExperimentalEncodingApi::class)
-    override val store: Store<OTrackerState<TaskModel>, SingleTaskIntent, SingleTaskAction> =
-        store(OTrackerState.Initial) {
+    override val store: Store<SingleTaskState, SingleTaskIntent, SingleTaskAction> =
+        store(SingleTaskState.Initial) {
 
             configure(configurationFactory, "SingleTask")
 
             recover { exception ->
                 updateState {
-                    OTrackerState.Error(errorMapper.map(exception = exception))
+                    SingleTaskState.Error.Internal(errorMapper.map(exception = exception))
                 }
                 null
             }
 
             reduce { intent ->
-                val userId = userStore.getUserId()
-                if (userId != null) {
-                    when (intent) {
-                        is SingleTaskIntent.CreateNew -> {
-                            runCatching {
-                                repository.createTask(
-                                    intent.model.copy(
-                                        userId = userId
-                                    )
-                                )
+                val userId = userStore.getUserId()!!
+
+                when (intent) {
+                    is SingleTaskIntent.CreateNew -> {
+                        handleNetworkRequest {
+                            handleTaskChange(intent.model) {
+                                repository.createTask(intent.model.copy(userId = userId))
                                 action(SingleTaskAction.CloseBottomSheet)
-                            }.onFailure {
-                                it.message?.let {
-                                    action(SingleTaskAction.ShowSnackbar(it))
-                                }
                             }
                         }
+                    }
 
-                        is SingleTaskIntent.Error -> {
-                            action(SingleTaskAction.ShowSnackbar(intent.message))
-                        }
-
-                        is SingleTaskIntent.Edit -> {
-                            runCatching {
-                                repository.changeTask(
-                                    intent.model.copy(
-                                        userId = userId
-                                    )
-                                )
+                    is SingleTaskIntent.Edit -> {
+                        handleNetworkRequest {
+                            handleTaskChange(intent.model) {
+                                repository.changeTask(intent.model.copy(userId = userId))
                                 action(SingleTaskAction.CloseBottomSheet)
-                            }.onFailure {
-                                it.message?.let {
-                                    action(SingleTaskAction.ShowSnackbar(it))
-                                }
                             }
                         }
+                    }
 
-                        is SingleTaskIntent.LoadTask -> {
+                    is SingleTaskIntent.LoadTask -> {
+                        updateState { SingleTaskState.Loading }
+                        if (intent.taskId != null) {
                             launch { attachmentRepository.updateAttachments(intent.taskId) }
-                            runCatching {
+                            handleNetworkRequest {
                                 repository.getTask(intent.taskId).also {
-                                    updateState { OTrackerState.Success(it) }
-                                }
-                            }.onFailure { throwable ->
-                                throwable.message?.let {
-                                    action(SingleTaskAction.ShowSnackbar(it))
+                                    updateState { SingleTaskState.Success(it) }
                                 }
                             }
+                        } else {
+                            updateState { SingleTaskState.Success(TaskModel()) }
                         }
+                    }
 
-                        is SingleTaskIntent.OnFileSelected -> {
-                            try {
-                                val bytes = intent.file?.readBytes()
-                                if (bytes != null) {
-                                    attachmentRepository.saveAttachment(
-                                        AttachmentModel(
-                                            name = intent.file.name,
-                                            contentType = intent.file.name.substring(
-                                                intent.file.name.lastIndexOf(
-                                                    "."
-                                                ) + 1, intent.file.name.length
-                                            ),
-                                            taskId = intent.taskId,
-                                            content = Base64.encode(bytes)
+                    is SingleTaskIntent.OnFileSelected -> {
+                        handleNetworkRequest {
+                            val bytes = intent.file?.readBytes()
+                            if (bytes != null) {
+                                val savedImage = attachmentRepository.saveAttachment(
+                                    AttachmentModel(
+                                        name = intent.file.name,
+                                        contentType = intent.file.name.substring(
+                                            intent.file.name.lastIndexOf(
+                                                "."
+                                            ) + 1, intent.file.name.length
+                                        ),
+                                        taskId = intent.taskId,
+                                        content = Base64.encode(bytes)
+                                    )
+                                )
+                                action(
+                                    SingleTaskAction.AddSelectedImage(
+                                        ImageModel(
+                                            bytes,
+                                            savedImage.id
                                         )
                                     )
-                                    action(SingleTaskAction.AddSelectedImage(bytes))
-                                }
-                            } catch (ex: Exception) {
-                                ex.message?.let { action(SingleTaskAction.ShowSnackbar(it)) }
+                                )
                             }
+                        }
+                    }
+
+                    is SingleTaskIntent.UiError -> {
+                        action(SingleTaskAction.ShowSnackbar(intent.message))
+                    }
+
+                    is SingleTaskIntent.DeleteAttachment -> {
+                        handleNetworkRequest {
+                            attachmentRepository.deleteAttachment(intent.id)
+                            action(SingleTaskAction.DeleteAttachment(intent.id))
                         }
                     }
                 }
             }
         }
+
+    private suspend fun PipelineContext<SingleTaskState, SingleTaskIntent, SingleTaskAction>.handleNetworkRequest(
+        block: suspend () -> Unit
+    ) {
+        runCatching {
+            block()
+        }.onFailure {
+            updateState { SingleTaskState.Error.Server(errorMapper.map(exception = it)) }
+        }
+    }
+
+    private suspend fun PipelineContext<SingleTaskState, SingleTaskIntent, SingleTaskAction>.handleTaskChange(
+        taskModel: TaskModel,
+        block: suspend () -> Unit
+    ) {
+        val isNameValid = nameValidator.validate(taskModel.name)
+        val isDescriptionValid =
+            taskModel.description?.let { descriptionValidator.validate(it) } ?: false
+
+        when {
+            isNameValid && isDescriptionValid -> {
+                block()
+            }
+
+            else -> {
+                updateState {
+                    val fieldErrors = buildList {
+                        if (!isNameValid) {
+                            add(InputField.NAME)
+                        }
+                        if (!isDescriptionValid) {
+                            add(InputField.DESCRIPTION)
+                        }
+                    }
+                    SingleTaskState.Error.Validation(fieldErrors)
+                }
+            }
+        }
+    }
 }
 

@@ -1,5 +1,7 @@
 package features.tasks
 
+import features.fileds.InputField
+import features.fileds.Validator
 import features.tasks.completed.CompletedTasksContainer
 import features.tasks.home.HomeTasksContainer
 import features.tasks.main.MainContainer
@@ -23,7 +25,15 @@ fun tasksModule() = module {
     }
 
     factory {
-        SingleTaskContainer(get(), get(), get(), get(), get())
+        SingleTaskContainer(
+            errorMapper = get(),
+            repository = get(),
+            configurationFactory = get(),
+            userStore = get(),
+            attachmentRepository = get(),
+            descriptionValidator = Validator(InputField.DESCRIPTION.regex),
+            nameValidator = Validator(InputField.NAME.regex)
+        )
     }
 
     factory {

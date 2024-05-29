@@ -38,6 +38,10 @@ class AttachmentDbImpl(
         }
     }
 
+    internal fun deleteAttachment(id: Long) {
+        dbQuery.deleteAllAttachments()
+    }
+
     internal fun saveAttachment(attachment: AttachmentDto) {
         with(attachment) {
             dbQuery.insertAttachment(
