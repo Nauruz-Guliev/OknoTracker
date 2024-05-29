@@ -83,7 +83,7 @@ class SingleTaskContainer(
                         handleNetworkRequest {
                             val bytes = intent.file?.readBytes()
                             if (bytes != null) {
-                                val savedImage = attachmentRepository.saveAttachment(
+                                val image = attachmentRepository.saveAttachment(
                                     AttachmentModel(
                                         name = intent.file.name,
                                         contentType = intent.file.name.substring(
@@ -99,7 +99,7 @@ class SingleTaskContainer(
                                     SingleTaskAction.AddSelectedImage(
                                         ImageModel(
                                             bytes,
-                                            savedImage.id
+                                            image.id
                                         )
                                     )
                                 )

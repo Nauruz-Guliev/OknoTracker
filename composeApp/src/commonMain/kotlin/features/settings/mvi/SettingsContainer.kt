@@ -68,6 +68,7 @@ class SettingsContainer(
                 when (intent) {
                     is SettingsIntent.Logout -> {
                         userStore.deleteUserId()
+                        action(SettingsAction.Logout)
                     }
 
                     SettingsIntent.TryAgain -> loadSettings()

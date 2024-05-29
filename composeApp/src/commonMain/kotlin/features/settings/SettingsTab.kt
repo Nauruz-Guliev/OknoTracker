@@ -43,7 +43,6 @@ import design_system.screens.OErrorScreen
 import design_system.screens.OLoadingScreen
 import dev.icerock.moko.resources.compose.stringResource
 import extensions.startFlowMvi
-import features.OTrackerState
 import features.settings.mvi.SettingsAction
 import features.settings.mvi.SettingsContainer
 import features.settings.mvi.SettingsIntent
@@ -70,7 +69,7 @@ object SettingsTab : Tab {
         val state by subscribe { action ->
             when (action) {
                 is SettingsAction.Logout -> {
-                    navigator?.replaceAll(SignInScreen())
+                    navigator?.parent?.replace(SignInScreen())
                 }
 
                 is SettingsAction.ShowSnackbar -> {
@@ -100,7 +99,7 @@ object SettingsTab : Tab {
                     SettingsState.Initial -> Unit
                     is SettingsState.Error -> {
                         OErrorScreen(
-                            errorModel = (state as OTrackerState.Error).error,
+                            errorModel = (state as SettingsState.Error).error,
                             onClickAction = {
                                 intent(SettingsIntent.TryAgain)
                             }

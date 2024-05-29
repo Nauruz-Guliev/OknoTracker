@@ -30,10 +30,12 @@ fun App() {
     }
 
     AppTheme {
-        if (userId != null) {
-            Navigator(MainScreen())
-        } else {
-            Navigator(SignInScreen())
+        Navigator(SignInScreen()) {
+            if (userId != null) {
+                Navigator(MainScreen())
+            } else {
+                Navigator(SignInScreen())
+            }
         }
     }
 }
