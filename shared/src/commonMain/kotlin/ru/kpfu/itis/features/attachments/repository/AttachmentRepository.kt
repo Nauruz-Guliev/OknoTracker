@@ -46,6 +46,13 @@ class AttachmentRepository(
             })
         }
 
+    suspend fun deleteAttachment(id: Long): AttachmentModel =
+        withContext(dispatcher) {
+            handleResponse(service.deleteAttachment(id)).also {
+                attachmentDbImpl.deleteAttachment(id)
+            }
+        }
+
     private fun handleResponse(response: AttachmentSingleResponse): AttachmentModel {
         return if (response.data != null) {
             mapper.mapItem(response.data)

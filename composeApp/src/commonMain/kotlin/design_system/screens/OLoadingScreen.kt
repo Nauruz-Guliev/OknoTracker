@@ -14,11 +14,12 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun OLoadingScreen(
     isLoading: Boolean = true,
+    modifier: Modifier = Modifier,
     progressColor: Color = MaterialTheme.colorScheme.primary,
     trackColor: Color = MaterialTheme.colorScheme.onPrimary
 ) {
     Box(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
     ) {
         if (isLoading) {

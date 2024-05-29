@@ -15,6 +15,10 @@ id, name, contentType, taskId, content
 deleteAllAttachments:
 DELETE FROM Attachment;
 
+deleteAttachment:
+DELETE FROM Attachment
+WHERE id = ?;
+
 getAllAttachments:
 SELECT Attachment.*
 FROM Attachment

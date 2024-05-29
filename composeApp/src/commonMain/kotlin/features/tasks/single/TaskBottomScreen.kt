@@ -1,6 +1,8 @@
 package features.tasks.single
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -49,6 +51,7 @@ import com.seiko.imageloader.model.ImageRequest
 import com.seiko.imageloader.rememberImagePainter
 import design_system.button.OFloatingButton
 import design_system.button.ORadioButton
+import design_system.screens.OLoadingScreen
 import design_system.textfield.OTextField
 import extensions.convertToString
 import extensions.isPastTime
@@ -69,7 +72,10 @@ import org.koin.compose.koinInject
 import pro.respawn.flowmvi.compose.dsl.subscribe
 import ru.kpfu.itis.features.task.domain.model.TaskModel
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalResourceApi::class)
+@OptIn(
+    ExperimentalMaterial3Api::class, ExperimentalResourceApi::class,
+    ExperimentalFoundationApi::class
+)
 @Composable
 fun TaskBottomSheet(
     taskId: Long? = null,
@@ -86,7 +92,7 @@ fun TaskBottomSheet(
     val confirmEnabled = derivedStateOf { datePickerState.selectedDateMillis != null }
     var pickedDate by remember { mutableStateOf<LocalDateTime?>(null) }
     val pickedPriority = remember { mutableStateOf(TaskPriority[taskModel?.priority.orEmpty()]) }
-    val listOfImages = remember { mutableStateListOf<ByteArray>() }
+    val listOfImages = remember { mutableStateListOf<ImageModel>() }
     val openDialog = remember { mutableStateOf(DialogType.NONE) }
 
     val state by subscribe { action ->
@@ -103,12 +109,9 @@ fun TaskBottomSheet(
                 listOfImages.add(action.image)
             }
 
-            SingleTaskAction.OpenDateDialog -> {
-
+            is SingleTaskAction.DeleteAttachment -> {
+                listOfImages.removeIf { it.id == action.id }
             }
-
-            SingleTaskAction.OpenFilePicker -> TODO()
-            SingleTaskAction.OpenPriorityAlert -> TODO()
         }
     }
 
@@ -125,14 +128,252 @@ fun TaskBottomSheet(
                 listOfImages.clear()
                 listOfImages.addAll(it)
             }
-            println(taskModel)
+
+            Scaffold {
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                ) {
+                    Column {
+                        Spacer(
+                            modifier = Modifier.height(32.dp)
+                        )
+
+                        OTextField(
+                            text = taskTitle,
+                            onValueChange = {
+                                taskTitle = it
+                            },
+                            label = "Enter task name",
+                            isEnabled = isEditingMode,
+                            characterMaxCount = InputField.NAME.maxLength,
+                            errorText = state.findFieldError(InputField.NAME),
+                        )
+
+                        OTextField(
+                            text = taskDescription,
+                            onValueChange = {
+                                taskDescription = it
+                            },
+                            label = "Enter task description",
+                            maxLines = 8,
+                            isEnabled = isEditingMode,
+                            characterMaxCount = InputField.DESCRIPTION.maxLength,
+                            errorText = state.findFieldError(InputField.DESCRIPTION),
+                        )
+                    }
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp),
+                        horizontalArrangement = Arrangement.End
+                    ) {
+                        Column {
+                            SuggestionChip(
+                                onClick = {
+                                    openDialog.value = DialogType.DATE
+                                },
+                                enabled = isEditingMode,
+                                label = {
+                                    Text(pickedDate?.convertToString() ?: "Deadline")
+                                },
+                                icon = {
+                                    Icon(
+                                        imageVector = Icons.Default.DateRange,
+                                        contentDescription = "Date"
+                                    )
+                                }
+                            )
+
+                            SuggestionChip(
+                                onClick = {
+                                    openDialog.value = DialogType.PRIORITY
+                                },
+                                enabled = isEditingMode,
+                                label = {
+                                    Text("Priority: ${pickedPriority.value}")
+                                },
+                                colors = SuggestionChipDefaults.suggestionChipColors(
+                                    containerColor = pickedPriority.value.mapToColor()
+                                )
+                            )
+                        }
+
+                        Spacer(Modifier.weight(1f))
+
+                        if (taskId != null && isEditingMode) {
+                            OFloatingButton(
+                                icon = Icons.Default.Add,
+                                onClickedAction = {
+                                    openDialog.value = DialogType.FILE_PICKER
+                                },
+                            )
+                        }
+
+                        Spacer(Modifier.width(8.dp))
+
+                        OFloatingButton(
+                            icon = if (isEditingMode) Icons.Default.Done
+                            else Icons.Default.Lock,
+                            onClickedAction = {
+                                if (isEditingMode) {
+                                    when (taskModel) {
+                                        null -> {
+                                            intent(
+                                                SingleTaskIntent.CreateNew(
+                                                    TaskModel(
+                                                        description = taskDescription,
+                                                        name = taskTitle,
+                                                        deadlineTime = pickedDate?.toString(),
+                                                        priority = pickedPriority.value.name
+                                                    )
+                                                )
+                                            )
+                                        }
+
+                                        else -> {
+                                            taskModel?.let {
+                                                intent(
+                                                    SingleTaskIntent.Edit(
+                                                        it.copy(
+                                                            description = taskDescription,
+                                                            name = taskTitle,
+                                                            deadlineTime = pickedDate?.toString(),
+                                                            priority = pickedPriority.value.name
+                                                        ),
+                                                        listOfImages
+                                                    )
+                                                )
+                                            }
+                                        }
+                                    }
+                                }
+                                isEditingMode = !isEditingMode
+                            }
+                        )
+
+                        @Composable
+                        fun PriorityRadioButton(taskPriority: TaskPriority) {
+                            ORadioButton(
+                                onPrioritySelected = {
+                                    pickedPriority.value = taskPriority
+                                    openDialog.value = DialogType.NONE
+                                },
+                                text = taskPriority.name,
+                                selected = pickedPriority.value == taskPriority,
+                                color = taskPriority.mapToColor()
+                            )
+                        }
+
+                        when (openDialog.value) {
+                            DialogType.DATE -> {
+                                DatePickerDialog(
+                                    onDismissRequest = {
+                                        openDialog.value = DialogType.NONE
+                                    },
+                                    confirmButton = {
+                                        TextButton(
+                                            enabled = confirmEnabled.value,
+                                            onClick = {
+                                                openDialog.value = DialogType.NONE
+                                                val instant =
+                                                    Instant.fromEpochMilliseconds(datePickerState.selectedDateMillis!!)
+
+                                                val date = instant.toLocalDateTime(TimeZone.UTC)
+                                                if (date.isPastTime()) {
+                                                    intent(SingleTaskIntent.UiError("Past time can not be chosen as deadline."))
+                                                } else {
+                                                    pickedDate = date
+                                                }
+                                            },
+                                            content = {
+                                                Text("Choose date")
+                                            },
+                                        )
+                                    },
+                                    content = {
+                                        DatePicker(datePickerState)
+                                    },
+                                )
+                            }
+
+                            DialogType.FILE_PICKER -> {
+                                if (taskId != null) {
+                                    LaunchedEffect(Unit) {
+                                        val file = Picker.pickFile(
+                                            type = PickerSelectionType.Image,
+                                            mode = PickerSelectionMode.Single,
+                                            title = "Pick an image",
+                                            initialDirectory = "/"
+                                        )
+                                        openDialog.value = DialogType.NONE
+                                        intent(SingleTaskIntent.OnFileSelected(file, taskId))
+                                    }
+                                }
+                            }
+
+                            DialogType.PRIORITY -> {
+                                BasicAlertDialog(
+                                    onDismissRequest = {
+                                        openDialog.value = DialogType.NONE
+                                    },
+                                    content = {
+                                        OutlinedCard(
+                                            modifier = Modifier.selectableGroup()
+                                                .padding(vertical = 8.dp),
+                                        ) {
+                                            PriorityRadioButton(TaskPriority.LOW)
+                                            PriorityRadioButton(TaskPriority.MEDIUM)
+                                            PriorityRadioButton(TaskPriority.HIGH)
+                                        }
+                                    }
+                                )
+                            }
+
+                            DialogType.NONE -> {}
+                        }
+                    }
+
+                    SnackbarHost(snackbarHostState)
+
+                    LazyRow(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
+                        items(listOfImages) { model ->
+                            Image(
+                                modifier = Modifier.size(120.dp)
+                                    .padding(horizontal = 8.dp)
+                                    .combinedClickable(
+                                        onLongClick = {
+                                            intent(SingleTaskIntent.DeleteAttachment(model.id))
+                                        },
+                                        onClick = { }
+                                    ),
+                                painter = rememberImagePainter(
+                                    ImageRequest(data = model.data) {
+                                        components {
+                                            add(ByteArrayFetcher.Factory())
+                                        }
+                                    }
+                                ),
+                                contentDescription = "Image",
+                                contentScale = ContentScale.FillBounds
+                            )
+                        }
+                    }
+                }
+            }
         }
 
         is SingleTaskState.Initial -> {
             taskId?.let { intent(SingleTaskIntent.LoadTask(it)) }
         }
 
-        is SingleTaskState.Loading -> {}
+        is SingleTaskState.Loading -> {
+            OLoadingScreen(
+                modifier = Modifier.height(240.dp)
+                    .fillMaxWidth()
+            )
+        }
+
         is SingleTaskState.Error.Internal -> {
             LaunchedEffect(Unit) {
                 snackbarHostState.showSnackbar((state as SingleTaskState.Error.Internal).errorModel.title)
@@ -146,232 +387,5 @@ fun TaskBottomSheet(
         }
 
         is SingleTaskState.Error.Validation -> {}
-    }
-
-    Scaffold {
-        Column(
-            modifier = Modifier.fillMaxSize(),
-        ) {
-            Column {
-                Spacer(
-                    modifier = Modifier.height(32.dp)
-                )
-
-                OTextField(
-                    text = taskTitle,
-                    onValueChange = {
-                        taskTitle = it
-                    },
-                    label = "Enter task name",
-                    isEnabled = isEditingMode,
-                    characterMaxCount = InputField.NAME.maxLength,
-                    errorText = state.findFieldError(InputField.NAME),
-                )
-
-                OTextField(
-                    text = taskDescription,
-                    onValueChange = {
-                        taskDescription = it
-                    },
-                    label = "Enter task description",
-                    maxLines = 8,
-                    isEnabled = isEditingMode,
-                    characterMaxCount = InputField.DESCRIPTION.maxLength,
-                    errorText = state.findFieldError(InputField.DESCRIPTION),
-                )
-            }
-
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
-                horizontalArrangement = Arrangement.End
-            ) {
-                Column {
-                    SuggestionChip(
-                        onClick = {
-                            openDialog.value = DialogType.DATE
-                        },
-                        enabled = isEditingMode,
-                        label = {
-                            Text(pickedDate?.convertToString() ?: "Deadline")
-                        },
-                        icon = {
-                            Icon(
-                                imageVector = Icons.Default.DateRange,
-                                contentDescription = "Date"
-                            )
-                        }
-                    )
-
-                    SuggestionChip(
-                        onClick = {
-                            openDialog.value = DialogType.PRIORITY
-                        },
-                        enabled = isEditingMode,
-                        label = {
-                            Text("Priority: ${pickedPriority.value}")
-                        },
-                        colors = SuggestionChipDefaults.suggestionChipColors(
-                            containerColor = pickedPriority.value.mapToColor()
-                        )
-                    )
-                }
-
-                Spacer(Modifier.weight(1f))
-
-                if (taskId != null && isEditingMode) {
-                    OFloatingButton(
-                        icon = Icons.Default.Add,
-                        onClickedAction = {
-                            openDialog.value = DialogType.FILE_PICKER
-                        },
-                    )
-                }
-
-                Spacer(Modifier.width(8.dp))
-
-                OFloatingButton(
-                    icon = if (isEditingMode) Icons.Default.Done
-                    else Icons.Default.Lock,
-                    onClickedAction = {
-                        if (isEditingMode) {
-                            when (taskModel) {
-                                null -> {
-                                    intent(
-                                        SingleTaskIntent.CreateNew(
-                                            TaskModel(
-                                                description = taskDescription,
-                                                name = taskTitle,
-                                                deadlineTime = pickedDate?.toString(),
-                                                priority = pickedPriority.value.name
-                                            )
-                                        )
-                                    )
-                                }
-
-                                else -> {
-                                    taskModel?.let {
-                                        intent(
-                                            SingleTaskIntent.Edit(
-                                                it.copy(
-                                                    description = taskDescription,
-                                                    name = taskTitle,
-                                                    deadlineTime = pickedDate?.toString(),
-                                                    priority = pickedPriority.value.name
-                                                ),
-                                                listOfImages
-                                            )
-                                        )
-                                    }
-                                }
-                            }
-                        }
-                        isEditingMode = !isEditingMode
-                    }
-                )
-
-                @Composable
-                fun PriorityRadioButton(taskPriority: TaskPriority) {
-                    ORadioButton(
-                        onPrioritySelected = {
-                            pickedPriority.value = taskPriority
-                            openDialog.value = DialogType.NONE
-                        },
-                        text = taskPriority.name,
-                        selected = pickedPriority.value == taskPriority,
-                        color = taskPriority.mapToColor()
-                    )
-                }
-
-                when (openDialog.value) {
-                    DialogType.DATE -> {
-                        DatePickerDialog(
-                            onDismissRequest = {
-                                openDialog.value = DialogType.NONE
-                            },
-                            confirmButton = {
-                                TextButton(
-                                    enabled = confirmEnabled.value,
-                                    onClick = {
-                                        openDialog.value = DialogType.NONE
-                                        val instant =
-                                            Instant.fromEpochMilliseconds(datePickerState.selectedDateMillis!!)
-
-                                        val date = instant.toLocalDateTime(TimeZone.UTC)
-                                        if (date.isPastTime()) {
-                                            intent(SingleTaskIntent.UiError("Past time can not be chosen as deadline."))
-                                        } else {
-                                            pickedDate = date
-                                        }
-                                    },
-                                    content = {
-                                        Text("Choose date")
-                                    },
-                                )
-                            },
-                            content = {
-                                DatePicker(datePickerState)
-                            },
-                        )
-                    }
-
-                    DialogType.FILE_PICKER -> {
-                        if (taskId != null) {
-                            LaunchedEffect(Unit) {
-                                val file = Picker.pickFile(
-                                    type = PickerSelectionType.Image,
-                                    mode = PickerSelectionMode.Single,
-                                    title = "Pick an image",
-                                    initialDirectory = "/"
-                                )
-                                openDialog.value = DialogType.NONE
-                                intent(SingleTaskIntent.OnFileSelected(file, taskId))
-                            }
-                        }
-                    }
-
-                    DialogType.PRIORITY -> {
-                        BasicAlertDialog(
-                            onDismissRequest = {
-                                openDialog.value = DialogType.NONE
-                            },
-                            content = {
-                                OutlinedCard(
-                                    modifier = Modifier.selectableGroup()
-                                        .padding(vertical = 8.dp),
-                                ) {
-                                    PriorityRadioButton(TaskPriority.LOW)
-                                    PriorityRadioButton(TaskPriority.MEDIUM)
-                                    PriorityRadioButton(TaskPriority.HIGH)
-                                }
-                            }
-                        )
-                    }
-
-                    DialogType.NONE -> {}
-                }
-            }
-
-            SnackbarHost(snackbarHostState)
-
-            LazyRow(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
-                items(listOfImages) {
-                    Image(
-                        modifier = Modifier.size(120.dp)
-                            .padding(horizontal = 8.dp),
-                        painter = rememberImagePainter(
-                            ImageRequest(data = it) {
-                                components {
-                                    add(ByteArrayFetcher.Factory())
-                                }
-                            }
-                        ),
-                        contentDescription = "Image",
-                        contentScale = ContentScale.FillBounds
-                    )
-                }
-            }
-        }
     }
 }

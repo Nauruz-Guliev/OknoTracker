@@ -83,7 +83,7 @@ class SingleTaskContainer(
                         handleNetworkRequest {
                             val bytes = intent.file?.readBytes()
                             if (bytes != null) {
-                                attachmentRepository.saveAttachment(
+                                val savedImage = attachmentRepository.saveAttachment(
                                     AttachmentModel(
                                         name = intent.file.name,
                                         contentType = intent.file.name.substring(
@@ -95,13 +95,27 @@ class SingleTaskContainer(
                                         content = Base64.encode(bytes)
                                     )
                                 )
-                                action(SingleTaskAction.AddSelectedImage(bytes))
+                                action(
+                                    SingleTaskAction.AddSelectedImage(
+                                        ImageModel(
+                                            bytes,
+                                            savedImage.id
+                                        )
+                                    )
+                                )
                             }
                         }
                     }
 
                     is SingleTaskIntent.UiError -> {
                         action(SingleTaskAction.ShowSnackbar(intent.message))
+                    }
+
+                    is SingleTaskIntent.DeleteAttachment -> {
+                        handleNetworkRequest {
+                            attachmentRepository.deleteAttachment(intent.id)
+                            action(SingleTaskAction.DeleteAttachment(intent.id))
+                        }
                     }
                 }
             }
