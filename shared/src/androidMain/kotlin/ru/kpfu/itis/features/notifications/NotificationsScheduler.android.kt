@@ -14,20 +14,19 @@ class NotificationScheduler(
     private val workManager: WorkManager
 ) : CommonNotificationsScheduler {
 
-    //    TODO() refactor
     override fun schedule(notificationId: Int, repeatInterval: Long, triggerTime: Long) {
         val workRequest: PeriodicWorkRequest = PeriodicWorkRequest
             .Builder(NotificationWorker::class.java, repeatInterval, TimeUnit.MILLISECONDS)
             .setInitialDelay(triggerTime, TimeUnit.MILLISECONDS)
             .build()
         workManager.enqueueUniquePeriodicWork(
-            "PeriodicNotification",
+            notificationId.toString(),
             ExistingPeriodicWorkPolicy.KEEP,
             workRequest
         )
     }
 
     override fun removeScheduling(notificationId: Int) {
-        // TODO() stop scheduling
+        workManager.cancelUniqueWork(notificationId.toString())
     }
 }

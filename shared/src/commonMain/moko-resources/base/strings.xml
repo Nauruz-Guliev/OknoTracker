@@ -33,11 +33,18 @@
     <string name="settings_item_dark_theme">Dark theme</string>
     <string name="settings_item_notifications">Reminders</string>
 
+<!--    common-->
 <!--    notifications-->
     <string name="notifications_channel_name">Reminder</string>
     <string name="notifications_channel_description">Daily reminder to finish tasks</string>
     <string name="notifications_channel_id">dwdko23kf0de9w</string>
     <string name="notifications_content">Check your tasks</string>
     <string name="notifications_are_not_enabled">Enable notifications in app settings</string>
+
+    <string name="time_picker_dialog_title">Select time</string>
+    <string name="picker_dialog_confirm_button">OK</string>
+    <string name="picker_dialog_cancel_button">Cancel</string>
+    <string name="date_picker_dialog_title">Select date</string>
+
 
 </resources>

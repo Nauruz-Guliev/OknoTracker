@@ -9,6 +9,10 @@ object OResources {
 
     object Common {
         fun errorIcon() = MR.images.wifi_sign
+        fun datePickerDialogTitle() = MR.strings.date_picker_dialog_title
+        fun timePickerDialogTitle() = MR.strings.time_picker_dialog_title
+        fun pickerDialogConfirmButton() = MR.strings.picker_dialog_confirm_button
+        fun pickerDialogCancelButton() = MR.strings.picker_dialog_cancel_button
     }
 
     object SignUp {
@@ -55,4 +59,5 @@ object OResources {
         fun notificationContent() = MR.strings.notifications_content
         fun notificationAreNotEnabled() = MR.strings.notifications_are_not_enabled
     }
+
 }

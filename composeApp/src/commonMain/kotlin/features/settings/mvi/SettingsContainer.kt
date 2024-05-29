@@ -1,8 +1,8 @@
 package features.settings.mvi
 
 
-import features.OTrackerState
 import features.notifications.REMINDER_NOTIFICATION_ID
+import features.notifications.ReminderNotification
 import features.settings.SettingsState
 import features.settings.UiSettingItem
 import features.settings.toDomain
@@ -19,11 +19,13 @@ import pro.respawn.flowmvi.plugins.reduce
 import ru.kpfu.itis.common.mapper.ErrorMapper
 import ru.kpfu.itis.features.notifications.CommonNotificationManager
 import ru.kpfu.itis.features.notifications.CommonNotificationsScheduler
+import ru.kpfu.itis.features.notifications.ONotification
 import ru.kpfu.itis.features.notifications.ScheduleIntervals
 import ru.kpfu.itis.features.settings.data.SettingStorage
 import ru.kpfu.itis.features.settings.domain.SettingItem
 import ru.kpfu.itis.features.settings.domain.SettingKey
 import ru.kpfu.itis.features.task.data.store.UserStore
+import java.util.Calendar
 
 class SettingsContainer(
     private val userStore: UserStore,
@@ -31,23 +33,24 @@ class SettingsContainer(
     private val errorMapper: ErrorMapper,
     private val settingsStorage: SettingStorage,
     private val commonNotificationManager: CommonNotificationManager,
-    private val elapsedRealtimeProvider: () -> Long,
-    private val commonNotificationsScheduler: CommonNotificationsScheduler
-) : Container<OTrackerState<SettingsState>, SettingsIntent, SettingsAction> {
+    private val commonNotificationsScheduler: CommonNotificationsScheduler,
+    private val reminderNotification: ONotification
+) : Container<SettingsState, SettingsIntent, SettingsAction> {
 
-    override val store: Store<OTrackerState<SettingsState>, SettingsIntent, SettingsAction> =
-        store(OTrackerState.Initial) {
+    override val store: Store<SettingsState, SettingsIntent, SettingsAction> =
+        store(SettingsState.Initial) {
 
             configure(configurationFactory, "Settings")
 
             recover { exception ->
                 updateState {
-                    OTrackerState.Error(errorMapper.map(exception = exception))
+                    SettingsState.Error(errorMapper.map(exception = exception))
                 }
                 null
             }
 
             init {
+                // TODO() remove
                 settingsStorage.save(
                     listOf(
                         SettingItem(
@@ -57,6 +60,7 @@ class SettingsContainer(
                         )
                     )
                 )
+                //
 
                 loadSettings()
             }
@@ -69,23 +73,31 @@ class SettingsContainer(
 
                     SettingsIntent.TryAgain -> loadSettings()
                     is SettingsIntent.UpdateSettingItem -> updateSetting(intent.item)
+                    is SettingsIntent.NotificationTimeWasSelected -> scheduleDailyNotification(
+                        intent.hour,
+                        intent.minute
+                    )
+
+                    SettingsIntent.TimePickerDialogWasClosed -> {
+                        action(SettingsAction.HideTimePicker)
+                    }
                 }
             }
         }
 
-    private suspend fun PipelineContext<OTrackerState<SettingsState>, SettingsIntent, SettingsAction>.loadSettings() {
-        updateState { OTrackerState.Loading }
+    private suspend fun PipelineContext<SettingsState, SettingsIntent, SettingsAction>.loadSettings() {
+        updateState { SettingsState.Loading }
         runCatching { settingsStorage.getAll() }.fold(
             onSuccess = { settings ->
-                updateState { OTrackerState.Success(SettingsState(settings.toUi())) }
+                updateState { SettingsState.SettingsDisplay(settings.toUi()) }
             },
             onFailure = {
-                updateState { OTrackerState.Error(errorMapper.map(exception = it)) }
+                updateState { SettingsState.Error(errorMapper.map(exception = it)) }
             }
         )
     }
 
-    private suspend fun PipelineContext<OTrackerState<SettingsState>, SettingsIntent, SettingsAction>.updateSetting(
+    private suspend fun PipelineContext<SettingsState, SettingsIntent, SettingsAction>.updateSetting(
         item: UiSettingItem
     ) {
         when (item.key) {
@@ -96,13 +108,15 @@ class SettingsContainer(
             }
         }
         runCatching {
-            settingsStorage.updateSetting(item.toDomain()) // todo remove returning settings
+            settingsStorage.updateSetting(item.toDomain())
         }.onFailure { error ->
             action(SettingsAction.ShowSnackbar(error.message.orEmpty()))
+        }.onSuccess { settings ->
+            updateState { SettingsState.SettingsDisplay(settings.toUi()) }
         }
     }
 
-    private suspend fun PipelineContext<OTrackerState<SettingsState>, SettingsIntent, SettingsAction>.manageReminder(
+    private suspend fun PipelineContext<SettingsState, SettingsIntent, SettingsAction>.manageReminder(
         item: UiSettingItem
     ) {
         if (!item.isChecked) {
@@ -110,20 +124,37 @@ class SettingsContainer(
                 action(SettingsAction.ShowSnackbar("Notification are not enabled"))// TODO()
                 return
             }
-
-            commonNotificationsScheduler.schedule(
-                REMINDER_NOTIFICATION_ID,
-                ScheduleIntervals.ONE_DAY,
-                System.currentTimeMillis() + 3000
-              //  elapsedRealtimeProvider() + 5000 // TODO()
-            )
-
-            // show dialog window
-            // select time intent
-            // setup notification
+            action(SettingsAction.ShowTimePicker)
         } else {
             commonNotificationsScheduler.removeScheduling(REMINDER_NOTIFICATION_ID)
         }
     }
+
+    private suspend fun PipelineContext<SettingsState, SettingsIntent, SettingsAction>.scheduleDailyNotification(
+        hour: Int,
+        minute: Int
+    ) {
+        action(SettingsAction.HideTimePicker)
+        val now = Calendar.getInstance()
+        val nextNotificationTime = Calendar.getInstance().apply {
+            set(Calendar.HOUR_OF_DAY, hour)
+            set(Calendar.MINUTE, minute)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+        }
+        if (now.after(nextNotificationTime)) {
+            nextNotificationTime.add(Calendar.DAY_OF_YEAR, 1)
+        }
+        // todo
+        reminderNotification.show()
+
+        commonNotificationsScheduler.removeScheduling(REMINDER_NOTIFICATION_ID)
+        commonNotificationsScheduler.schedule(
+            REMINDER_NOTIFICATION_ID,
+            ScheduleIntervals.ONE_DAY,
+            nextNotificationTime.timeInMillis
+        )
+    }
+
 }
 
