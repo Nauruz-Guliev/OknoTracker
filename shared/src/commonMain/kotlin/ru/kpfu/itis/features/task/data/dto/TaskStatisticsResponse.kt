@@ -6,7 +6,7 @@ import ru.kpfu.itis.common.model.ErrorDto
 
 @Serializable
 data class TaskStatisticsResponse(
-    @SerialName("taskList")
+    @SerialName("data")
     val data: List<TaskStatisticDto>? = null,
     @SerialName("isSuccess")
     val isSuccess: Boolean,
