@@ -1,6 +1,7 @@
 package features.settings
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.icons.Icons
@@ -33,8 +35,11 @@ import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
+import design_system.button.OButton
 import design_system.screens.OErrorScreen
 import design_system.screens.OLoadingScreen
 import dev.icerock.moko.resources.compose.stringResource
@@ -43,6 +48,7 @@ import features.OTrackerState
 import features.settings.mvi.SettingsAction
 import features.settings.mvi.SettingsContainer
 import features.settings.mvi.SettingsIntent
+import features.signin.SignInScreen
 import org.koin.compose.koinInject
 import pro.respawn.flowmvi.api.Store
 import pro.respawn.flowmvi.compose.dsl.subscribe
@@ -58,13 +64,14 @@ object SettingsTab : Tab {
 
         startFlowMvi()
 
+        val navigator = LocalNavigator.current
         val scaffoldState = rememberScaffoldState()
         val isTimePickerVisible = remember { mutableStateOf(false) }
 
         val state by subscribe { action ->
             when (action) {
                 is SettingsAction.Logout -> {
-                    intent(SettingsIntent.Logout)
+                    navigator?.replace(SignInScreen())
                 }
 
                 is SettingsAction.ShowSnackbar -> {
@@ -82,37 +89,45 @@ object SettingsTab : Tab {
         }
 
         Scaffold(
-            modifier = Modifier.fillMaxSize()
-                .background(MaterialTheme.colors.background)
-                .padding(LocalPaddingValues.current.medium),
+            modifier = Modifier.fillMaxSize(),
             scaffoldState = scaffoldState
         ) {
-            when (state) {
-                is SettingsState.SettingsDisplay -> SettingsContent(state as SettingsState.SettingsDisplay)
-                SettingsState.Initial -> Unit
-                is SettingsState.Error -> {
-                    OErrorScreen(
-                        errorModel = (state as OTrackerState.Error).error,
-                        onClickAction = {
-                            intent(SettingsIntent.TryAgain)
+            Box(modifier = Modifier.fillMaxSize().padding(bottom = LocalPaddingValues.current.medium)){
+                when (state) {
+                    is SettingsState.SettingsDisplay -> SettingsContent(state as SettingsState.SettingsDisplay)
+                    SettingsState.Initial -> Unit
+                    is SettingsState.Error -> {
+                        OErrorScreen(
+                            errorModel = (state as OTrackerState.Error).error,
+                            onClickAction = {
+                                intent(SettingsIntent.TryAgain)
+                            }
+                        )
+                    }
+
+                    is SettingsState.Loading -> {
+                        OLoadingScreen()
+                    }
+                }
+
+                OButton(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .align(Alignment.BottomCenter),
+                    onClickAction = { intent(SettingsIntent.Logout) },
+                    text = stringResource(OResources.Settings.logout())
+                )
+
+                if (isTimePickerVisible.value) {
+                    OTimePickerDialog(
+                        onCancel = {
+                            intent(SettingsIntent.TimePickerDialogWasClosed)
+                        },
+                        onConfirm = { hour, minute ->
+                            intent(SettingsIntent.NotificationTimeWasSelected(hour, minute))
                         }
                     )
                 }
-
-                is SettingsState.Loading -> {
-                    OLoadingScreen()
-                }
-            }
-
-            if (isTimePickerVisible.value) {
-                OTimePickerDialog(
-                    onCancel = {
-                        intent(SettingsIntent.TimePickerDialogWasClosed)
-                    },
-                    onConfirm = { hour, minute ->
-                        intent(SettingsIntent.NotificationTimeWasSelected(hour, minute))
-                    }
-                )
             }
         }
     }
@@ -137,18 +152,22 @@ object SettingsTab : Tab {
     private fun Store<SettingsState, SettingsIntent, SettingsAction>.SettingsContent(
         state: SettingsState.SettingsDisplay
     ) {
-        Column(
-            modifier = Modifier.fillMaxWidth()
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(LocalPaddingValues.current.medium)
         ) {
             state.settings.forEach { item ->
-                SettingItem(
-                    itemName = item.title,
-                    isChecked = item.isChecked,
-                    onCheckChange = {
-                        intent(SettingsIntent.UpdateSettingItem(item))
-                    }
-                )
-                Spacer(modifier = Modifier.size(LocalPaddingValues.current.medium))
+                item(key = item.key) {
+                    SettingItem(
+                        itemName = item.title,
+                        isChecked = item.isChecked,
+                        onCheckChange = {
+                            intent(SettingsIntent.UpdateSettingItem(item))
+                        }
+                    )
+                    Spacer(modifier = Modifier.size(LocalPaddingValues.current.medium))
+                }
             }
         }
     }

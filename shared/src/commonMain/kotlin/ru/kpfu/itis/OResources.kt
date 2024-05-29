@@ -49,6 +49,8 @@ object OResources {
 
     object Settings {
         fun title() = MR.strings.settings_title
+        fun logout() = MR.strings.settings_item_logout
+        fun successfulLogout() = MR.strings.setting_successful_logout
     }
 
     object Notification {
