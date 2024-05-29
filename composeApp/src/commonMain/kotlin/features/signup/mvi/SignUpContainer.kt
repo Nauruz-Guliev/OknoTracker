@@ -2,8 +2,6 @@ package features.signup.mvi
 
 import features.fileds.InputField
 import features.fileds.Validator
-import features.signin.mvi.SignInAction
-import features.signin.mvi.SignInState
 import features.signup.SignUpState
 import flow_mvi.ConfigurationFactory
 import flow_mvi.configure
@@ -43,16 +41,18 @@ class SignUpContainer(
                     is SignUpIntent.SignUp -> signup(intent.email, intent.password)
 
                     SignUpIntent.TryAgain -> withState {
-                        when(this){
-                            is SignUpState.NetworkError ->{
+                        when (this) {
+                            is SignUpState.NetworkError -> {
                                 signup(
                                     email = this.email,
                                     password = this.password
                                 )
                             }
-                            is SignUpState.InternalError ->{
+
+                            is SignUpState.InternalError -> {
                                 updateState { SignUpState.Initial }
                             }
+
                             else -> Unit
                         }
                     }

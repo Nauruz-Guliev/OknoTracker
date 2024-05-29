@@ -136,7 +136,7 @@ private fun IntentReceiver<SignInIntent>.InitialContent(
                 label = stringResource(InputField.EMAIL.labelText),
                 text = email,
                 characterMaxCount = InputField.EMAIL.maxLength,
-                errorText = state.findFieldError(InputField.EMAIL)?.let{ stringResource(it) },
+                errorText = state.findFieldError(InputField.EMAIL)?.let { stringResource(it) },
                 initialIcon = Icons.Default.Email
             )
 

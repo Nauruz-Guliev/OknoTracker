@@ -2,7 +2,6 @@ package features.settings.mvi
 
 
 import features.notifications.REMINDER_NOTIFICATION_ID
-import features.notifications.ReminderNotification
 import features.settings.SettingsState
 import features.settings.UiSettingItem
 import features.settings.toDomain

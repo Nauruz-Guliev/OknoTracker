@@ -14,7 +14,8 @@ enum class TaskPriority(val value: String) {
         private val map = entries.associateBy { it.value }
         operator fun get(value: String): TaskPriority {
             return map[value.lowercase()
-                .replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }] ?: LOW
+                .replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }]
+                ?: LOW
         }
     }
 }

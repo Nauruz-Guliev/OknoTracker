@@ -7,7 +7,7 @@ actual fun commonNotificationManager() = object : CommonNotificationManager {
         channelId: StringResource,
         notificationTitle: StringResource,
         notificationId: Int
-    ) : Boolean = false
+    ): Boolean = false
 
     override fun areNotificationsEnabled(): Boolean = false
 

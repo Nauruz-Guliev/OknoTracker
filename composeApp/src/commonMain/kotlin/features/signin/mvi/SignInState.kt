@@ -15,6 +15,6 @@ sealed interface SignInState : MVIState {
     data object Loading : SignInState
     data class ValidationError(val fieldErrors: List<InputField>) : SignInState
     data class InternalError(val error: ErrorModel) : SignInState
-    data class NetworkError(val email: String, val password: String): SignInState
+    data class NetworkError(val email: String, val password: String) : SignInState
 }
 

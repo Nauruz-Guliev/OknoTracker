@@ -93,7 +93,7 @@ class SignUpScreen : Screen {
     }
 
     @Composable
-    private fun IntentReceiver<SignUpIntent>.InitialContent(state: SignUpState){
+    private fun IntentReceiver<SignUpIntent>.InitialContent(state: SignUpState) {
         Box(
             contentAlignment = Alignment.TopStart,
             modifier = Modifier.fillMaxSize()
@@ -147,7 +147,7 @@ class SignUpScreen : Screen {
 
                 OButton(
                     text = "Sign up",
-                    onClickAction = {intent(SignUpIntent.SignUp(email, password))}
+                    onClickAction = { intent(SignUpIntent.SignUp(email, password)) }
                 )
 
                 Spacer(

@@ -8,6 +8,7 @@ sealed interface SettingsState : MVIState {
     data class SettingsDisplay(
         val settings: List<UiSettingItem>
     ) : SettingsState
+
     data object Loading : SettingsState
     data class Error(val error: ErrorModel) : SettingsState
     data object Initial : SettingsState

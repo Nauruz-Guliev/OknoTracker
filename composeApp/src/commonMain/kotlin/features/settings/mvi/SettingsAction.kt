@@ -6,7 +6,7 @@ import pro.respawn.flowmvi.api.MVIAction
 @Immutable
 sealed interface SettingsAction : MVIAction {
     data object Logout : SettingsAction
-    data class ShowSnackbar(val message: String): SettingsAction
-    data object ShowTimePicker: SettingsAction
-    data object HideTimePicker: SettingsAction
+    data class ShowSnackbar(val message: String) : SettingsAction
+    data object ShowTimePicker : SettingsAction
+    data object HideTimePicker : SettingsAction
 }

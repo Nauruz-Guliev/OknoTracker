@@ -7,7 +7,7 @@ import ru.kpfu.itis.features.task.data.dto.TaskDto
 import ru.kpfu.itis.features.task.data.dto.TaskPriorityDto
 import ru.kpfu.itis.features.task.domain.model.TaskModel
 
-class TaskMapper : Mapper<TaskDto, TaskModel>{
+class TaskMapper : Mapper<TaskDto, TaskModel> {
 
     override fun mapItem(input: TaskDto): TaskModel {
         return with(input) {

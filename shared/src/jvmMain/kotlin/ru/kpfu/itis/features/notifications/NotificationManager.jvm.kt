@@ -7,11 +7,12 @@ actual fun commonNotificationManager() = object : CommonNotificationManager {
         channelId: StringResource,
         notificationTitle: StringResource,
         notificationId: Int
-    ) :Boolean= false
+    ): Boolean = false
 
     override fun areNotificationsEnabled(): Boolean = false
 
 }
+
 // TODO someday i will show this on ios, but not todoy
 actual fun notificationManager(): CommonNotificationManager {
     TODO("Not yet implemented")

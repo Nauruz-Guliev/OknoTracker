@@ -36,7 +36,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import cafe.adriel.voyager.navigator.LocalNavigator
-import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
 import design_system.button.OButton
@@ -92,7 +91,10 @@ object SettingsTab : Tab {
             modifier = Modifier.fillMaxSize(),
             scaffoldState = scaffoldState
         ) {
-            Box(modifier = Modifier.fillMaxSize().padding(bottom = LocalPaddingValues.current.medium)){
+            Box(
+                modifier = Modifier.fillMaxSize()
+                    .padding(bottom = LocalPaddingValues.current.medium)
+            ) {
                 when (state) {
                     is SettingsState.SettingsDisplay -> SettingsContent(state as SettingsState.SettingsDisplay)
                     SettingsState.Initial -> Unit

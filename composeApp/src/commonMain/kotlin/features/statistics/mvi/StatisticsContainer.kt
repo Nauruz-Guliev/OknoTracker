@@ -1,7 +1,6 @@
 package features.statistics.mvi
 
 import features.OTrackerState
-import features.statistics.UiStatistics
 import features.statistics.UiStatisticsState
 import features.statistics.mapper.mapStatistics
 import flow_mvi.ConfigurationFactory

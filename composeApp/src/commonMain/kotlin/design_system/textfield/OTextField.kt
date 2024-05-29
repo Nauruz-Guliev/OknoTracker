@@ -61,7 +61,7 @@ fun OTextField(
         isError = errorText != null,
         trailingIcon = {
             when {
-                errorText != null ->{
+                errorText != null -> {
                     Icon(
                         imageVector = errorIcon,
                         contentDescription = errorText,

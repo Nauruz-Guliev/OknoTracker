@@ -47,16 +47,18 @@ class SignInContainer(
 
                     SignInIntent.Outer.TryAgain -> {
                         withState {
-                            when(this){
-                                is SignInState.NetworkError ->{
+                            when (this) {
+                                is SignInState.NetworkError -> {
                                     login(
                                         email = this.email,
                                         password = this.password
                                     )
                                 }
-                                is SignInState.InternalError ->{
+
+                                is SignInState.InternalError -> {
                                     updateState { SignInState.Initial }
                                 }
+
                                 else -> Unit
                             }
                         }

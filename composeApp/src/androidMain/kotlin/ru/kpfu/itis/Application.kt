@@ -46,7 +46,7 @@ class Application : Application() {
         createNotificationChannel()
     }
 
-    private fun createNotificationChannel(){
+    private fun createNotificationChannel() {
         val notificationProvider: AndroidNotificationChannelProvider by inject()
         notificationProvider.createNotificationChannel(
             channelId = getString(OResources.Notification.notificationChannelId().resourceId),

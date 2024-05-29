@@ -11,9 +11,12 @@
     <string name="login_password_label">Password</string>
     <string name="login_email_label">Email
     </string>
-    <string name="login_email_error">The email must contain '@' symbol, domain name and top-level domain that
-        is 2 to 6 letters long, the use of Cyrillic alphabet is prohibited</string>
-    <string name="login_password_error">The password must consist of 8 to 20 characters, contain al least one uppercase, lowercase character, digit and special symbol
+    <string name="login_email_error">The email must contain '@' symbol, domain name and top-level
+        domain that
+        is 2 to 6 letters long, the use of Cyrillic alphabet is prohibited
+    </string>
+    <string name="login_password_error">The password must consist of 8 to 20 characters, contain al
+        least one uppercase, lowercase character, digit and special symbol
     </string>
 
     <!--    statistics-->
@@ -34,8 +37,8 @@
     <string name="settings_item_logout">Logout</string>
     <string name="setting_successful_logout">Successful logout</string>
 
-<!--    common-->
-<!--    notifications-->
+    <!--    common-->
+    <!--    notifications-->
     <string name="notifications_channel_name">Reminder</string>
     <string name="notifications_channel_description">Daily reminder to finish tasks</string>
     <string name="notifications_channel_id">dwdko23kf0de9w</string>
