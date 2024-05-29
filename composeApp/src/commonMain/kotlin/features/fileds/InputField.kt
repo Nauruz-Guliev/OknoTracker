@@ -22,15 +22,15 @@ enum class InputField(
         maxLength = null
     ),
     NAME(
-        regex = "^.{1,100}$",
+        regex = "^.{1,50}$",
         errorText = OResources.SingleTask.singleTaskNameError(),
         labelText = OResources.SingleTask.singleTaskNameLabel(),
-        maxLength = 100
+        maxLength = 50
     ),
     DESCRIPTION(
-        regex = "^.{1,100}$",
+        regex = "^.{1,500}$",
         errorText = OResources.SingleTask.singleTaskDescriptionError(),
         labelText = OResources.SingleTask.singleTaskDescriptionError(),
-        maxLength = 100
+        maxLength = 500
     )
 }
