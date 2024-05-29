@@ -3,6 +3,7 @@ package ru.kpfu.itis
 import android.app.Application
 import features.settings.di.settingsModule
 import features.signin.di.signInModule
+import features.signup.di.signUpModule
 import features.statistics.di.statisticsModule
 import features.tasks.tasksModule
 import initKoin
@@ -37,6 +38,7 @@ class Application : Application() {
             repositoryModule(),
             serviceModule(),
             notificationsModule(),
+            signUpModule()
         ) {
             androidContext(this@Application)
         }

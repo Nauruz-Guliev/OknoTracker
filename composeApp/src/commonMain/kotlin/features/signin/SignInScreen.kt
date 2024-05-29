@@ -8,6 +8,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.Scaffold
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -115,12 +118,12 @@ private fun IntentReceiver<SignInIntent>.InitialContent(
             var password by rememberSaveable { mutableStateOf("") }
 
             Spacer(
-                modifier = Modifier.height(80.dp)
+                modifier = Modifier.height(120.dp) // todo hardcode
             )
 
             Image(
                 painter = painterResource(OResources.Login.icon()),
-                modifier = Modifier.size(200.dp),
+                modifier = Modifier.size(160.dp),
                 contentDescription = "Login icon: girl with a laptop"
             )
 
@@ -132,8 +135,9 @@ private fun IntentReceiver<SignInIntent>.InitialContent(
                 onValueChange = { email = it },
                 label = stringResource(InputField.EMAIL.labelText),
                 text = email,
-                characterMaxCount = InputField.PASSWORD.maxLength,
-                errorText = state.findFieldError(InputField.EMAIL)?.let{ stringResource(it) }
+                characterMaxCount = InputField.EMAIL.maxLength,
+                errorText = state.findFieldError(InputField.EMAIL)?.let{ stringResource(it) },
+                initialIcon = Icons.Default.Email
             )
 
             Spacer(
@@ -146,7 +150,8 @@ private fun IntentReceiver<SignInIntent>.InitialContent(
                 text = password,
                 characterMaxCount = InputField.PASSWORD.maxLength,
                 errorText = state.findFieldError(InputField.PASSWORD)?.let { stringResource(it) },
-                isPassword = true
+                isPassword = true,
+                initialIcon = Icons.Default.Lock
             )
 
             Spacer(

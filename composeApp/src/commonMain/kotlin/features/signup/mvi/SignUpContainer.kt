@@ -1,7 +1,10 @@
-package features.signin.mvi
+package features.signup.mvi
 
 import features.fileds.InputField
 import features.fileds.Validator
+import features.signin.mvi.SignInAction
+import features.signin.mvi.SignInState
+import features.signup.SignUpState
 import flow_mvi.ConfigurationFactory
 import flow_mvi.configure
 import pro.respawn.flowmvi.api.Container
@@ -14,58 +17,52 @@ import ru.kpfu.itis.common.mapper.ErrorMapper
 import ru.kpfu.itis.features.task.data.store.UserStore
 import ru.kpfu.itis.features.user.data.repository.UserRepository
 
-class SignInContainer(
+class SignUpContainer(
     private val errorMapper: ErrorMapper,
     private val userRepository: UserRepository,
     private val configurationFactory: ConfigurationFactory,
     private val userStore: UserStore,
     private val emailValidator: Validator,
     private val passwordValidator: Validator,
-) : Container<SignInState, SignInIntent, SignInAction> {
+) : Container<SignUpState, SignUpIntent, SignUpAction> {
 
-    override val store: Store<SignInState, SignInIntent, SignInAction> =
-        store(SignInState.Initial) {
-            configure(configurationFactory, "SignIn")
+    override val store: Store<SignUpState, SignUpIntent, SignUpAction> =
+        store(SignUpState.Initial) {
+            configure(configurationFactory, "SignUp")
 
             recover { exception ->
                 updateState {
-                    SignInState.InternalError(errorMapper.map(exception = exception))
+                    SignUpState.InternalError(errorMapper.map(exception = exception))
                 }
                 null
             }
 
             reduce { intent ->
                 when (intent) {
-                    is SignInIntent.Outer.Login -> {
-                        login(intent.email, intent.password)
-                    }
 
-                    SignInIntent.Outer.SignUp -> {
-                        action(SignInAction.OpenSignUpScreen)
-                        updateState { SignInState.Initial }
-                    }
+                    is SignUpIntent.SignUp -> signup(intent.email, intent.password)
 
-                    SignInIntent.Outer.TryAgain -> {
-                        withState {
-                            when(this){
-                                is SignInState.NetworkError ->{
-                                    login(
-                                        email = this.email,
-                                        password = this.password
-                                    )
-                                }
-                                is SignInState.InternalError ->{
-                                    updateState { SignInState.Initial }
-                                }
-                                else -> Unit
+                    SignUpIntent.TryAgain -> withState {
+                        when(this){
+                            is SignUpState.NetworkError ->{
+                                signup(
+                                    email = this.email,
+                                    password = this.password
+                                )
                             }
+                            is SignUpState.InternalError ->{
+                                updateState { SignUpState.Initial }
+                            }
+                            else -> Unit
                         }
                     }
+
+                    SignUpIntent.SignIn -> action(SignUpAction.OpenSignInScreen)
                 }
             }
         }
 
-    private suspend fun PipelineContext<SignInState, SignInIntent, SignInAction>.login(
+    private suspend fun PipelineContext<SignUpState, SignUpIntent, SignUpAction>.signup(
         email: String,
         password: String
     ) {
@@ -73,21 +70,21 @@ class SignInContainer(
         val isPasswordValid = passwordValidator.validate(password)
 
         if (isPasswordValid && isEmailValid) {
-            updateState { SignInState.Loading }
-            val data = userRepository.signIn(email, password)
+            updateState { SignUpState.Loading }
+            val data = userRepository.signUp(email, password)
             when {
                 data.data != null -> {
                     userStore.setUserID(data.data!!.id)
-                    action(SignInAction.OpenMainScreen(data.data!!.id))
-                    updateState { SignInState.Initial }
+                    action(SignUpAction.OpenMainScreen(data.data!!.id))
+                    updateState { SignUpState.Initial }
                 }
 
                 data.error != null -> {
                     updateState {
-                        SignInState.NetworkError(email = email, password = password)
+                        SignUpState.NetworkError(email = email, password = password)
                     }
                     action(
-                        SignInAction.ShowSnackbar(
+                        SignUpAction.ShowSnackbar(
                             text = data.error?.title.orEmpty(),
                             actionLabel = "Try again",
                         )
@@ -106,8 +103,9 @@ class SignInContainer(
                         add(InputField.PASSWORD)
                     }
                 }
-                SignInState.ValidationError(fieldErrors)
+                SignUpState.ValidationError(fieldErrors)
             }
         }
     }
+
 }

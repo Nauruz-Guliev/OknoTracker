@@ -53,6 +53,7 @@ import design_system.button.OFloatingButton
 import design_system.button.ORadioButton
 import design_system.screens.OLoadingScreen
 import design_system.textfield.OTextField
+import dev.icerock.moko.resources.compose.stringResource
 import extensions.convertToString
 import extensions.isPastTime
 import extensions.mapToByteArray
@@ -146,7 +147,8 @@ fun TaskBottomSheet(
                             label = "Enter task name",
                             isEnabled = isEditingMode,
                             characterMaxCount = InputField.NAME.maxLength,
-                            errorText = state.findFieldError(InputField.NAME),
+                            errorText = state.findFieldError(InputField.NAME)
+                                ?.let { stringResource(it) },
                         )
 
                         OTextField(
@@ -158,7 +160,8 @@ fun TaskBottomSheet(
                             maxLines = 8,
                             isEnabled = isEditingMode,
                             characterMaxCount = InputField.DESCRIPTION.maxLength,
-                            errorText = state.findFieldError(InputField.DESCRIPTION),
+                            errorText = state.findFieldError(InputField.DESCRIPTION)
+                                ?.let { stringResource(it) },
                         )
                     }
 

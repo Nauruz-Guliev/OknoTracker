@@ -11,12 +11,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
-import dev.icerock.moko.resources.StringResource
-import dev.icerock.moko.resources.compose.stringResource
-import javax.swing.Icon
 
 @Composable
 fun OTextField(
@@ -25,8 +23,9 @@ fun OTextField(
     text: String,
     modifier: Modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp),
     isPassword: Boolean = false,
-    errorText: StringResource? = null,
-    icon: Icon? = null,
+    errorText: String? = null,
+    errorIcon: ImageVector = Icons.Default.Warning,
+    initialIcon: ImageVector? = null,
     characterMaxCount: Int? = null,
     maxLines: Int = 1,
     isEnabled: Boolean = true,
@@ -43,10 +42,10 @@ fun OTextField(
         },
         label = { Text(label) },
         supportingText = {
-            if(errorText != null){
+            if (errorText != null) {
                 Row {
                     Text(
-                        text = stringResource(errorText),
+                        text = errorText,
                         Modifier.weight(1f)
                     )
                     characterMaxCount?.let {
@@ -61,13 +60,19 @@ fun OTextField(
         maxLines = maxLines,
         isError = errorText != null,
         trailingIcon = {
-            errorText?.let {
-                Icon(
-                    imageVector = Icons.Filled.Warning,
-                    contentDescription = stringResource(errorText),
-                    tint = MaterialTheme.colorScheme.error
-                )
-            } ?: icon
+            when {
+                errorText != null ->{
+                    Icon(
+                        imageVector = errorIcon,
+                        contentDescription = errorText,
+                        tint = MaterialTheme.colorScheme.error
+                    )
+                }
+
+                initialIcon != null -> {
+                    Icon(imageVector = initialIcon, contentDescription = initialIcon.toString())
+                }
+            }
         }
     )
 }

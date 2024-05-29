@@ -71,7 +71,7 @@ object SettingsTab : Tab {
         val state by subscribe { action ->
             when (action) {
                 is SettingsAction.Logout -> {
-                    navigator?.replace(SignInScreen())
+                    navigator?.replaceAll(SignInScreen())
                 }
 
                 is SettingsAction.ShowSnackbar -> {
