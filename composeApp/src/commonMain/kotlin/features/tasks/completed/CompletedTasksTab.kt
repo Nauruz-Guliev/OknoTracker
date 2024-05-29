@@ -18,13 +18,13 @@ import androidx.compose.material.rememberDismissState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -38,7 +38,6 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
 import design_system.card.OTaskCard
-import design_system.screens.EmptyTasksState
 import design_system.screens.OErrorScreen
 import extensions.convertToString
 import extensions.startFlowMvi
@@ -66,129 +65,123 @@ object CompletedTasksTab : Tab {
         val sheetState = rememberModalBottomSheetState()
         var selectedTaskId by rememberSaveable { mutableStateOf<Long?>(null) }
         val snackbarHostState = remember { SnackbarHostState() }
-        var itemList by rememberSaveable { mutableStateOf(listOf<TaskModel>()) }
+        val itemList = remember { mutableStateListOf<TaskModel>() }
         var showEmptyState by rememberSaveable { mutableStateOf(true) }
 
-        Scaffold(
-            snackbarHost = {
-                SnackbarHost(snackbarHostState)
-            },
-        ) {
+        Box(modifier = Modifier.fillMaxSize()) {
 
-            Box(
-                modifier = Modifier.fillMaxSize()
-                    .padding(it)
-            ) {
-
-                val state by subscribe { action ->
-                    when (action) {
-                        is CompletedTasksAction.OpenTaskBottomSheet -> {
-                            selectedTaskId = action.taskId
-                            showBottomSheet = true
-                        }
-
-                        CompletedTasksAction.SignOut -> {
-                            navigator?.replace(SignInScreen())
-                        }
-
-                        is CompletedTasksAction.ShowSnackbar -> {
-                            action.message?.let { it1 -> snackbarHostState.showSnackbar(it1) }
-                        }
+            val state by subscribe { action ->
+                when (action) {
+                    is CompletedTasksAction.OpenTaskBottomSheet -> {
+                        selectedTaskId = action.taskId
+                        showBottomSheet = true
                     }
-                }
 
-                if (itemList.isEmpty() && showEmptyState) {
-                    EmptyTasksState()
-                }
-
-                LazyColumn(modifier = Modifier.fillMaxSize()) {
-                    items(
-                        items = itemList,
-                        key = {
-                            it.id
-                        }
-                    ) { task ->
-                        val dismissState = rememberDismissState(
-                            confirmStateChange = {
-                                if (it == DismissValue.DismissedToStart) {
-                                    intent(CompletedTasksIntent.DeleteTask(task.id))
-                                }
-                                true
-                            }
-                        )
-                        SwipeToDismiss(
-                            state = dismissState,
-                            directions = setOf(DismissDirection.EndToStart),
-                            background = {
-                                val color = when (dismissState.dismissDirection) {
-                                    DismissDirection.EndToStart -> MaterialTheme.colorScheme.errorContainer
-                                    else -> Color.Transparent
-                                }
-                                Box(
-                                    modifier = Modifier.fillMaxSize()
-                                        .background(color)
-                                        .padding(8.dp),
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Default.Delete,
-                                        contentDescription = "Delete",
-                                        tint = MaterialTheme.colorScheme.onPrimary,
-                                        modifier = Modifier.align(Alignment.CenterEnd)
-                                    )
-                                }
-                            },
-                            dismissContent = {
-                                OTaskCard(
-                                    onCheckedAction = { isChecked, taskId ->
-                                        intent(CompletedTasksIntent.TaskChecked(isChecked, taskId))
-                                    },
-                                    task = task,
-                                    labels = buildList {
-                                        add(
-                                            task.priority to TaskPriority.get(task.priority)
-                                                .mapToColor()
-                                        )
-                                        task.deadlineTime?.let {
-                                            add(
-                                                LocalDateTime.parse(it)
-                                                    .convertToString() to secondaryContainerLight
-                                            )
-                                        }
-                                    }
-                                ) {
-                                    intent(CompletedTasksIntent.EditTask(it))
-                                }
-                            }
-                        )
+                    CompletedTasksAction.SignOut -> {
+                        navigator?.replace(SignInScreen())
                     }
-                }
 
-                when (state) {
-                    is OTrackerState.Initial -> {
+                    is CompletedTasksAction.ShowSnackbar -> {
                         intent(CompletedTasksIntent.LoadTasks)
-                    }
-
-                    is OTrackerState.Success -> {
-                        showEmptyState = false
-                        LaunchedEffect(Unit) {
-                            (state as OTrackerState.Success<Flow<List<TaskModel>>>).data.collectLatest {
-                                itemList = it
-                            }
-                        }
-                    }
-
-                    is OTrackerState.Loading -> {}
-                    is OTrackerState.Error -> {
-                        showEmptyState = false
-                        OErrorScreen(
-                            errorModel = (state as OTrackerState.Error).error,
-                            onClickAction = {
-                                intent(CompletedTasksIntent.LoadTasks)
-                            }
-                        )
+                        action.message?.let { it1 -> snackbarHostState.showSnackbar(it1) }
                     }
                 }
             }
+
+
+            LazyColumn(modifier = Modifier.fillMaxSize()) {
+                items(
+                    items = itemList,
+                    key = {
+                        it.id
+                    }
+                ) { task ->
+                    val dismissState = rememberDismissState(
+                        confirmStateChange = {
+                            if (it == DismissValue.DismissedToStart) {
+                                itemList.removeIf { task.id == it.id }
+                                intent(CompletedTasksIntent.DeleteTask(task.id))
+                            }
+                            true
+                        }
+                    )
+                    SwipeToDismiss(
+                        state = dismissState,
+                        directions = setOf(DismissDirection.EndToStart),
+                        background = {
+                            val color = when (dismissState.dismissDirection) {
+                                DismissDirection.EndToStart -> MaterialTheme.colorScheme.errorContainer
+                                else -> Color.Transparent
+                            }
+                            Box(
+                                modifier = Modifier.fillMaxSize()
+                                    .background(color)
+                                    .padding(8.dp),
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Delete,
+                                    contentDescription = "Delete",
+                                    tint = MaterialTheme.colorScheme.onPrimary,
+                                    modifier = Modifier.align(Alignment.CenterEnd)
+                                )
+                            }
+                        },
+                        dismissContent = {
+                            OTaskCard(
+                                onCheckedAction = { isChecked, taskId ->
+                                    intent(CompletedTasksIntent.TaskChecked(isChecked, taskId))
+                                },
+                                task = task,
+                                labels = buildList {
+                                    add(
+                                        task.priority to TaskPriority.get(task.priority)
+                                            .mapToColor()
+                                    )
+                                    task.deadlineTime?.let {
+                                        add(
+                                            LocalDateTime.parse(it)
+                                                .convertToString() to secondaryContainerLight
+                                        )
+                                    }
+                                }
+                            ) {
+                                intent(CompletedTasksIntent.EditTask(it))
+                            }
+                        }
+                    )
+                }
+            }
+
+            when (state) {
+                is OTrackerState.Initial -> {
+                    intent(CompletedTasksIntent.LoadTasks)
+                }
+
+                is OTrackerState.Success -> {
+                    showEmptyState = false
+                    LaunchedEffect(Unit) {
+                        (state as OTrackerState.Success<Flow<List<TaskModel>>>).data.collectLatest {
+                            itemList.clear()
+                            itemList.addAll(it)
+                        }
+                    }
+                }
+
+                is OTrackerState.Loading -> {}
+                is OTrackerState.Error -> {
+                    showEmptyState = false
+                    OErrorScreen(
+                        errorModel = (state as OTrackerState.Error).error,
+                        onClickAction = {
+                            intent(CompletedTasksIntent.LoadTasks)
+                        }
+                    )
+                }
+            }
+            SnackbarHost(
+                modifier = Modifier.align(Alignment.BottomCenter),
+                hostState = snackbarHostState
+            )
         }
 
         if (showBottomSheet) {

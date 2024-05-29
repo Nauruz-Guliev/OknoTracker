@@ -14,6 +14,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import dev.icerock.moko.resources.StringResource
+import dev.icerock.moko.resources.compose.stringResource
 import javax.swing.Icon
 
 @Composable
@@ -23,7 +25,7 @@ fun OTextField(
     text: String,
     modifier: Modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp),
     isPassword: Boolean = false,
-    errorText: String? = null,
+    errorText: StringResource? = null,
     icon: Icon? = null,
     characterMaxCount: Int? = null,
     maxLines: Int = 1,
@@ -44,7 +46,7 @@ fun OTextField(
             if(errorText != null){
                 Row {
                     Text(
-                        text = errorText,
+                        text = stringResource(errorText),
                         Modifier.weight(1f)
                     )
                     characterMaxCount?.let {
@@ -62,7 +64,7 @@ fun OTextField(
             errorText?.let {
                 Icon(
                     imageVector = Icons.Filled.Warning,
-                    contentDescription = errorText,
+                    contentDescription = stringResource(errorText),
                     tint = MaterialTheme.colorScheme.error
                 )
             } ?: icon

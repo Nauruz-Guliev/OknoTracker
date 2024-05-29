@@ -34,6 +34,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -85,6 +86,7 @@ object HomeTasksTab : Tab {
 
                     is HomeTasksAction.ShowSnackbar -> {
                         action.message?.let { it1 -> snackbarHostState.showSnackbar(it1) }
+                        intent(HomeTasksIntent.LoadTasks)
                     }
 
                     HomeTasksAction.SignOut -> {
@@ -112,7 +114,7 @@ object HomeTasksTab : Tab {
                             isAllTasksEnabled = !isAllTasksEnabled
                             intent(HomeTasksIntent.LoadTasks)
                         },
-                        store = this@with
+                        store = this@with,
                     )
                 }
 
@@ -134,6 +136,11 @@ object HomeTasksTab : Tab {
                     )
                 }
             }
+
+            SnackbarHost(
+                modifier = Modifier.align(Alignment.BottomCenter),
+                hostState = snackbarHostState
+            )
         }
 
         if (showBottomSheet) {
@@ -151,7 +158,6 @@ object HomeTasksTab : Tab {
                 )
             }
         }
-        SnackbarHost(snackbarHostState)
     }
 
     override val options: TabOptions
@@ -172,7 +178,7 @@ object HomeTasksTab : Tab {
 
 @Composable
 fun SuccessState(
-    itemList: List<TaskModel>,
+    itemList: SnapshotStateList<TaskModel>,
     allTaskEnabledAction: () -> Unit,
     isAllTasksEnabled: Boolean,
     store: Store<OTrackerState<Flow<List<TaskModel>>>, HomeTasksIntent, HomeTasksAction>,
@@ -197,7 +203,7 @@ fun SuccessState(
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun TasksList(
-    itemList: List<TaskModel>,
+    itemList: SnapshotStateList<TaskModel>,
     store: Store<OTrackerState<Flow<List<TaskModel>>>, HomeTasksIntent, HomeTasksAction>
 ) {
     LazyColumn(modifier = Modifier.fillMaxSize()) {
@@ -210,6 +216,7 @@ fun TasksList(
             val dismissState = rememberDismissState(
                 confirmStateChange = {
                     if (it == DismissValue.DismissedToStart) {
+                        itemList.remove(task)
                         store.intent(HomeTasksIntent.DeleteTask(task.id))
                     }
                     true

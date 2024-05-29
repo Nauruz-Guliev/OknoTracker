@@ -20,5 +20,17 @@ enum class InputField(
         errorText = OResources.Login.emailError(),
         labelText = OResources.Login.emailLabel(),
         maxLength = null
+    ),
+    NAME(
+        regex = "^.{1,100}$",
+        errorText = OResources.SingleTask.singleTaskNameError(),
+        labelText = OResources.SingleTask.singleTaskNameLabel(),
+        maxLength = 100
+    ),
+    DESCRIPTION(
+        regex = "^.{1,100}$",
+        errorText = OResources.SingleTask.singleTaskDescriptionError(),
+        labelText = OResources.SingleTask.singleTaskDescriptionError(),
+        maxLength = 100
     )
 }

@@ -19,6 +19,4 @@ sealed interface SignInIntent : MVIIntent {
 
         data object TryAgain : Outer
     }
-
-
 }
