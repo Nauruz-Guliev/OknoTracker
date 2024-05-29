@@ -13,8 +13,7 @@
     </string>
     <string name="login_email_error">The email must contain '@' symbol, domain name and top-level domain that
         is 2 to 6 letters long, the use of Cyrillic alphabet is prohibited</string>
-    <string name="login_password_error">The password must consist of 8 to 20 characters, the use of
-        Cyrillic alphabet is prohibited
+    <string name="login_password_error">The password must consist of 8 to 20 characters, contain al least one uppercase, lowercase character, digit and special symbol
     </string>
 
     <!--    statistics-->
@@ -33,7 +32,7 @@
     <string name="settings_item_dark_theme">Dark theme</string>
     <string name="settings_item_notifications">Reminders</string>
     <string name="settings_item_logout">Logout</string>
-    <string name="setting_successful_logout">Ыuccessful logout</string>
+    <string name="setting_successful_logout">Successful logout</string>
 
 <!--    common-->
 <!--    notifications-->

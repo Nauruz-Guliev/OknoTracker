@@ -92,9 +92,9 @@ class SignInScreen : Screen {
                 )
             }
 
-            SignInState.Initial -> InitialContent(state)
-            is SignInState.ValidationError -> InitialContent(state)
-            is SignInState.NetworkError -> Unit
+            is SignInState.ValidationError, is SignInState.NetworkError, SignInState.Initial -> InitialContent(
+                state
+            )
         }
     }
 }
@@ -133,7 +133,7 @@ private fun IntentReceiver<SignInIntent>.InitialContent(
                 label = stringResource(InputField.EMAIL.labelText),
                 text = email,
                 characterMaxCount = InputField.PASSWORD.maxLength,
-                errorText = state.findFieldError(InputField.EMAIL)
+                errorText = state.findFieldError(InputField.EMAIL)?.let{ stringResource(it) }
             )
 
             Spacer(
@@ -145,7 +145,8 @@ private fun IntentReceiver<SignInIntent>.InitialContent(
                 label = stringResource(InputField.PASSWORD.labelText),
                 text = password,
                 characterMaxCount = InputField.PASSWORD.maxLength,
-                errorText = state.findFieldError(InputField.PASSWORD)
+                errorText = state.findFieldError(InputField.PASSWORD)?.let { stringResource(it) },
+                isPassword = true
             )
 
             Spacer(
