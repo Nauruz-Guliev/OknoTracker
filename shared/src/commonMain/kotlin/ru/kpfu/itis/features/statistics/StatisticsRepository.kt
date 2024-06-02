@@ -20,7 +20,6 @@ private class StatisticsRepositoryImpl(
             userId = userStore.getUserId() ?: error("Not authorized"),
         ).let(mapper::map)
     }
-
 }
 
 fun StatisticsRepository(

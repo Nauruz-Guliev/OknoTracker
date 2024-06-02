@@ -1,4 +1,4 @@
-package features.tasks.home
+package features.tasks.home.mvi
 
 import pro.respawn.flowmvi.api.MVIIntent
 import ru.kpfu.itis.common.model.ErrorModel

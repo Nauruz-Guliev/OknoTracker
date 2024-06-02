@@ -71,8 +71,8 @@ class SignInContainer(
         email: String,
         password: String
     ) {
-        val isEmailValid = true // emailValidator.validate(email)
-        val isPasswordValid = true // passwordValidator.validate(password)
+        val isEmailValid = emailValidator.validate(email)
+        val isPasswordValid = passwordValidator.validate(password)
 
         if (isPasswordValid && isEmailValid) {
             updateState { SignInState.Loading }

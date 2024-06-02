@@ -1,7 +1,7 @@
-package features.tasks.main
+package features.tasks.main.mvi
 
 import features.OTrackerState
-import flow_mvi.DefaultConfigurationFactory
+import flow_mvi.ConfigurationFactory
 import flow_mvi.configure
 import pro.respawn.flowmvi.api.Container
 import pro.respawn.flowmvi.api.Store
@@ -15,7 +15,7 @@ import ru.kpfu.itis.features.task.domain.model.TaskModel
 
 class MainContainer(
     private val errorMapper: ErrorMapper,
-    private val configurationFactory: DefaultConfigurationFactory,
+    private val configurationFactory: ConfigurationFactory,
     private val repository: TaskRepository,
     private val userStore: UserStore,
 ) : Container<OTrackerState<List<TaskModel>>, MainIntent, MainAction> {

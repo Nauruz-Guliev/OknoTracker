@@ -5,7 +5,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import java.util.Locale
 
-
 enum class TaskPriority(val value: String) {
 
     LOW("Low"), MEDIUM("Medium"), HIGH("High");

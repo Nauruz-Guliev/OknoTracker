@@ -2,7 +2,7 @@ package features.tasks.single
 
 import features.fileds.InputField
 import features.fileds.Validator
-import flow_mvi.DefaultConfigurationFactory
+import flow_mvi.ConfigurationFactory
 import flow_mvi.configure
 import kotlinx.coroutines.launch
 import pro.respawn.flowmvi.api.Container
@@ -23,7 +23,7 @@ import kotlin.io.encoding.ExperimentalEncodingApi
 class SingleTaskContainer(
     private val errorMapper: ErrorMapper,
     private val repository: TaskRepository,
-    private val configurationFactory: DefaultConfigurationFactory,
+    private val configurationFactory: ConfigurationFactory,
     private val userStore: UserStore,
     private val attachmentRepository: AttachmentRepository,
     private val nameValidator: Validator,

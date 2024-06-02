@@ -1,4 +1,4 @@
-package features.tasks.completed
+package features.tasks.completed.mvi
 
 import androidx.compose.runtime.Immutable
 import pro.respawn.flowmvi.api.MVIAction

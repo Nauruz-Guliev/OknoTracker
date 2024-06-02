@@ -21,11 +21,6 @@ fun App() {
     var userId by remember { mutableStateOf<Long?>(null) }
 
     runBlocking {
-        // LaunchedEffect could be used here
-        // but with LaunchedEffect we will not wait for result of coroutine and instantly navigate
-        // to MainScreen, then, after a small delay, we will be navigated to SignInScreen
-        // which is not expected behaviour
-        // therefore runBlocking is the best choice
         userId = store.getUserId()
     }
 

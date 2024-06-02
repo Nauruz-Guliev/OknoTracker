@@ -12,6 +12,7 @@ interface SettingStorage {
 }
 
 private class SettingStorageImpl(private val store: KStore<List<SettingItemDto>>) : SettingStorage {
+
     override suspend fun updateSetting(item: SettingItem): List<SettingItem> {
         store.update { saved ->
             if (saved == null) return@update saved
@@ -32,7 +33,6 @@ private class SettingStorageImpl(private val store: KStore<List<SettingItemDto>>
     override suspend fun getAll(): List<SettingItem> {
         return store.get()?.toDomainList() ?: emptyList()
     }
-
 }
 
 fun SettingStorage(baseFilePath: String): SettingStorage =

@@ -1,4 +1,4 @@
-package features.tasks.completed
+package features.tasks.completed.mvi
 
 import pro.respawn.flowmvi.api.MVIIntent
 

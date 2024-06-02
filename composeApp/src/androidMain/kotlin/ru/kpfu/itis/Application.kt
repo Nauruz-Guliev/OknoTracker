@@ -5,15 +5,19 @@ import features.settings.di.settingsModule
 import features.signin.di.signInModule
 import features.signup.di.signUpModule
 import features.statistics.di.statisticsModule
-import features.tasks.tasksModule
+import features.tasks.completed.di.completedTasksModule
+import features.tasks.home.di.homeTasksModule
+import features.tasks.main.di.mainTasksModule
+import features.tasks.single.di.singleTaskModule
+import flow_mvi.flowMviModule
 import initKoin
 import org.koin.android.ext.android.inject
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
-import ru.kpfu.itis.common.data.driver.databaseModule
 import ru.kpfu.itis.di.androidModule
 import ru.kpfu.itis.di.dbModule
 import ru.kpfu.itis.di.dispatcherModule
+import ru.kpfu.itis.di.mapperModule
 import ru.kpfu.itis.di.networkModule
 import ru.kpfu.itis.di.notifications.notificationsModule
 import ru.kpfu.itis.di.repositoryModule
@@ -25,26 +29,35 @@ class Application : Application() {
     override fun onCreate() {
         super.onCreate()
         initKoin(
-            signInModule(),
+            // data modules
             networkModule(),
             androidModule(),
-            tasksModule(),
-            databaseModule(),
-            dbModule(),
-            kstoreModule(cacheDir.path),
-            settingsModule(),
-            dispatcherModule(),
-            statisticsModule(),
-            repositoryModule(),
             serviceModule(),
+            mapperModule(),
+            dbModule(),
+            repositoryModule(),
+            kstoreModule(cacheDir.path),
+            // feature modules
+            signInModule(),
+            settingsModule(),
+            statisticsModule(),
+            signUpModule(),
+            completedTasksModule(),
+            homeTasksModule(),
+            mainTasksModule(),
+            singleTaskModule(),
+            // utils module
+            dispatcherModule(),
             notificationsModule(),
-            signUpModule()
+            flowMviModule(),
         ) {
             androidContext(this@Application)
         }
-
         createNotificationChannel()
     }
+
+    private fun kstoreModule(filePath: String) = module { factory { filePath } }
+
 
     private fun createNotificationChannel() {
         val notificationProvider: AndroidNotificationChannelProvider by inject()
@@ -54,7 +67,4 @@ class Application : Application() {
             channelDescription = getString(OResources.Notification.notificationChannelDescription().resourceId),
         )
     }
-
 }
-
-fun kstoreModule(filePath: String) = module { factory { filePath } }

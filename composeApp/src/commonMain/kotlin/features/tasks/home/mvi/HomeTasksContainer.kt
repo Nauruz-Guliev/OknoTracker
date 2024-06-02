@@ -1,7 +1,7 @@
-package features.tasks.home
+package features.tasks.home.mvi
 
 import features.OTrackerState
-import flow_mvi.DefaultConfigurationFactory
+import flow_mvi.ConfigurationFactory
 import flow_mvi.configure
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
@@ -19,7 +19,7 @@ import ru.kpfu.itis.features.task.domain.model.TaskModel
 class HomeTasksContainer(
     private val errorMapper: ErrorMapper,
     private val repository: TaskRepository,
-    private val configurationFactory: DefaultConfigurationFactory,
+    private val configurationFactory: ConfigurationFactory,
     private val userStore: UserStore,
 ) : Container<OTrackerState<Flow<List<TaskModel>>>, HomeTasksIntent, HomeTasksAction> {
 

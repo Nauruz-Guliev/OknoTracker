@@ -3,8 +3,6 @@ package features.signin.di
 import features.fileds.InputField
 import features.fileds.Validator
 import features.signin.mvi.SignInContainer
-import flow_mvi.ConfigurationFactory
-import flow_mvi.DefaultConfigurationFactory
 import org.koin.dsl.module
 import ru.kpfu.itis.common.mapper.ErrorMapper
 import ru.kpfu.itis.features.user.data.repository.UserRepository
@@ -29,8 +27,5 @@ fun signInModule() = module {
     }
     single {
         UserService(get(), get())
-    }
-    single<ConfigurationFactory> {
-        DefaultConfigurationFactory()
     }
 }

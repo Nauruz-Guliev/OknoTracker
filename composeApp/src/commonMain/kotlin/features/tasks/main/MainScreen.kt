@@ -44,6 +44,9 @@ import features.settings.SettingsTab
 import features.statistics.StatisticsTab
 import features.tasks.completed.CompletedTasksTab
 import features.tasks.home.HomeTasksTab
+import features.tasks.main.mvi.MainAction
+import features.tasks.main.mvi.MainContainer
+import features.tasks.main.mvi.MainIntent
 import features.tasks.single.TaskBottomSheet
 import org.koin.compose.koinInject
 import pro.respawn.flowmvi.compose.dsl.subscribe

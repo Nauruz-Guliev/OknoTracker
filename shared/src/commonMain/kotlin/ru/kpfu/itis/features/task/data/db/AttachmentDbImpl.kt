@@ -39,7 +39,7 @@ class AttachmentDbImpl(
     }
 
     internal fun deleteAttachment(id: Long) {
-        dbQuery.deleteAllAttachments()
+        dbQuery.deleteAttachment(id)
     }
 
     internal fun saveAttachment(attachment: AttachmentDto) {

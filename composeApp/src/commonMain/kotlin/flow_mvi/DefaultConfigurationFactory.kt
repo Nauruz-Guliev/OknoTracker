@@ -14,6 +14,7 @@ import pro.respawn.flowmvi.savedstate.dsl.JsonSaver
 import pro.respawn.flowmvi.savedstate.plugins.saveStatePlugin
 
 class DefaultConfigurationFactory : ConfigurationFactory {
+
     override fun <S : MVIState> saver(
         serializer: KSerializer<S>,
         fileName: String,
