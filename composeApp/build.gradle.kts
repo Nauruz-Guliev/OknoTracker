@@ -39,9 +39,6 @@ kotlin {
             implementation(compose.runtime)
             implementation(compose.foundation)
             implementation(compose.material3)
-
-            // material 2 used for bottom nav bar
-            implementation(compose.material)
             implementation(compose.ui)
             implementation(compose.components.resources)
             implementation(compose.components.uiToolingPreview)
@@ -81,6 +78,9 @@ kotlin {
 
             // image loader (for files)
             api(libs.image.loader)
+
+            // immutable collections
+            implementation(libs.kotlinx.collections.immutable)
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)

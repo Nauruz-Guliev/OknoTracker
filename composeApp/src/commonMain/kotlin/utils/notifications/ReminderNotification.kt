@@ -1,4 +1,4 @@
-package features.notifications
+package utils.notifications
 
 import ru.kpfu.itis.OResources
 import ru.kpfu.itis.features.notifications.CommonNotificationManager

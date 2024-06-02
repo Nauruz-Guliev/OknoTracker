@@ -1,4 +1,4 @@
-package features.fileds
+package utils.validation
 
 import dev.icerock.moko.resources.StringResource
 import ru.kpfu.itis.OResources

@@ -1,7 +1,5 @@
 package features.tasks.single
 
-import features.fileds.InputField
-import features.fileds.Validator
 import flow_mvi.ConfigurationFactory
 import flow_mvi.configure
 import kotlinx.coroutines.launch
@@ -17,6 +15,8 @@ import ru.kpfu.itis.features.task.data.repository.TaskRepository
 import ru.kpfu.itis.features.task.data.store.UserStore
 import ru.kpfu.itis.features.task.domain.model.AttachmentModel
 import ru.kpfu.itis.features.task.domain.model.TaskModel
+import utils.validation.InputField
+import utils.validation.Validator
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 

@@ -2,9 +2,9 @@ package features.signin.mvi
 
 import androidx.compose.runtime.Immutable
 import dev.icerock.moko.resources.StringResource
-import features.fileds.InputField
 import pro.respawn.flowmvi.api.MVIState
 import ru.kpfu.itis.common.model.ErrorModel
+import utils.validation.InputField
 
 @Immutable
 sealed interface SignInState : MVIState {

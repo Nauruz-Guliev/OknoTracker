@@ -61,9 +61,8 @@ import extensions.convertToString
 import extensions.isPastTime
 import extensions.mapToByteArray
 import extensions.startFlowMvi
-import features.TaskPriority
-import features.fileds.InputField
-import features.mapToColor
+import features.tasks.TaskPriority
+import features.tasks.mapToColor
 import io.github.vinceglb.picker.core.Picker
 import io.github.vinceglb.picker.core.PickerSelectionMode
 import io.github.vinceglb.picker.core.PickerSelectionType
@@ -71,16 +70,13 @@ import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
-import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.koin.compose.koinInject
 import pro.respawn.flowmvi.api.Store
 import pro.respawn.flowmvi.compose.dsl.subscribe
 import ru.kpfu.itis.features.task.domain.model.TaskModel
+import utils.validation.InputField
 
-@OptIn(
-    ExperimentalMaterial3Api::class, ExperimentalResourceApi::class,
-    ExperimentalFoundationApi::class
-)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TaskBottomSheet(
     taskId: Long? = null,

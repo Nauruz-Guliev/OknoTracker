@@ -29,7 +29,6 @@ import design_system.textfield.OTextField
 import dev.icerock.moko.resources.compose.painterResource
 import dev.icerock.moko.resources.compose.stringResource
 import extensions.startFlowMvi
-import features.fileds.InputField
 import features.signin.mvi.SignInAction
 import features.signin.mvi.SignInContainer
 import features.signin.mvi.SignInIntent
@@ -41,6 +40,7 @@ import pro.respawn.flowmvi.api.IntentReceiver
 import pro.respawn.flowmvi.api.Store
 import pro.respawn.flowmvi.compose.dsl.subscribe
 import ru.kpfu.itis.OResources
+import utils.validation.InputField
 
 class SignInScreen : Screen {
 

@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <resources>
+
     <string name="url">https://okno-tracker.onrender.com/</string>
     <string name="unknown_error_title">Something went wrong</string>
-    <string name="unknown_error_details">
-        We are aware of this issue and are actively working to resolve it
+    <string name="unknown_error_details">We are aware of this issue and are actively working to
+        resolve it
     </string>
 
     <!--    login-->
@@ -38,6 +39,9 @@
     <string name="setting_successful_logout">Successful logout</string>
 
     <!--    common-->
+    <string name="save">Save</string>
+    <string name="exit">Exit</string>
+    <string name="delete">Delete</string>
     <!--    notifications-->
     <string name="notifications_channel_name">Reminder</string>
     <string name="notifications_channel_description">Daily reminder to finish tasks</string>

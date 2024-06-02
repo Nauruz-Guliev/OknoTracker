@@ -1,7 +1,5 @@
 package features.signin.mvi
 
-import features.fileds.InputField
-import features.fileds.Validator
 import flow_mvi.ConfigurationFactory
 import flow_mvi.configure
 import pro.respawn.flowmvi.api.Container
@@ -13,6 +11,8 @@ import pro.respawn.flowmvi.plugins.reduce
 import ru.kpfu.itis.common.mapper.ErrorMapper
 import ru.kpfu.itis.features.task.data.store.UserStore
 import ru.kpfu.itis.features.user.data.repository.UserRepository
+import utils.validation.InputField
+import utils.validation.Validator
 
 class SignInContainer(
     private val errorMapper: ErrorMapper,

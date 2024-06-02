@@ -1,7 +1,6 @@
 package features.settings.mvi
 
 
-import features.notifications.REMINDER_NOTIFICATION_ID
 import features.settings.SettingsState
 import features.settings.UiSettingItem
 import features.settings.toDomain
@@ -24,6 +23,7 @@ import ru.kpfu.itis.features.settings.data.SettingStorage
 import ru.kpfu.itis.features.settings.domain.SettingItem
 import ru.kpfu.itis.features.settings.domain.SettingKey
 import ru.kpfu.itis.features.task.data.store.UserStore
+import utils.notifications.REMINDER_NOTIFICATION_ID
 import java.util.Calendar
 
 class SettingsContainer(

@@ -1,9 +1,9 @@
 package features.signup.di
 
-import features.fileds.InputField
-import features.fileds.Validator
 import features.signup.mvi.SignUpContainer
 import org.koin.dsl.module
+import utils.validation.InputField
+import utils.validation.Validator
 
 fun signUpModule() = module {
     single<SignUpContainer> {

@@ -2,10 +2,10 @@ package features.tasks.single
 
 import androidx.compose.runtime.Immutable
 import dev.icerock.moko.resources.StringResource
-import features.fileds.InputField
 import pro.respawn.flowmvi.api.MVIState
 import ru.kpfu.itis.common.model.ErrorModel
 import ru.kpfu.itis.features.task.domain.model.TaskModel
+import utils.validation.InputField
 
 @Immutable
 sealed interface SingleTaskState : MVIState {

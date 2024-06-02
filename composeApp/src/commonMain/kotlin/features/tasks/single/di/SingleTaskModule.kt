@@ -1,9 +1,9 @@
 package features.tasks.single.di
 
-import features.fileds.InputField
-import features.fileds.Validator
 import features.tasks.single.SingleTaskContainer
 import org.koin.dsl.module
+import utils.validation.InputField
+import utils.validation.Validator
 
 fun singleTaskModule() = module {
     single {

@@ -13,6 +13,7 @@ object OResources {
         fun timePickerDialogTitle() = MR.strings.time_picker_dialog_title
         fun pickerDialogConfirmButton() = MR.strings.picker_dialog_confirm_button
         fun pickerDialogCancelButton() = MR.strings.picker_dialog_cancel_button
+        fun deleteText() = MR.strings.delete
     }
 
     object SignUp {
