@@ -42,12 +42,11 @@ import extensions.startFlowMvi
 import features.OTrackerState
 import features.settings.SettingsTab
 import features.statistics.StatisticsTab
-import features.tasks.completed.CompletedTasksTab
-import features.tasks.home.HomeTasksTab
+import features.tasks.completed.CompletedTasksScreen
+import features.tasks.home.HomeTasksScreen
 import features.tasks.main.mvi.MainAction
 import features.tasks.main.mvi.MainContainer
 import features.tasks.main.mvi.MainIntent
-import features.tasks.single.TaskBottomSheet
 import org.koin.compose.koinInject
 import pro.respawn.flowmvi.compose.dsl.subscribe
 
@@ -77,7 +76,7 @@ class MainScreen : Screen {
             }
         }
 
-        TabNavigator(HomeTasksTab) {
+        TabNavigator(HomeTasksScreen) {
 
             Scaffold(
                 topBar = {
@@ -112,11 +111,14 @@ class MainScreen : Screen {
                 },
                 sheetState = sheetState
             ) {
+                /*
                 TaskBottomSheet(
                     closeAction = {
                         showBottomSheet = false
                     },
                 )
+
+                 */
             }
         }
     }
@@ -136,8 +138,8 @@ class MainScreen : Screen {
                 modifier = Modifier.width(220.dp)
                     .padding(vertical = 24.dp, horizontal = 16.dp)
             ) {
-                TabNavigationItem(HomeTasksTab, onTabSelectedAction)
-                TabNavigationItem(CompletedTasksTab, onTabSelectedAction)
+                TabNavigationItem(HomeTasksScreen, onTabSelectedAction)
+                TabNavigationItem(CompletedTasksScreen, onTabSelectedAction)
                 TabNavigationItem(StatisticsTab, onTabSelectedAction)
                 TabNavigationItem(SettingsTab, onTabSelectedAction)
             }

@@ -3,7 +3,10 @@ package features.tasks.home.mvi
 import features.OTrackerState
 import flow_mvi.ConfigurationFactory
 import flow_mvi.configure
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import pro.respawn.flowmvi.api.Container
 import pro.respawn.flowmvi.api.Store
@@ -21,9 +24,8 @@ class HomeTasksContainer(
     private val repository: TaskRepository,
     private val configurationFactory: ConfigurationFactory,
     private val userStore: UserStore,
-) : Container<OTrackerState<Flow<List<TaskModel>>>, HomeTasksIntent, HomeTasksAction> {
-
-    override val store: Store<OTrackerState<Flow<List<TaskModel>>>, HomeTasksIntent, HomeTasksAction> =
+) : Container<OTrackerState<Flow<ImmutableList<TaskModel>>>, HomeTasksIntent, HomeTasksAction> {
+    override val store: Store<OTrackerState<Flow<ImmutableList<TaskModel>>>, HomeTasksIntent, HomeTasksAction> =
         store(OTrackerState.Initial) {
 
             configure(configurationFactory, "Tasks")
@@ -44,7 +46,10 @@ class HomeTasksContainer(
                             updateState { OTrackerState.Loading }
                             launch { repository.updateTasks(TaskType.ALL, userId) }
                             runCatching {
-                                updateState { OTrackerState.Success(repository.getCachedTasks()) }
+                                updateState {
+                                    OTrackerState.Success(
+                                        repository.getCachedTasks().map { it.toPersistentList() })
+                                }
                             }.onFailure {
                                 action(HomeTasksAction.ShowSnackbar(it.message))
                             }

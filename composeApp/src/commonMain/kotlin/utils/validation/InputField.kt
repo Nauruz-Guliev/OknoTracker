@@ -23,14 +23,14 @@ enum class InputField(
     ),
     NAME(
         regex = "^.{1,50}$",
-        errorText = OResources.SingleTask.singleTaskNameError(),
-        labelText = OResources.SingleTask.singleTaskNameLabel(),
+        errorText = OResources.SingleTask.nameError(),
+        labelText = OResources.SingleTask.nameLabel(),
         maxLength = 50
     ),
     DESCRIPTION(
         regex = "^.{1,500}$",
-        errorText = OResources.SingleTask.singleTaskDescriptionError(),
-        labelText = OResources.SingleTask.singleTaskDescriptionError(),
+        errorText = OResources.SingleTask.descriptionError(),
+        labelText = OResources.SingleTask.fieldDescriptionLabel(),
         maxLength = 500
     )
 }

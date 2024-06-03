@@ -1,9 +1,13 @@
-package features.tasks.single
+package features.tasks.single.mvi
 
+import extensions.isPastTime
 import flow_mvi.ConfigurationFactory
 import flow_mvi.configure
 import kotlinx.coroutines.launch
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import pro.respawn.flowmvi.api.Container
+import pro.respawn.flowmvi.api.FlowMVIDSL
 import pro.respawn.flowmvi.api.PipelineContext
 import pro.respawn.flowmvi.api.Store
 import pro.respawn.flowmvi.dsl.store
@@ -29,23 +33,18 @@ class SingleTaskContainer(
     private val nameValidator: Validator,
     private val descriptionValidator: Validator,
 ) : Container<SingleTaskState, SingleTaskIntent, SingleTaskAction> {
-
     @OptIn(ExperimentalEncodingApi::class)
     override val store: Store<SingleTaskState, SingleTaskIntent, SingleTaskAction> =
         store(SingleTaskState.Initial) {
-
             configure(configurationFactory, "SingleTask")
 
             recover { exception ->
-                updateState {
-                    SingleTaskState.Error.Internal(errorMapper.map(exception = exception))
-                }
+                action(SingleTaskAction.ShowSnackbar(errorMapper.map(exception = exception).title))
                 null
             }
 
             reduce { intent ->
                 val userId = userStore.getUserId()!!
-
                 when (intent) {
                     is SingleTaskIntent.CreateNew -> {
                         handleNetworkRequest {
@@ -67,15 +66,18 @@ class SingleTaskContainer(
 
                     is SingleTaskIntent.LoadTask -> {
                         updateState { SingleTaskState.Loading }
-                        if (intent.taskId != null) {
+                        intent.taskId?.let {
                             launch { attachmentRepository.updateAttachments(intent.taskId) }
                             handleNetworkRequest {
-                                repository.getTask(intent.taskId).also {
-                                    updateState { SingleTaskState.Success(it) }
-                                }
+                                repository.getTask(intent.taskId)
+                            } ?: TaskModel()
+                        }.also {
+                            updateState {
+                                SingleTaskState.Success(
+                                    it ?: TaskModel(),
+                                    emptyList()
+                                )
                             }
-                        } else {
-                            updateState { SingleTaskState.Success(TaskModel()) }
                         }
                     }
 
@@ -95,45 +97,72 @@ class SingleTaskContainer(
                                         content = Base64.encode(bytes)
                                     )
                                 )
-                                action(
-                                    SingleTaskAction.AddSelectedImage(
-                                        ImageModel(
-                                            bytes,
-                                            image.id
-                                        )
-                                    )
-                                )
+                                withState {
+                                }
                             }
                         }
-                    }
-
-                    is SingleTaskIntent.UiError -> {
-                        action(SingleTaskAction.ShowSnackbar(intent.message))
                     }
 
                     is SingleTaskIntent.DeleteAttachment -> {
                         handleNetworkRequest {
                             attachmentRepository.deleteAttachment(intent.id)
-                            action(SingleTaskAction.DeleteAttachment(intent.id))
+                            tryUpdateState { model ->
+                                model?.copy(attachments = model.attachments.filter { it.id != intent.id })
+                            }
+                        }
+                    }
+
+                    is SingleTaskIntent.OnDateSelected -> {
+                        val date = intent.date.toLocalDateTime(TimeZone.UTC)
+                        if (date.isPastTime()) {
+                            action(SingleTaskAction.ShowSnackbar("Past time"))
+                        } else {
+                            tryUpdateState { model ->
+                                model?.copy(deadlineTime = date.toString())
+                            }
+                        }
+                    }
+
+                    is SingleTaskIntent.OnPrioritySelected -> {
+                        tryUpdateState { model ->
+                            model?.copy(priority = intent.priority.name)
                         }
                     }
                 }
             }
         }
-
-    private suspend fun PipelineContext<SingleTaskState, SingleTaskIntent, SingleTaskAction>.handleNetworkRequest(
-        block: suspend () -> Unit
+    @FlowMVIDSL
+    private fun PipelineContext<SingleTaskState, *, *>.tryUpdateState(
+        block: (TaskModel?) -> TaskModel?,
     ) {
-        runCatching {
+        useState {
+            if (this is SingleTaskState.Success) {
+                block(this.taskModel)?.let {
+                    SingleTaskState.Success(
+                        it,
+                        emptyList()
+                    )
+                } ?: this
+            } else {
+                this
+            }
+        }
+    }
+
+    private suspend fun <T> PipelineContext<SingleTaskState, *, SingleTaskAction>.handleNetworkRequest(
+        block: suspend () -> T,
+    ): T? {
+        return try {
             block()
-        }.onFailure {
-            updateState { SingleTaskState.Error.Server(errorMapper.map(exception = it)) }
+        } catch (ex: Exception) {
+            action(SingleTaskAction.ShowSnackbar(ex.message.toString()))
+            null
         }
     }
 
     private suspend fun PipelineContext<SingleTaskState, SingleTaskIntent, SingleTaskAction>.handleTaskChange(
         taskModel: TaskModel,
-        block: suspend () -> Unit
+        block: suspend () -> Unit,
     ) {
         val isNameValid = nameValidator.validate(taskModel.name)
         val isDescriptionValid =
@@ -143,9 +172,8 @@ class SingleTaskContainer(
             isNameValid && isDescriptionValid -> {
                 block()
             }
-
             else -> {
-                updateState {
+                withState {
                     val fieldErrors = buildList {
                         if (!isNameValid) {
                             add(InputField.NAME)
@@ -154,7 +182,9 @@ class SingleTaskContainer(
                             add(InputField.DESCRIPTION)
                         }
                     }
-                    SingleTaskState.Error.Validation(fieldErrors)
+                    if (this is SingleTaskState.Success) {
+                        SingleTaskState.ValidationError(taskModel, fieldErrors)
+                    }
                 }
             }
         }

@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -16,391 +15,363 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material3.BasicAlertDialog
-import androidx.compose.material3.DatePicker
-import androidx.compose.material3.DatePickerDialog
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.OutlinedCard
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.SuggestionChipDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import base.BaseScreen
 import com.seiko.imageloader.ImageLoader
 import com.seiko.imageloader.component.fetcher.ByteArrayFetcher
 import com.seiko.imageloader.model.ImageRequest
 import com.seiko.imageloader.rememberImagePainter
 import design_system.button.OFloatingButton
-import design_system.button.ORadioButton
 import design_system.screens.OLoadingScreen
 import design_system.textfield.OTextField
 import dev.icerock.moko.resources.compose.stringResource
-import extensions.convertToString
-import extensions.isPastTime
-import extensions.mapToByteArray
-import extensions.startFlowMvi
+import features.tasks.DialogsOpener
 import features.tasks.TaskPriority
 import features.tasks.mapToColor
-import io.github.vinceglb.picker.core.Picker
-import io.github.vinceglb.picker.core.PickerSelectionMode
-import io.github.vinceglb.picker.core.PickerSelectionType
-import kotlinx.datetime.Instant
+import features.tasks.single.mvi.ImageModel
+import features.tasks.single.mvi.SingleTaskAction
+import features.tasks.single.mvi.SingleTaskContainer
+import features.tasks.single.mvi.SingleTaskIntent
+import features.tasks.single.mvi.SingleTaskState
 import kotlinx.datetime.LocalDateTime
-import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
-import org.koin.compose.koinInject
 import pro.respawn.flowmvi.api.Store
-import pro.respawn.flowmvi.compose.dsl.subscribe
+import ru.kpfu.itis.OResources
 import ru.kpfu.itis.features.task.domain.model.TaskModel
+import theme.LocalPaddingValues
 import utils.validation.InputField
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun TaskBottomSheet(
-    taskId: Long? = null,
-    closeAction: () -> Unit,
-) = with(koinInject<SingleTaskContainer>().store) {
-    startFlowMvi()
+class SingleTaskScreen(
+    private val taskId: Long? = null,
+    private val closeAction: () -> Unit,
+) : BaseScreen<SingleTaskState, SingleTaskIntent, SingleTaskAction>() {
+    @Composable
+    override fun Content() = withStore<SingleTaskContainer> {
+        val openDialog = remember { mutableStateOf<DialogsOpener>(DialogsOpener.None) }
+        Box {
+            HandleDialogRequest(
+                dialog = openDialog.value,
+                onDismissAction = {
+                    openDialog.value = DialogsOpener.None
+                }
+            )
+            action = { action ->
+                handleAction(action) {
+                    openDialog.value = it
+                }
+            }
+            currentState = { state ->
+                HandleState(state) {
+                    openDialog.value = it
+                }
+            }
+        }
+    }
+    @Composable
+    fun Store<*, SingleTaskIntent, *>.HandleState(
+        state: SingleTaskState,
+        openDialogAction: (DialogsOpener) -> Unit,
+    ) {
+        when (state) {
+            is SingleTaskState.Success -> {
+                InitialScreen(state.taskModel, state, openDialogAction)
+            }
 
-    var taskModel by remember { mutableStateOf<TaskModel?>(null) }
-    var taskTitle by remember { mutableStateOf("") }
-    var taskDescription by remember { mutableStateOf("") }
-    val snackbarHostState = remember { SnackbarHostState() }
-    var isEditingMode = remember { mutableStateOf(false) }
-    val datePickerState = rememberDatePickerState()
-    val confirmEnabled = derivedStateOf { datePickerState.selectedDateMillis != null }
-    var pickedDate by remember { mutableStateOf<LocalDateTime?>(null) }
-    val pickedPriority = remember { mutableStateOf(TaskPriority[taskModel?.priority.orEmpty()]) }
-    val listOfImages = remember { mutableStateListOf<ImageModel>() }
-    val openDialog = remember { mutableStateOf(DialogType.NONE) }
+            is SingleTaskState.Initial -> {
+                OLoadingScreen(
+                    modifier = Modifier.height(240.dp).fillMaxWidth()
+                )
+                intent(SingleTaskIntent.LoadTask(taskId))
+            }
 
-    val state by subscribe { action ->
+            is SingleTaskState.Loading -> {
+                OLoadingScreen(
+                    modifier = Modifier.height(240.dp).fillMaxWidth()
+                )
+            }
+
+            is SingleTaskState.ValidationError -> {
+                InitialScreen(state.taskModel, state, openDialogAction)
+            }
+        }
+    }
+
+    private fun handleAction(
+        action: SingleTaskAction,
+        openDialogAction: (DialogsOpener) -> Unit,
+    ) {
         when (action) {
             is SingleTaskAction.CloseBottomSheet -> {
                 closeAction()
             }
 
             is SingleTaskAction.ShowSnackbar -> {
-                snackbarHostState.showSnackbar(action.message)
-            }
-
-            is SingleTaskAction.AddSelectedImage -> {
-                listOfImages.add(action.image)
-            }
-
-            is SingleTaskAction.DeleteAttachment -> {
-                listOfImages.removeIf { it.id == action.id }
+                openDialogAction(DialogsOpener.SnackBar(action.message))
             }
         }
     }
+    @Composable
+    fun Store<*, SingleTaskIntent, *>.InitialScreen(
+        taskModel: TaskModel? = null,
+        state: SingleTaskState,
+        openDialogAction: (DialogsOpener) -> Unit = { },
+    ) {
+        val taskTitle = remember { mutableStateOf(taskModel?.name.orEmpty()) }
+        val taskDescription = remember { mutableStateOf(taskModel?.description.orEmpty()) }
+        val isEditingMode = remember { mutableStateOf(false) }
+        val pickedPriority = remember { mutableStateOf(TaskPriority.LOW) }
+        val pickedDate = remember { mutableStateOf<LocalDateTime?>(null) }
+        val listOfImages = mutableStateListOf<ImageModel>()
 
-    Box {
-        Column(
-            modifier = Modifier.fillMaxSize(),
+        pickedPriority.value = TaskPriority[taskModel?.priority.orEmpty()]
+        pickedDate.value = taskModel?.deadlineTime?.toLocalDateTime()
+
+        Column {
+            TaskTextFields(
+                state = state,
+                isEditingMode = isEditingMode.value,
+                taskTitle = taskTitle.value,
+                taskDescription = taskDescription.value,
+                onDescriptionChanged = {
+                    taskDescription.value = it
+                },
+                onTitleChanged = {
+                    taskTitle.value = it
+                }
+            )
+
+            Row {
+                TaskChips(
+                    onDialogOpenerAction = openDialogAction,
+                    isEditingMode = isEditingMode.value,
+                    pickedPriority = pickedPriority.value,
+                    pickedDate = pickedDate.value.toString()
+                )
+
+                TaskButtons(
+                    isEditingMode = isEditingMode.value,
+                    pickedPriority = pickedPriority.value,
+                    pickedDate = pickedDate.value,
+                    listOfImages = listOfImages,
+                    onEditingModeChanged = {
+                        isEditingMode.value = it
+                    },
+                    taskModel = taskModel,
+                    openDialogAction = openDialogAction,
+                    taskDescription = taskDescription.value,
+                    taskTitle = taskTitle.value
+                )
+
+                ImageList(listOfImages, isEditingMode)
+            }
+        }
+    }
+    @Composable
+    fun Store<*, SingleTaskIntent, *>.TaskButtons(
+        isEditingMode: Boolean,
+        openDialogAction: (DialogsOpener) -> Unit,
+        taskModel: TaskModel?,
+        taskDescription: String,
+        taskTitle: String,
+        pickedDate: LocalDateTime?,
+        pickedPriority: TaskPriority,
+        listOfImages: List<ImageModel>,
+        onEditingModeChanged: (Boolean) -> Unit,
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth()
+                .padding(horizontal = LocalPaddingValues.current.medium),
+            horizontalArrangement = Arrangement.End
         ) {
-            Column {
-                Spacer(
-                    modifier = Modifier.height(32.dp)
-                )
-
-                OTextField(
-                    text = taskTitle,
-                    onValueChange = {
-                        taskTitle = it
-                    },
-                    label = "Enter task name",
-                    isEnabled = isEditingMode.value,
-                    characterMaxCount = InputField.NAME.maxLength,
-                    errorText = state.findFieldError(InputField.NAME)?.let { stringResource(it) },
-                )
-
-                OTextField(
-                    text = taskDescription,
-                    onValueChange = {
-                        taskDescription = it
-                    },
-                    label = "Enter task description",
-                    maxLines = 8,
-                    isEnabled = isEditingMode.value,
-                    characterMaxCount = InputField.DESCRIPTION.maxLength,
-                    errorText = state.findFieldError(InputField.DESCRIPTION)
-                        ?.let { stringResource(it) },
-                )
-            }
-
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
-                horizontalArrangement = Arrangement.End
-            ) {
-                Column {
-                    SuggestionChip(
-                        onClick = {
-                            openDialog.value = DialogType.DATE
-                        },
-                        enabled = isEditingMode.value,
-                        label = {
-                            Text(pickedDate?.convertToString() ?: "Deadline")
-                        },
-                        icon = {
-                            Icon(
-                                imageVector = Icons.Default.DateRange,
-                                contentDescription = "Date"
-                            )
-                        }
-                    )
-
-                    SuggestionChip(
-                        onClick = {
-                            openDialog.value = DialogType.PRIORITY
-                        },
-                        enabled = isEditingMode.value,
-                        label = {
-                            Text("Priority: ${pickedPriority.value}")
-                        },
-                        colors = SuggestionChipDefaults.suggestionChipColors(
-                            containerColor = pickedPriority.value.mapToColor()
-                        )
-                    )
-                }
-
-                Spacer(Modifier.weight(1f))
-
-                if (taskId != null && isEditingMode.value) {
-                    OFloatingButton(
-                        icon = Icons.Default.Add,
-                        onClickedAction = {
-                            openDialog.value = DialogType.FILE_PICKER
-                        },
-                    )
-                }
-
-                Spacer(Modifier.width(8.dp))
-
+            Spacer(Modifier.weight(1f))
+            if (taskId != null && isEditingMode) {
                 OFloatingButton(
-                    icon = if (isEditingMode.value) Icons.Default.Done
-                    else Icons.Default.Lock,
+                    icon = Icons.Default.Add,
                     onClickedAction = {
-                        if (isEditingMode.value) {
-                            when (taskModel) {
-                                null -> {
-                                    intent(
-                                        SingleTaskIntent.CreateNew(
-                                            TaskModel(
-                                                description = taskDescription,
-                                                name = taskTitle,
-                                                deadlineTime = pickedDate?.toString(),
-                                                priority = pickedPriority.value.name
-                                            )
-                                        )
-                                    )
-                                }
-
-                                else -> {
-                                    taskModel?.let {
-                                        intent(
-                                            SingleTaskIntent.Edit(
-                                                it.copy(
-                                                    description = taskDescription,
-                                                    name = taskTitle,
-                                                    deadlineTime = pickedDate?.toString(),
-                                                    priority = pickedPriority.value.name
-                                                ),
-                                                listOfImages
-                                            )
-                                        )
-                                    }
-                                }
-                            }
-                        }
-                        isEditingMode.value = !isEditingMode.value
-                    }
+                        openDialogAction(DialogsOpener.FilePicker { file ->
+                            intent(SingleTaskIntent.OnFileSelected(file, taskId))
+                        })
+                    },
                 )
-
-                @Composable
-                fun PriorityRadioButton(taskPriority: TaskPriority) {
-                    ORadioButton(
-                        onPrioritySelected = {
-                            pickedPriority.value = taskPriority
-                            openDialog.value = DialogType.NONE
-                        },
-                        text = taskPriority.name,
-                        selected = pickedPriority.value == taskPriority,
-                        color = taskPriority.mapToColor()
+            }
+            Spacer(Modifier.width(LocalPaddingValues.current.small))
+            OFloatingButton(
+                icon = if (isEditingMode) Icons.Default.Done
+                else Icons.Default.Lock,
+                onClickedAction = {
+                    if (isEditingMode) {
+                        handleFloatingButtonClick(
+                            taskModel,
+                            taskDescription,
+                            taskTitle,
+                            pickedDate.toString(),
+                            pickedPriority.value,
+                            listOfImages
+                        )
+                    }
+                    onEditingModeChanged(!isEditingMode)
+                })
+        }
+    }
+    @Composable
+    fun Store<*, SingleTaskIntent, *>.TaskChips(
+        onDialogOpenerAction: (DialogsOpener) -> Unit,
+        isEditingMode: Boolean,
+        pickedDate: String,
+        pickedPriority: TaskPriority,
+    ) {
+        Column(modifier = Modifier.padding(horizontal = LocalPaddingValues.current.medium)) {
+            SuggestionChip(
+                onClick = {
+                    onDialogOpenerAction(DialogsOpener.DatePicker {
+                        intent(SingleTaskIntent.OnDateSelected(it))
+                    })
+                },
+                enabled = isEditingMode,
+                label = { Text(pickedDate) },
+                icon = {
+                    Icon(
+                        imageVector = Icons.Default.DateRange,
+                        contentDescription = stringResource(OResources.Common.imageText())
                     )
                 }
-
-                when (openDialog.value) {
-                    DialogType.DATE -> {
-                        DatePickerDialog(
-                            onDismissRequest = {
-                                openDialog.value = DialogType.NONE
-                            },
-                            confirmButton = {
-                                TextButton(
-                                    enabled = confirmEnabled.value,
-                                    onClick = {
-                                        openDialog.value = DialogType.NONE
-                                        val instant =
-                                            Instant.fromEpochMilliseconds(datePickerState.selectedDateMillis!!)
-
-                                        val date = instant.toLocalDateTime(TimeZone.UTC)
-                                        if (date.isPastTime()) {
-                                            intent(SingleTaskIntent.UiError("Past time can not be chosen as deadline."))
-                                        } else {
-                                            pickedDate = date
-                                        }
-                                    },
-                                    content = {
-                                        Text("Choose date")
-                                    },
-                                )
-                            },
-                            content = {
-                                DatePicker(datePickerState)
-                            },
-                        )
-                    }
-
-                    DialogType.FILE_PICKER -> {
-                        if (taskId != null) {
-                            LaunchedEffect(Unit) {
-                                val file = Picker.pickFile(
-                                    type = PickerSelectionType.Image,
-                                    mode = PickerSelectionMode.Single,
-                                    title = "Pick an image",
-                                    initialDirectory = "/"
-                                )
-                                openDialog.value = DialogType.NONE
-                                intent(SingleTaskIntent.OnFileSelected(file, taskId))
-                            }
-                        }
-                    }
-
-                    DialogType.PRIORITY -> {
-                        BasicAlertDialog(
-                            onDismissRequest = {
-                                openDialog.value = DialogType.NONE
-                            },
-                            content = {
-                                OutlinedCard(
-                                    modifier = Modifier.selectableGroup()
-                                        .padding(vertical = 8.dp),
-                                ) {
-                                    PriorityRadioButton(TaskPriority.LOW)
-                                    PriorityRadioButton(TaskPriority.MEDIUM)
-                                    PriorityRadioButton(TaskPriority.HIGH)
-                                }
-                            }
-                        )
-                    }
-
-                    DialogType.NONE -> {}
-                }
-            }
-
-            SnackbarHost(snackbarHostState)
-
-            ImageList(listOfImages, isEditingMode)
+            )
+            SuggestionChip(
+                onClick = {
+                    onDialogOpenerAction(DialogsOpener.PriorityPicker(pickedPriority) {
+                        intent(SingleTaskIntent.OnPrioritySelected(it))
+                    })
+                },
+                enabled = isEditingMode,
+                label = {
+                    Text(stringResource(OResources.SingleTask.priorityLabel(), pickedPriority))
+                },
+                colors = SuggestionChipDefaults.suggestionChipColors(
+                    containerColor = pickedPriority.mapToColor()
+                )
+            )
         }
+    }
+    @Composable
+    fun TaskTextFields(
+        state: SingleTaskState,
+        isEditingMode: Boolean,
+        taskTitle: String,
+        taskDescription: String,
+        onTitleChanged: (String) -> Unit,
+        onDescriptionChanged: (String) -> Unit,
+    ) {
+        Column {
+            Spacer(modifier = Modifier.height(LocalPaddingValues.current.extraLarge))
+            OTextField(
+                text = taskTitle,
+                onValueChange = onTitleChanged,
+                label = stringResource(OResources.SingleTask.fieldNameLabel()),
+                isEnabled = isEditingMode,
+                characterMaxCount = InputField.NAME.maxLength,
+                errorText = state.findFieldError(InputField.NAME)
+                    ?.let { stringResource(it) },
+            )
+            OTextField(
+                text = taskDescription,
+                onValueChange = onDescriptionChanged,
+                label = stringResource(OResources.SingleTask.fieldDescriptionLabel()),
+                maxLines = 8,
+                isEnabled = isEditingMode,
+                characterMaxCount = InputField.DESCRIPTION.maxLength,
+                errorText = state.findFieldError(InputField.DESCRIPTION)
+                    ?.let { stringResource(it) },
+            )
+        }
+    }
 
-        when (state) {
-            is SingleTaskState.Success -> {
-                taskModel = (state as SingleTaskState.Success).taskModel
-                taskTitle = taskModel?.name.orEmpty()
-                taskDescription = taskModel?.description.orEmpty()
-                pickedDate = taskModel?.deadlineTime?.let {
-                    LocalDateTime.parse(it)
-                }
-                pickedPriority.value = TaskPriority[taskModel?.priority ?: TaskPriority.LOW.name]
-                taskModel?.attachments?.mapToByteArray()?.let {
-                    listOfImages.clear()
-                    listOfImages.addAll(it)
-                }
-            }
-
-            is SingleTaskState.Initial -> {
-                taskId?.let { intent(SingleTaskIntent.LoadTask(it)) }
-            }
-
-            is SingleTaskState.Loading -> {
-                OLoadingScreen(
-                    modifier = Modifier.height(240.dp)
-                        .fillMaxWidth()
+    fun Store<*, SingleTaskIntent, *>.handleFloatingButtonClick(
+        taskModel: TaskModel?,
+        taskDescription: String,
+        taskTitle: String,
+        pickedDate: String,
+        pickedPriority: String,
+        listOfImages: List<ImageModel>,
+    ) {
+        when (taskModel) {
+            null -> {
+                intent(
+                    SingleTaskIntent.CreateNew(
+                        TaskModel(
+                            description = taskDescription,
+                            name = taskTitle,
+                            deadlineTime = pickedDate,
+                            priority = pickedPriority
+                        )
+                    )
                 )
             }
 
-            is SingleTaskState.Error.Internal -> {
-                LaunchedEffect(Unit) {
-                    snackbarHostState.showSnackbar((state as SingleTaskState.Error.Internal).errorModel.title)
-                }
+            else -> {
+                intent(
+                    SingleTaskIntent.Edit(
+                        taskModel.copy(
+                            description = taskDescription,
+                            name = taskTitle,
+                            deadlineTime = pickedDate,
+                            priority = pickedPriority
+                        ),
+                        attachments = listOfImages
+                    )
+                )
             }
-
-            is SingleTaskState.Error.Server -> {
-                LaunchedEffect(Unit) {
-                    snackbarHostState.showSnackbar((state as SingleTaskState.Error.Server).errorModel.title)
-                }
-            }
-
-            is SingleTaskState.Error.Validation -> {}
         }
     }
-}
-
-@OptIn(ExperimentalFoundationApi::class)
-@Composable
-fun Store<*, SingleTaskIntent, *>.ImageList(
-    imageList: SnapshotStateList<ImageModel>,
-    isEditingMode: MutableState<Boolean>,
-) {
-    ImageLoader {
-        components {
-            add(ByteArrayFetcher.Factory())
+    @OptIn(ExperimentalFoundationApi::class)
+    @Composable
+    fun Store<*, SingleTaskIntent, *>.ImageList(
+        imageList: SnapshotStateList<ImageModel>,
+        isEditingMode: MutableState<Boolean>,
+    ) {
+        ImageLoader {
+            components {
+                add(ByteArrayFetcher.Factory())
+            }
         }
-    }
-
-    LazyRow(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
-        items(imageList) { model ->
-            Image(
-                modifier = Modifier.size(120.dp)
-                    .padding(horizontal = 8.dp)
-                    .combinedClickable(
-                        onLongClick = {
+        LazyRow(
+            modifier = Modifier.padding(
+                horizontal = LocalPaddingValues.current.medium,
+                vertical = LocalPaddingValues.current.small
+            )
+        ) {
+            items(imageList) { model ->
+                Image(
+                    modifier = Modifier.size(120.dp)
+                        .padding(horizontal = LocalPaddingValues.current.medium)
+                        .combinedClickable(onLongClick = {
                             if (isEditingMode.value) {
                                 intent(SingleTaskIntent.DeleteAttachment(model.id))
                             }
-                        },
-                        onClick = { }
+                        }, onClick = { }),
+                    painter = rememberImagePainter(
+                        ImageRequest(data = model.data)
                     ),
-                painter = rememberImagePainter(
-                    ImageRequest(data = model.data)
-                ),
-                contentDescription = "Image",
-                contentScale = ContentScale.FillBounds
-            )
+                    contentDescription = stringResource(OResources.Common.imageText()),
+                    contentScale = ContentScale.FillBounds
+                )
+            }
         }
     }
 }

@@ -1,12 +1,12 @@
 package features.tasks.single.di
 
-import features.tasks.single.SingleTaskContainer
+import features.tasks.single.mvi.SingleTaskContainer
 import org.koin.dsl.module
 import utils.validation.InputField
 import utils.validation.Validator
 
 fun singleTaskModule() = module {
-    single {
+    factory {
         SingleTaskContainer(
             errorMapper = get(),
             repository = get(),

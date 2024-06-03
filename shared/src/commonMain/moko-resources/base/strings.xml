@@ -42,6 +42,9 @@
     <string name="save">Save</string>
     <string name="exit">Exit</string>
     <string name="delete">Delete</string>
+    <string name="name">Name</string>
+    <string name="date">Date</string>
+    <string name="image">Image</string>
     <!--    notifications-->
     <string name="notifications_channel_name">Reminder</string>
     <string name="notifications_channel_description">Daily reminder to finish tasks</string>
@@ -57,7 +60,9 @@
 
     <!-- single task -->
     <string name="task_name_error">Title should contain 1-80 characters</string>
-    <string name="task_name_label">Name</string>
+    <string name="task_field_name">Enter task name</string>
+    <string name="task_field_description">Enter task description</string>
+    <string name="task_priority_label">Priority: %1s</string>
     <string name="task_description_error">Description should contain 1-500 characters</string>
     <string name="task_description_label">Description</string>
 </resources>

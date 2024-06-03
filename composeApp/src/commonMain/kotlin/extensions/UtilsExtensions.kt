@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import features.tasks.TaskPriority
 import features.tasks.mapToColor
-import features.tasks.single.ImageModel
+import features.tasks.single.mvi.ImageModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.datetime.LocalDateTime

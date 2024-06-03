@@ -6,7 +6,6 @@ import ru.kpfu.itis.shared.MR
 
 // TODO() to generate resources use `./gradlew generateMRcommonMain`
 object OResources {
-
     object Common {
         fun errorIcon() = MR.images.wifi_sign
         fun datePickerDialogTitle() = MR.strings.date_picker_dialog_title
@@ -14,6 +13,9 @@ object OResources {
         fun pickerDialogConfirmButton() = MR.strings.picker_dialog_confirm_button
         fun pickerDialogCancelButton() = MR.strings.picker_dialog_cancel_button
         fun deleteText() = MR.strings.delete
+        fun dateText() = MR.strings.date
+        fun nameText() = MR.strings.name
+        fun imageText() = MR.strings.image
     }
 
     object SignUp {
@@ -22,27 +24,21 @@ object OResources {
 
     object Login {
         fun title() = MR.strings.login_title
-
         fun emailLabel() = MR.strings.login_email_label
         fun emailError() = MR.strings.login_email_error
         fun password() = MR.strings.login_password_label
         fun passwordError() = MR.strings.login_password_error
-
         fun icon() = MR.images.woman_sitting_cross_legged_with_a_laptop
     }
 
     object Statistics {
         fun title() = MR.strings.statistics_title
         fun description() = MR.strings.statistics_description
-
         fun completedTasks() = MR.strings.statistics_completed_tasks
         fun completedOnTimeTasks() = MR.strings.statistics_completed_on_time_tasks
-
         fun remainingTasks() = MR.strings.statistics_remaining_tasks
-
         fun statisticsImage(): ImageResource = MR.images.statistics_man_with_prize
         fun statisticsImageContentDescription() = MR.strings.statistics_man_with_prize_image
-
         fun emptyStatisticsImage(): ImageResource = MR.images.statistics_team
         fun emptyStatisticsLabel(): StringResource = MR.strings.statistics_empty
         fun emptyStatisticsDescription() = MR.strings.statistics_empty_description
@@ -64,9 +60,11 @@ object OResources {
     }
 
     object SingleTask {
-        fun singleTaskNameError() = MR.strings.task_name_error
-        fun singleTaskNameLabel() = MR.strings.task_name_label
-        fun singleTaskDescriptionError() = MR.strings.task_description_error
-        fun singleTaskDescriptionLabel() = MR.strings.task_description_label
+        fun nameError() = MR.strings.task_name_error
+        fun nameLabel() = MR.strings.name
+        fun descriptionError() = MR.strings.task_description_error
+        fun fieldNameLabel() = MR.strings.task_field_name
+        fun fieldDescriptionLabel() = MR.strings.task_field_description
+        fun priorityLabel() = MR.strings.task_priority_label
     }
 }

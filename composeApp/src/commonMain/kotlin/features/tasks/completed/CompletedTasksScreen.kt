@@ -15,9 +15,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
-import base.BaseTab
+import base.BaseScreen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
+import cafe.adriel.voyager.navigator.bottomSheet.BottomSheetNavigator
+import cafe.adriel.voyager.navigator.bottomSheet.LocalBottomSheetNavigator
+import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
 import design_system.card.OTaskCard
 import design_system.screens.OErrorScreen
@@ -30,6 +33,7 @@ import features.tasks.DialogsOpener
 import features.tasks.completed.mvi.CompletedTasksAction
 import features.tasks.completed.mvi.CompletedTasksContainer
 import features.tasks.completed.mvi.CompletedTasksIntent
+import features.tasks.single.SingleTaskScreen
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.flow.Flow
@@ -37,13 +41,16 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import pro.respawn.flowmvi.api.Store
 import ru.kpfu.itis.features.task.domain.model.TaskModel
 
-object CompletedTasksTab :
-    BaseTab<OTrackerState<Flow<List<TaskModel>>>, CompletedTasksIntent, CompletedTasksAction>() {
+object CompletedTasksScreen :
+    BaseScreen<OTrackerState<Flow<List<TaskModel>>>, CompletedTasksIntent, CompletedTasksAction>(),
+    Tab {
 
     @Composable
     override fun Content() = withStore<CompletedTasksContainer> {
         val navigator = LocalNavigator.current
+        val bottomSheetNavigator = LocalBottomSheetNavigator.current
         val dialogsOpener = remember { mutableStateOf<DialogsOpener>(DialogsOpener.None) }
+
         Box(modifier = Modifier.fillMaxSize()) {
             currentState = { state ->
                 HandleState(state)
@@ -54,7 +61,8 @@ object CompletedTasksTab :
                     dialogsOpenerChangeAction = { dialog ->
                         dialogsOpener.value = dialog
                     },
-                    navigator = navigator
+                    navigator = navigator,
+                    bottomSheetNavigator = bottomSheetNavigator,
                 )
             }
             HandleDialogRequest(
@@ -69,11 +77,19 @@ object CompletedTasksTab :
     private fun Store<*, CompletedTasksIntent, *>.handleAction(
         action: CompletedTasksAction,
         dialogsOpenerChangeAction: (DialogsOpener) -> Unit,
-        navigator: Navigator?
+        navigator: Navigator?,
+        bottomSheetNavigator: BottomSheetNavigator,
     ) {
         when (action) {
             is CompletedTasksAction.OpenTaskBottomSheet -> {
-                dialogsOpenerChangeAction(DialogsOpener.TaskBottomSheet(action.taskId))
+                bottomSheetNavigator.show(
+                    SingleTaskScreen(
+                        taskId = action.taskId,
+                        closeAction = {
+                            bottomSheetNavigator.hide()
+                        }
+                    )
+                )
             }
 
             is CompletedTasksAction.ShowSnackbar -> {
@@ -111,7 +127,6 @@ object CompletedTasksTab :
                     }
                 )
             }
-
             is OTrackerState.Loading -> OLoadingScreen()
             is OTrackerState.Error ->
                 OErrorScreen(

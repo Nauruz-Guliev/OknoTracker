@@ -1,4 +1,4 @@
-package features.tasks.single
+package features.tasks.single.mvi
 
 import androidx.compose.runtime.Immutable
 import pro.respawn.flowmvi.api.MVIAction
@@ -8,8 +8,6 @@ sealed interface SingleTaskAction : MVIAction {
 
     data class ShowSnackbar(val message: String) : SingleTaskAction
     data object CloseBottomSheet : SingleTaskAction
-    data class AddSelectedImage(val image: ImageModel) : SingleTaskAction
-    data class DeleteAttachment(val id: Long) : SingleTaskAction
 }
 
 @Immutable
